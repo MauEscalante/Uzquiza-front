@@ -1,0 +1,93 @@
+.page {
+  display: grid;
+  gap: 18px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 20px;
+}
+
+.toolbar h2 {
+  margin: 0 0 4px;
+  font-size: 1.15rem;
+}
+
+.toolbar p,
+.feedback,
+.error,
+.emptyState {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.filters {
+  display: grid;
+  gap: 12px;
+  padding: 0 20px 20px;
+}
+
+.feedback {
+  color: var(--success);
+  font-weight: 600;
+}
+
+.error {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.actions button {
+  padding-inline: 0.85rem;
+}
+
+.form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.detailGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.detailGrid div {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  background: var(--surface-muted);
+}
+
+.detailGrid span {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.detailGrid strong {
+  font-size: 0.98rem;
+}
+
+@media (max-width: 720px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .form,
+  .detailGrid {
+    grid-template-columns: 1fr;
+  }
+}

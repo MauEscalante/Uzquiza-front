@@ -1,0 +1,29 @@
+.shell {
+  display: grid;
+  grid-template-columns: 288px minmax(0, 1fr);
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(21, 101, 192, 0.12), transparent 32%),
+    linear-gradient(180deg, #f6f9fd 0%, #eef3f8 100%);
+}
+
+.mainArea {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.content {
+  min-width: 0;
+  padding: 24px;
+}
+
+@media (max-width: 960px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+
+  .content {
+    padding: 18px;
+  }
+}

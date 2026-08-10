@@ -1,0 +1,75 @@
+.page {
+  display: grid;
+  gap: 18px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 20px;
+}
+
+.toolbar h2 {
+  margin: 0 0 4px;
+  font-size: 1.15rem;
+}
+
+.toolbar p,
+.feedback,
+.error,
+.emptyState {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.feedback {
+  color: var(--success);
+  font-weight: 600;
+}
+
+.error {
+  padding: 0 20px 20px;
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.actions button {
+  padding-inline: 0.85rem;
+}
+
+.historyList {
+  display: grid;
+  gap: 12px;
+}
+
+.historyList article {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  background: var(--surface-muted);
+}
+
+.historyList strong,
+.historyList p {
+  display: block;
+}
+
+.historyList p {
+  margin: 6px 0 0;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 720px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

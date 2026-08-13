@@ -1,4 +1,9 @@
-import { createId, mockRequest } from './api'
+import {
+  createPropiedadController,
+  deletePropiedadController,
+  listPropiedadesController,
+  updatePropiedadController,
+} from '../controllers/propiedadesController'
 import type { Propiedad, PropiedadFormValues } from '../types/propiedad'
 
 let propiedades: Propiedad[] = [
@@ -8,25 +13,30 @@ let propiedades: Propiedad[] = [
 ]
 
 export async function listPropiedades() {
-  return mockRequest(propiedades)
+  return listPropiedadesController()
 }
 
 export async function createPropiedad(values: PropiedadFormValues) {
   const created: Propiedad = {
-    id: createId('prop'),
+    id: `prop-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
     ...values,
   }
 
   propiedades = [created, ...propiedades]
-  return mockRequest(created)
+  return createPropiedadController(created)
 }
 
 export async function updatePropiedad(id: string, values: PropiedadFormValues) {
-  propiedades = propiedades.map((propiedad) => (propiedad.id === id ? { ...propiedad, ...values } : propiedad))
-  return mockRequest(propiedades.find((propiedad) => propiedad.id === id) ?? propiedades[0])
+  const updated: Propiedad = {
+    ...(propiedades.find((propiedad) => propiedad.id === id) ?? { id }),
+    ...values,
+  }
+
+  propiedades = propiedades.map((propiedad) => (propiedad.id === id ? updated : propiedad))
+  return updatePropiedadController(id, updated)
 }
 
 export async function deletePropiedad(id: string) {
   propiedades = propiedades.filter((propiedad) => propiedad.id !== id)
-  return mockRequest(true)
+  return deletePropiedadController(id)
 }

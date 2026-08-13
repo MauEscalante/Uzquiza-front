@@ -1,9 +1,14 @@
-import { createId, formatCurrency, mockRequest } from './api'
+import { formatCurrency } from './api'
+import {
+  aplicarAjusteController,
+  calcularAjusteController,
+  listAjustesController,
+} from '../controllers/ajustesController'
 import { getContratosSnapshot } from './contratosService'
 import type { Ajuste } from '../types/ajuste'
 
 let ajustes: Ajuste[] = getContratosSnapshot().map((contrato, index) => ({
-  id: createId('aj'),
+  id: `aj-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
   contrato: contrato.codigo,
   propiedad: contrato.propiedad,
   inquilino: contrato.inquilino,
@@ -20,7 +25,7 @@ let ajustes: Ajuste[] = getContratosSnapshot().map((contrato, index) => ({
 }))
 
 export async function listAjustes() {
-  return mockRequest(ajustes)
+  return listAjustesController(ajustes)
 }
 
 export async function calcularAjuste(id: string) {
@@ -42,7 +47,7 @@ export async function calcularAjuste(id: string) {
     }
   })
 
-  return mockRequest(ajustes.find((ajuste) => ajuste.id === id) ?? ajustes[0])
+  return calcularAjusteController(ajustes.find((ajuste) => ajuste.id === id) ?? ajustes[0])
 }
 
 export async function aplicarAjuste(id: string) {
@@ -59,5 +64,5 @@ export async function aplicarAjuste(id: string) {
     }
   })
 
-  return mockRequest(ajustes.find((ajuste) => ajuste.id === id) ?? ajustes[0])
+  return aplicarAjusteController(ajustes.find((ajuste) => ajuste.id === id) ?? ajustes[0])
 }

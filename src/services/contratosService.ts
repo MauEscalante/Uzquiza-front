@@ -1,4 +1,9 @@
-import { createId, mockRequest } from './api'
+import {
+  createContratoController,
+  deleteContratoController,
+  listContratosController,
+  updateContratoController,
+} from '../controllers/contratosController'
 import type { Contrato, ContratoFormValues } from '../types/contrato'
 
 let contratos: Contrato[] = [
@@ -29,27 +34,32 @@ let contratos: Contrato[] = [
 ]
 
 export async function listContratos() {
-  return mockRequest(contratos)
+  return listContratosController(contratos)
 }
 
 export async function createContrato(values: ContratoFormValues) {
   const created: Contrato = {
-    id: createId('con'),
+    id: `con-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
     ...values,
   }
 
   contratos = [created, ...contratos]
-  return mockRequest(created)
+  return createContratoController(created)
 }
 
 export async function updateContrato(id: string, values: ContratoFormValues) {
-  contratos = contratos.map((contrato) => (contrato.id === id ? { ...contrato, ...values } : contrato))
-  return mockRequest(contratos.find((contrato) => contrato.id === id) ?? contratos[0])
+  const updated: Contrato = {
+    ...(contratos.find((contrato) => contrato.id === id) ?? { id, codigo: '', propiedad: '', inquilino: '', fechaInicio: '', fechaFin: '', importeActual: 0, tipoAjuste: 'IPC', periodicidad: 'Mensual', estado: 'Activo' }),
+    ...values,
+  }
+
+  contratos = contratos.map((contrato) => (contrato.id === id ? updated : contrato))
+  return updateContratoController(updated)
 }
 
 export async function deleteContrato(id: string) {
   contratos = contratos.filter((contrato) => contrato.id !== id)
-  return mockRequest(true)
+  return deleteContratoController()
 }
 
 export function getContratosSnapshot() {

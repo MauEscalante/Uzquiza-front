@@ -1,4 +1,9 @@
-import { createId, mockRequest } from './api'
+import {
+  createClienteController,
+  deleteClienteController,
+  listClientesController,
+  updateClienteController,
+} from '../controllers/clientesController'
 import type { Cliente, ClienteFormValues } from '../types/cliente'
 
 let clientes: Cliente[] = [
@@ -8,26 +13,31 @@ let clientes: Cliente[] = [
 ]
 
 export async function listClientes() {
-  return mockRequest(clientes)
+  return listClientesController()
 }
 
 export async function createCliente(values: ClienteFormValues) {
   const created: Cliente = {
-    id: createId('cli'),
+    id: `cli-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
     numeroCliente: `CLI-${1000 + clientes.length + 1}`,
     ...values,
   }
 
   clientes = [created, ...clientes]
-  return mockRequest(created)
+  return createClienteController(created)
 }
 
 export async function updateCliente(id: string, values: ClienteFormValues) {
-  clientes = clientes.map((cliente) => (cliente.id === id ? { ...cliente, ...values } : cliente))
-  return mockRequest(clientes.find((cliente) => cliente.id === id) ?? clientes[0])
+  const updated: Cliente = {
+    ...(clientes.find((cliente) => cliente.id === id) ?? { id, numeroCliente: `CLI-${1000 + clientes.length + 1}` }),
+    ...values,
+  }
+
+  clientes = clientes.map((cliente) => (cliente.id === id ? updated : cliente))
+  return updateClienteController(id, updated)
 }
 
 export async function deleteCliente(id: string) {
   clientes = clientes.filter((cliente) => cliente.id !== id)
-  return mockRequest(true)
+  return deleteClienteController(id)
 }

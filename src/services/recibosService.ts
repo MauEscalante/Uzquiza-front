@@ -57,6 +57,22 @@ export async function generarRecibo(values: ReciboFormValues, recibosAjustar: Re
   return response.json()
 }
 
+//funcion para obtener el resumen
+export async function obtenerResumen() {
+  const response = await fetch(`http://127.0.0.1:8000/resumen/`, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(`Error al cargar resumen: ${response.status}`)
+  }
+
+  return response.json()
+}
+
 //funcion para listar el historial de ingresos por comisiones
 export async function listHistorialIngreso() {
   const response = await fetch('http://127.0.0.1:8000/libroDiario/', {

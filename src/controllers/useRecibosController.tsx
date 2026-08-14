@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { formatCurrency, formatPercent } from '../services/api'
-import { descargarExcelMock, generarRecibo, listHistorialIngreso, obtenerRecibosAjustar, obtenerRecibosReAjustar } from '../services/recibosService'
+import { descargarExcelMock, generarRecibo, listHistorialIngreso, obtenerRecibosAjustar, obtenerRecibosReAjustar, obtenerResumen } from '../services/recibosService'
 import type { Recibo, ReciboFormValues } from '../types/recibo'
 
 const monthNames = [
@@ -55,6 +55,10 @@ export function useRecibosController() {
 	const [error, setError] = useState('')
 	const [feedback, setFeedback] = useState('')
 	const [form, setForm] = useState<FormState>(emptyForm)
+	const [totalIngresos, setTotalIngresos] = useState(0);
+	const [cantidadRecibosActivos, setCantidadRecibosActivos] = useState(0);
+	const [aumentoPorcentual, setAumentoPorcentual] = useState(0);
+	const [aumentoMonetario, setAumentoMonetario] = useState(0);
 
 	useEffect(() => {
 		let mounted = true
@@ -76,23 +80,24 @@ export function useRecibosController() {
 			}
 		}
 
-		void loadRecibos()
+		const cargarResumen = async () => {
+			console.log('Cargando resumen...')
+			const resumen = await obtenerResumen();
+			setTotalIngresos(resumen.totalIngresos);
+			setCantidadRecibosActivos(resumen.cantidadRecibosActivos);
+			setAumentoPorcentual(resumen.aumentoPorcentual);
+			setAumentoMonetario(resumen.aumentoMonetario);
+		};
 
+		void loadRecibos()
+		void cargarResumen()
 		return () => {
 			mounted = false
 		}
 	}, [])
 
 	const sortedRecibos = useMemo(() => sortRecibosDescendente(recibos), [recibos])
-	const latestRecibo = sortedRecibos[0] ?? null
-	const previousRecibo = sortedRecibos[1] ?? null
 
-	const totalIngresos = useMemo(() => recibos.reduce((total, recibo) => total + recibo.total, 0), [recibos])
-	const cantidadRecibosActivos = recibos.length
-	const aumentoMonetario = latestRecibo && previousRecibo ? latestRecibo.total - previousRecibo.total : 0
-	const aumentoPorcentual = previousRecibo && previousRecibo.total > 0
-		? ((latestRecibo?.total ?? 0) - previousRecibo.total) / previousRecibo.total * 100
-		: 0
 
 	async function handleGenerate() {
 		setError('')

@@ -42,7 +42,7 @@ function Recibos() {
           </div>
 
           <div className={styles.actions}>
-            <Button onClick={() => void handleGenerate()}>Generar recibos</Button>
+            <Button onClick={() => void handleGenerate()}>Hacer recibos</Button>
             <Button variant="secondary" onClick={() => void handleDownloadExcel()}>Descargar Excel</Button>
           </div>
         </Card>
@@ -57,9 +57,9 @@ function Recibos() {
         </Card>
       </section>
 
-      <Card title="Historial de ingresos por comisiones" >
+      <Card title="Historial mensual de libro diario" >
         {loading ? <div className={styles.emptyState}>Cargando recibos...</div> : null}
-        {!loading && recibos.length === 0 ? <div className={styles.emptyState}>Todavía no hay historial de ingresos por comisiones.</div> : null}
+        {!loading && recibos.length === 0 ? <div className={styles.emptyState}>Todavía no hay historial.</div> : null}
         {!loading && recibos.length > 0 ? (
           <div className={styles.receiptList}>
             {recibos.map((recibo) => (

@@ -3,7 +3,7 @@ import { listAjustes } from '../services/ajustesService'
 import { listClientes } from '../services/clientesService'
 import { listContratos } from '../services/contratosService'
 import { listPropiedades } from '../services/propiedadesService'
-import { listRecibos } from '../services/recibosService'
+import { listHistorialIngreso } from '../services/recibosService'
 import type { Ajuste } from '../types/ajuste'
 import type { Cliente } from '../types/cliente'
 import type { Contrato } from '../types/contrato'
@@ -41,7 +41,7 @@ export function useDashboardController() {
           listPropiedades(),
           listContratos(),
           listAjustes(),
-          listRecibos(),
+          listHistorialIngreso(),
         ])
 
         if (!mounted) {

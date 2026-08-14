@@ -42,7 +42,7 @@ function Recibos() {
           </div>
 
           <div className={styles.actions}>
-            <Button onClick={() => void handleGenerate()}>Generar recibo</Button>
+            <Button onClick={() => void handleGenerate()}>Generar recibos</Button>
             <Button variant="secondary" onClick={() => void handleDownloadExcel()}>Descargar Excel</Button>
           </div>
         </Card>

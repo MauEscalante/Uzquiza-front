@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { formatCurrency, formatPercent } from '../services/api'
-import { descargarExcelMock, generarRecibo, listHistorialIngreso } from '../services/recibosService'
-import { getContratosSnapshot } from '../services/contratosService'
+import { descargarExcelMock, generarRecibo, listHistorialIngreso, obtenerRecibosAjustar, obtenerRecibosReAjustar } from '../services/recibosService'
 import type { Recibo, ReciboFormValues } from '../types/recibo'
 
 const monthNames = [
@@ -48,10 +47,7 @@ function sortRecibosDescendente(recibos: Recibo[]) {
 	})
 }
 
-function resolveContratoBase() {
-	const contratos = getContratosSnapshot()
-	return contratos.find((contrato) => contrato.estado === 'Activo') ?? contratos[0] ?? null
-}
+
 
 export function useRecibosController() {
 	const [recibos, setRecibos] = useState<Recibo[]>([])
@@ -106,19 +102,18 @@ export function useRecibosController() {
 			return
 		}
 
-		const contrato = resolveContratoBase()
-
-		if (!contrato) {
-			setError('No hay contratos disponibles para generar recibos.')
-			return
-		}
-
 		const payload: ReciboFormValues = {
 			mes: form.mes,
 			anio: form.anio,
 		}
 
-		const created = await generarRecibo(payload)
+		//obtengo que recibos tengo que hacer el ajuste inicial
+		const recibosAjustar = await obtenerRecibosAjustar(payload.mes, payload.anio)
+		//obtengo recibos q tienen re ajuste
+		const recibosReAjuste = await obtenerRecibosReAjustar(payload.mes, payload.anio)
+		//generate recibo
+		const created = await generarRecibo(payload, recibosAjustar, recibosReAjuste)
+
 
 	}
 

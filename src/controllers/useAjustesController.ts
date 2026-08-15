@@ -41,17 +41,27 @@ export function useAjustesController() {
 
   async function handleCalcular(ajuste: Ajuste) {
     const updated = await calcularAjuste(ajuste.id)
+    if (!updated) {
+      setError('No se pudo calcular el ajuste.')
+      return
+    }
+
     setAjustes((current) => current.map((entry) => (entry.id === ajuste.id ? updated : entry)))
     setFeedback('Ajuste calculado correctamente.')
   }
 
   async function handleAplicar(ajuste: Ajuste) {
-    const shouldApply = window.confirm(`¿Aplicar el ajuste del contrato ${ajuste.contrato}?`)
+    const shouldApply = window.confirm('¿Aplicar este ajuste?')
     if (!shouldApply) {
       return
     }
 
     const updated = await aplicarAjuste(ajuste.id)
+    if (!updated) {
+      setError('No se pudo aplicar el ajuste.')
+      return
+    }
+
     setAjustes((current) => current.map((entry) => (entry.id === ajuste.id ? updated : entry)))
     setFeedback('Ajuste aplicado correctamente.')
   }

@@ -1,10 +1,6 @@
 
 import type { Recibo, ReciboFormValues } from '../types/recibo'
 
-let recibos: Recibo[] = [
-  { id: '082026', mes: 'Julio', anio: '2026', total: 341000 },
-]
-
 //funcion para obtener los recibos a ajustar
 export async function obtenerRecibosAjustar(mes: string, anio: string) {
   const response = await fetch(`http://127.0.0.1:8000/recibos/ajustar/${mes}/${anio}`, {

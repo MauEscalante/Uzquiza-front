@@ -1,7 +1,6 @@
 import Button from '../components/Button'
 import Card from '../components/Card'
 import Modal from '../components/Modal'
-import StatusBadge from '../components/StatusBadge'
 import Table from '../components/Table'
 import { formatCurrency } from '../services/api'
 import { useAjustesController } from '../controllers/useAjustesController'
@@ -16,8 +15,6 @@ function Ajustes() {
     historyOpen,
     setHistoryOpen,
     selectedAjuste,
-    handleCalcular,
-    handleAplicar,
     openHistory,
   } = useAjustesController()
 
@@ -27,7 +24,7 @@ function Ajustes() {
         <div className={styles.toolbar}>
           <div>
             <h2>Ajustes</h2>
-            <p>Tabla prioritaria para seguimiento de próximos ajustes de alquiler.</p>
+            <p>Tabla de ajustes y re ajustes de alquileres</p>
           </div>
           {feedback ? <div className={styles.feedback}>{feedback}</div> : null}
         </div>
@@ -39,24 +36,19 @@ function Ajustes() {
       {!loading && visibleAjustes.length === 0 ? <Card><div className={styles.emptyState}>No hay ajustes para mostrar.</div></Card> : null}
 
       {!loading && visibleAjustes.length > 0 ? (
-        <Table headers={["Contrato", "Propiedad", "Inquilino", "Importe actual", "Tipo de ajuste", "Periodicidad", "Fecha del próximo ajuste", "Nuevo importe", "Estado", "Acciones"]}>
+        <Table headers={["Propiedad", "Inquilino", "Importe anterior", "Tipo de ajuste", "Periodicidad", "Nuevo importe", "Tipo", "Acciones"]}>
           {visibleAjustes.map((ajuste) => (
+
             <tr key={ajuste.id}>
-              <td><StatusBadge variant="info">{ajuste.contrato}</StatusBadge></td>
               <td>{ajuste.propiedad}</td>
               <td>{ajuste.inquilino}</td>
-              <td>{formatCurrency(ajuste.importeActual)}</td>
+              <td>{formatCurrency(ajuste.importeAnterior)}</td>
               <td>{ajuste.tipoAjuste}</td>
               <td>{ajuste.periodicidad}</td>
-              <td>{ajuste.fechaProximoAjuste}</td>
               <td>{formatCurrency(ajuste.nuevoImporte)}</td>
-              <td>
-                <StatusBadge variant={ajuste.estado === 'Ajuste realizado' ? 'success' : ajuste.estado === 'Ajuste pendiente' ? 'warning' : 'info'}>{ajuste.estado}</StatusBadge>
-              </td>
+              <td>{ajuste.actualizacion}</td>
               <td>
                 <div className={styles.actions}>
-                  <Button variant="secondary" onClick={() => void handleCalcular(ajuste)}>Calcular ajuste</Button>
-                  <Button variant="ghost" onClick={() => void handleAplicar(ajuste)}>Aplicar ajuste</Button>
                   <Button variant="danger" onClick={() => openHistory(ajuste)}>Ver historial</Button>
                 </div>
               </td>

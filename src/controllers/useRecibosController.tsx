@@ -117,9 +117,7 @@ export function useRecibosController() {
 		//obtengo recibos q tienen re ajuste
 		const recibosReAjuste = await obtenerRecibosReAjustar(payload.mes, payload.anio)
 		//generate recibo
-		const created = await generarRecibo(payload, recibosAjustar, recibosReAjuste)
-
-
+		await generarRecibo(payload, recibosAjustar, recibosReAjuste)
 	}
 
 	async function handleDownloadExcel() {

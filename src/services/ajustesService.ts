@@ -1,68 +1,59 @@
-import { formatCurrency } from './api'
-import {
-  aplicarAjusteController,
-  calcularAjusteController,
-  listAjustesController,
-} from '../controllers/ajustesController'
-import { getContratosSnapshot } from './contratosService'
 import type { Ajuste } from '../types/ajuste'
 
-let ajustes: Ajuste[] = getContratosSnapshot().map((contrato, index) => ({
-  id: `aj-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
-  contrato: contrato.codigo,
-  propiedad: contrato.propiedad,
-  inquilino: contrato.inquilino,
-  importeActual: contrato.importeActual,
-  tipoAjuste: contrato.tipoAjuste,
-  periodicidad: contrato.periodicidad,
-  fechaProximoAjuste: index === 0 ? '2026-09-01' : '2026-07-01',
-  nuevoImporte: index === 0 ? 336000 : 301500,
-  estado: index === 0 ? 'Ajuste próximo' : 'Ajuste pendiente',
-  historial: [
-    { fecha: '2026-03-01', detalle: 'Último cálculo registrado' },
-    { fecha: '2025-12-01', detalle: 'Ajuste aplicado correctamente' },
-  ],
-}))
+const mockAjustes: Ajuste[] = [
+  {
+    id: '1',
+    propiedad: 'Av. San Martín 1234',
+    inquilino: 'Ana Pérez',
+    importeAnterior: 320000,
+    tipoAjuste: 'IPC',
+    periodicidad: 'Trimestral',
+    fechaProximoAjuste: '2026-09-01',
+    nuevoImporte: 336000,
+    estado: 'Ajuste próximo',
+    actualizacion: 'Ajuste',
+    historial: [
+      { fecha: '2025-01-01', detalle: 'Ajuste inicial' },
+      { fecha: '2025-04-01', detalle: 'Subió 5%' },
+    ],
+  },
+  {
+    id: '2',
+    propiedad: 'Italia 789',
+    inquilino: 'Julián Gómez',
+    importeAnterior: 285000,
+    tipoAjuste: 'ICL',
+    periodicidad: 'Semestral',
+    fechaProximoAjuste: '2026-07-01',
+    nuevoImporte: 301500,
+    estado: 'Ajuste pendiente',
+    actualizacion: 'Re Ajuste',
+    historial: [
+      { fecha: '2024-07-01', detalle: 'Ajuste por inflación' },
+      { fecha: '2025-01-01', detalle: 'Reajuste anual' },
+    ],
+  },
+]
 
-export async function listAjustes() {
-  return listAjustesController(ajustes)
+export async function listAjustes(): Promise<Ajuste[]> {
+  return mockAjustes
 }
 
-export async function calcularAjuste(id: string) {
-  ajustes = ajustes.map((ajuste) => {
-    if (ajuste.id !== id) {
-      return ajuste
-    }
-
-    const nuevoImporte = Math.round(ajuste.importeActual * 1.08)
-
-    return {
-      ...ajuste,
-      nuevoImporte,
-      estado: 'Ajuste pendiente',
-      historial: [
-        { fecha: new Date().toISOString().slice(0, 10), detalle: `Nuevo importe calculado: ${formatCurrency(nuevoImporte)}` },
-        ...ajuste.historial,
-      ],
-    }
+export async function chequearHistorial(ajusteId: string): Promise<Ajuste | null> {
+  const response = await fetch(`http://127.0.0.1:8000/ajuste/historial/${ajusteId}/`, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+    },
   })
 
-  return calcularAjusteController(ajustes.find((ajuste) => ajuste.id === id) ?? ajustes[0])
+  if (!response.ok) {
+    throw new Error(`Error al cargar recibos a ajustar: ${response.status}`)
+  }
+
+  return response.json()
 }
 
-export async function aplicarAjuste(id: string) {
-  ajustes = ajustes.map((ajuste) => {
-    if (ajuste.id !== id) {
-      return ajuste
-    }
 
-    return {
-      ...ajuste,
-      importeActual: ajuste.nuevoImporte,
-      estado: 'Ajuste realizado',
-      historial: [{ fecha: new Date().toISOString().slice(0, 10), detalle: 'Ajuste aplicado con éxito' }, ...ajuste.historial],
-    }
-  })
 
-  return aplicarAjusteController(ajustes.find((ajuste) => ajuste.id === id) ?? ajustes[0])
-}
+

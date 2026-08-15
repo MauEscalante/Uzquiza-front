@@ -1,3 +1,5 @@
+export type AjusteTipo = 'Ajuste' | 'Re Ajuste'
+
 export type AjusteEstado = 'Ajuste próximo' | 'Ajuste pendiente' | 'Ajuste realizado'
 
 export interface AjusteHistorialItem {
@@ -7,14 +9,14 @@ export interface AjusteHistorialItem {
 
 export interface Ajuste {
   id: string
-  contrato: string
   propiedad: string
   inquilino: string
-  importeActual: number
+  importeAnterior: number
   tipoAjuste: string
   periodicidad: string
   fechaProximoAjuste: string
   nuevoImporte: number
   estado: AjusteEstado
+  actualizacion: AjusteTipo
   historial: AjusteHistorialItem[]
 }

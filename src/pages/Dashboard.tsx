@@ -38,7 +38,7 @@ function Dashboard() {
             {state.ajustes.slice(0, 3).map((ajuste) => (
               <article key={ajuste.id} className={styles.adjustmentItem}>
                 <div>
-                  <strong>{ajuste.contrato}</strong>
+                  <strong>{ajuste.inquilino}</strong>
                   <p>{ajuste.propiedad}</p>
                 </div>
                 <div>

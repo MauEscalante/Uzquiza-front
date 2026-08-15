@@ -39,20 +39,21 @@ export async function listAjustes(): Promise<Ajuste[]> {
   return mockAjustes
 }
 
-export async function calcularAjuste(id: string): Promise<Ajuste | null> {
-  const ajuste = mockAjustes.find((item) => item.id === id)
-  if (!ajuste) {
-    return null
+export async function chequearHistorial(ajusteId: string): Promise<Ajuste | null> {
+  const response = await fetch(`http://127.0.0.1:8000/ajuste/historial/${ajusteId}/`, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(`Error al cargar recibos a ajustar: ${response.status}`)
   }
 
-  return { ...ajuste, estado: 'Ajuste próximo' }
+  return response.json()
 }
 
-export async function aplicarAjuste(id: string): Promise<Ajuste | null> {
-  const ajuste = mockAjustes.find((item) => item.id === id)
-  if (!ajuste) {
-    return null
-  }
 
-  return { ...ajuste, estado: 'Ajuste realizado' }
-}
+
+

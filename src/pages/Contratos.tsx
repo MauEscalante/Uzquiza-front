@@ -5,8 +5,8 @@ import Modal from '../components/Modal'
 import Select from '../components/Select'
 import StatusBadge from '../components/StatusBadge'
 import Table from '../components/Table'
-import { estadoOptions, periodicidadOptions, tipoAjusteOptions, useContratosController } from '../controllers/useContratosController'
-import type { ContratoEstado } from '../types/contrato'
+import {  periodicidadOptions, tipoAjusteOptions, useContratosController } from '../controllers/useContratosController'
+
 import styles from './Contratos.module.css'
 
 function Contratos() {
@@ -98,10 +98,10 @@ function Contratos() {
           <Input label="Inquilino" value={form.inquilino} onChange={(event) => setForm((current) => ({ ...current, inquilino: event.target.value }))} />
           <Input label="Fecha de inicio" type="date" value={form.fechaInicio} onChange={(event) => setForm((current) => ({ ...current, fechaInicio: event.target.value }))} />
           <Input label="Fecha de finalización" type="date" value={form.fechaFin} onChange={(event) => setForm((current) => ({ ...current, fechaFin: event.target.value }))} />
-          <Input label="Importe actual" type="number" value={form.importeActual} onChange={(event) => setForm((current) => ({ ...current, importeActual: event.target.value }))} />
+          <Input label="Importe inicial" type="number" value={form.importeActual} onChange={(event) => setForm((current) => ({ ...current, importeActual: event.target.value }))} />
           <Select label="Tipo de ajuste" options={tipoAjusteOptions} value={form.tipoAjuste} onChange={(event) => setForm((current) => ({ ...current, tipoAjuste: event.target.value }))} />
           <Select label="Periodicidad" options={periodicidadOptions} value={form.periodicidad} onChange={(event) => setForm((current) => ({ ...current, periodicidad: event.target.value }))} />
-          <Select label="Estado" options={estadoOptions} value={form.estado} onChange={(event) => setForm((current) => ({ ...current, estado: event.target.value as ContratoEstado }))} />
+          
           {formError ? <div className={styles.error}>{formError}</div> : null}
         </form>
       </Modal>

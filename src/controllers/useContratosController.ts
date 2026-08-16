@@ -28,9 +28,8 @@ export const tipoAjusteOptions = [
 ]
 
 export const periodicidadOptions = [
-  { label: 'Mensual', value: 'Mensual' },
-  { label: 'Bimestral', value: 'Bimestral' },
   { label: 'Trimestral', value: 'Trimestral' },
+  { label: 'Cuatrimestral', value: 'Cuatrimestral' },
   { label: 'Semestral', value: 'Semestral' },
 ]
 
@@ -42,7 +41,7 @@ const emptyForm: FormState = {
   fechaFin: '',
   importeActual: '',
   tipoAjuste: 'IPC',
-  periodicidad: 'Mensual',
+  periodicidad: 'Cuatrimestral',
   estado: 'Activo',
 }
 

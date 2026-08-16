@@ -1,15 +1,8 @@
-import {
-  createContratoController,
-  deleteContratoController,
-  listContratosController,
-  updateContratoController,
-} from '../controllers/contratosController'
 import type { Contrato, ContratoFormValues } from '../types/contrato'
 
 let contratos: Contrato[] = [
   {
     id: 'con-001',
-    codigo: 'CTR-2401',
     propiedad: 'Av. San Martín 1234',
     inquilino: 'Ana Pérez',
     fechaInicio: '2024-01-01',
@@ -21,7 +14,6 @@ let contratos: Contrato[] = [
   },
   {
     id: 'con-002',
-    codigo: 'CTR-2402',
     propiedad: 'Italia 789',
     inquilino: 'Julián Gómez',
     fechaInicio: '2023-09-15',
@@ -34,32 +26,67 @@ let contratos: Contrato[] = [
 ]
 
 export async function listContratos() {
-  return listContratosController(contratos)
+  const response = await fetch(`http://127.0.0.1:8000/contratos/`, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(`Error al cargar contratos: ${response.status}`)
+  }
+
+  return response.json()
+}
+
+export async function getContratoDetails(id: string) {
+  const response = await fetch(`http://127.0.0.1:8000/contratos/${id}/`, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(`Error al cargar resumen: ${response.status}`)
+  }
+
+  return response.json()
 }
 
 export async function createContrato(values: ContratoFormValues) {
-  const created: Contrato = {
-    id: `con-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
-    ...values,
+  const response = await fetch(`http://127.0.0.1:8000/contratos/`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(values),
+  })
+
+  if (!response.ok) {
+    throw new Error(`Error al cargar contrato: ${response.status}`)
   }
 
-  contratos = [created, ...contratos]
-  return createContratoController(created)
+  return response.json()
 }
 
-export async function updateContrato(id: string, values: ContratoFormValues) {
-  const updated: Contrato = {
-    ...(contratos.find((contrato) => contrato.id === id) ?? { id, codigo: '', propiedad: '', inquilino: '', fechaInicio: '', fechaFin: '', importeActual: 0, tipoAjuste: 'IPC', periodicidad: 'Mensual', estado: 'Activo' }),
-    ...values,
-  }
 
-  contratos = contratos.map((contrato) => (contrato.id === id ? updated : contrato))
-  return updateContratoController(updated)
-}
 
 export async function deleteContrato(id: string) {
-  contratos = contratos.filter((contrato) => contrato.id !== id)
-  return deleteContratoController()
+  const response = await fetch(`http://127.0.0.1:8000/resumen/${id}`, {
+    method: 'DELETE',
+    headers: {
+      Accept: 'application/json',
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(`Error al eliminar contrato: ${response.status}`)
+  }
+
+  return response.json()
 }
 
 export function getContratosSnapshot() {

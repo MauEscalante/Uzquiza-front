@@ -33,7 +33,8 @@ function Dashboard() {
           </ul>
         </Card>
 
-        <Card title="Próximos ajustes de alquiler" subtitle="Contratos con revisión en el corto plazo">
+        //aca van los contratos que se vencen/////////////////////////////////////////////////
+        <Card title="Próximos contratos a vencer" subtitle="Contratos que vencen en el corto plazo">
           <div className={styles.adjustmentList}>
             {state.ajustes.slice(0, 3).map((ajuste) => (
               <article key={ajuste.id} className={styles.adjustmentItem}>

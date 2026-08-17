@@ -5,8 +5,8 @@ import Modal from '../components/Modal'
 import Select from '../components/Select'
 import StatusBadge from '../components/StatusBadge'
 import Table from '../components/Table'
-import { estadoOptions, periodicidadOptions, tipoAjusteOptions, useContratosController } from '../controllers/useContratosController'
-import type { ContratoEstado } from '../types/contrato'
+import {  periodicidadOptions, tipoAjusteOptions, useContratosController } from '../controllers/useContratosController'
+
 import styles from './Contratos.module.css'
 
 function Contratos() {
@@ -27,7 +27,6 @@ function Contratos() {
     feedback,
     filteredContratos,
     openCreateModal,
-    openEditModal,
     openDetail,
     handleSubmit,
     handleDelete,
@@ -57,14 +56,14 @@ function Contratos() {
       {!loading && filteredContratos.length === 0 ? <Card><div className={styles.emptyState}>No hay contratos para mostrar.</div></Card> : null}
 
       {!loading && filteredContratos.length > 0 ? (
-        <Table headers={["Código", "Propiedad", "Inquilino", "Inicio", "Fin", "Importe actual", "Tipo de ajuste", "Periodicidad", "Estado", "Acciones"]}>
+        <Table headers={[ "Propiedad", "Inquilino", "Inicio", "Fin", "Importe inicial", "Deposito", "Tipo de ajuste", "Periodicidad", "Estado", "Acciones"]}>
           {filteredContratos.map((contrato) => (
             <tr key={contrato.id}>
-              <td><StatusBadge variant="info">{contrato.codigo}</StatusBadge></td>
               <td>{contrato.propiedad}</td>
               <td>{contrato.inquilino}</td>
               <td>{contrato.fechaInicio}</td>
               <td>{contrato.fechaFin}</td>
+              <td>{formatCurrency(contrato.importeActual)}</td>
               <td>{formatCurrency(contrato.importeActual)}</td>
               <td>{contrato.tipoAjuste}</td>
               <td>{contrato.periodicidad}</td>
@@ -74,7 +73,6 @@ function Contratos() {
               <td>
                 <div className={styles.actions}>
                   <Button variant="ghost" onClick={() => openDetail(contrato)}>Ver detalles</Button>
-                  <Button variant="secondary" onClick={() => openEditModal(contrato)}>Editar</Button>
                   <Button variant="danger" onClick={() => void handleDelete(contrato)}>Eliminar</Button>
                 </div>
               </td>
@@ -95,15 +93,15 @@ function Contratos() {
         )}
       >
         <form id="contrato-form" className={styles.form} onSubmit={(event) => void handleSubmit(event)}>
-          <Input label="Código de contrato" value={form.codigo} onChange={(event) => setForm((current) => ({ ...current, codigo: event.target.value }))} />
+      
           <Input label="Propiedad" value={form.propiedad} onChange={(event) => setForm((current) => ({ ...current, propiedad: event.target.value }))} />
           <Input label="Inquilino" value={form.inquilino} onChange={(event) => setForm((current) => ({ ...current, inquilino: event.target.value }))} />
           <Input label="Fecha de inicio" type="date" value={form.fechaInicio} onChange={(event) => setForm((current) => ({ ...current, fechaInicio: event.target.value }))} />
           <Input label="Fecha de finalización" type="date" value={form.fechaFin} onChange={(event) => setForm((current) => ({ ...current, fechaFin: event.target.value }))} />
-          <Input label="Importe actual" type="number" value={form.importeActual} onChange={(event) => setForm((current) => ({ ...current, importeActual: event.target.value }))} />
+          <Input label="Importe inicial" type="number" value={form.importeActual} onChange={(event) => setForm((current) => ({ ...current, importeActual: event.target.value }))} />
           <Select label="Tipo de ajuste" options={tipoAjusteOptions} value={form.tipoAjuste} onChange={(event) => setForm((current) => ({ ...current, tipoAjuste: event.target.value }))} />
           <Select label="Periodicidad" options={periodicidadOptions} value={form.periodicidad} onChange={(event) => setForm((current) => ({ ...current, periodicidad: event.target.value }))} />
-          <Select label="Estado" options={estadoOptions} value={form.estado} onChange={(event) => setForm((current) => ({ ...current, estado: event.target.value as ContratoEstado }))} />
+          
           {formError ? <div className={styles.error}>{formError}</div> : null}
         </form>
       </Modal>
@@ -111,7 +109,6 @@ function Contratos() {
       <Modal open={detailOpen} title="Detalle de contrato" onClose={() => setDetailOpen(false)} footer={<Button variant="ghost" onClick={() => setDetailOpen(false)}>Cerrar</Button>}>
         {selectedContrato ? (
           <div className={styles.detailGrid}>
-            <div><span>Código</span><strong>{selectedContrato.codigo}</strong></div>
             <div><span>Propiedad</span><strong>{selectedContrato.propiedad}</strong></div>
             <div><span>Inquilino</span><strong>{selectedContrato.inquilino}</strong></div>
             <div><span>Inicio</span><strong>{selectedContrato.fechaInicio}</strong></div>

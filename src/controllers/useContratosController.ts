@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { formatCurrency } from '../services/api'
-import { createContrato, deleteContrato, listContratos, updateContrato } from '../services/contratosService'
+import { createContrato, deleteContrato, listContratos } from '../services/contratosService'
 import type { Contrato, ContratoEstado, ContratoFormValues } from '../types/contrato'
 
 interface FormState {
@@ -28,9 +28,8 @@ export const tipoAjusteOptions = [
 ]
 
 export const periodicidadOptions = [
-  { label: 'Mensual', value: 'Mensual' },
-  { label: 'Bimestral', value: 'Bimestral' },
   { label: 'Trimestral', value: 'Trimestral' },
+  { label: 'Cuatrimestral', value: 'Cuatrimestral' },
   { label: 'Semestral', value: 'Semestral' },
 ]
 
@@ -42,7 +41,7 @@ const emptyForm: FormState = {
   fechaFin: '',
   importeActual: '',
   tipoAjuste: 'IPC',
-  periodicidad: 'Mensual',
+  periodicidad: 'Cuatrimestral',
   estado: 'Activo',
 }
 
@@ -93,7 +92,7 @@ export function useContratosController() {
       return contratos
     }
 
-    return contratos.filter((contrato) => [contrato.codigo, contrato.propiedad, contrato.inquilino, contrato.estado, contrato.tipoAjuste, contrato.periodicidad]
+    return contratos.filter((contrato) => [contrato.id, contrato.propiedad, contrato.inquilino, contrato.estado, contrato.tipoAjuste, contrato.periodicidad]
       .some((value) => value.toLowerCase().includes(normalizedSearch)))
   }, [contratos, search])
 
@@ -104,22 +103,6 @@ export function useContratosController() {
     setModalOpen(true)
   }
 
-  function openEditModal(contrato: Contrato) {
-    setEditingContrato(contrato)
-    setForm({
-      codigo: contrato.codigo,
-      propiedad: contrato.propiedad,
-      inquilino: contrato.inquilino,
-      fechaInicio: contrato.fechaInicio,
-      fechaFin: contrato.fechaFin,
-      importeActual: String(contrato.importeActual),
-      tipoAjuste: contrato.tipoAjuste,
-      periodicidad: contrato.periodicidad,
-      estado: contrato.estado,
-    })
-    setFormError('')
-    setModalOpen(true)
-  }
 
   function openDetail(contrato: Contrato) {
     setSelectedContrato(contrato)
@@ -144,15 +127,7 @@ export function useContratosController() {
       return
     }
 
-    const saved = editingContrato ? await updateContrato(editingContrato.id, payload) : await createContrato(payload)
-
-    if (editingContrato) {
-      setContratos((current) => current.map((contrato) => (contrato.id === editingContrato.id ? saved : contrato)))
-      setFeedback('Contrato actualizado correctamente.')
-    } else {
-      setContratos((current) => [saved, ...current])
-      setFeedback('Contrato creado correctamente.')
-    }
+    await createContrato(payload)
 
     setModalOpen(false)
     setEditingContrato(null)
@@ -160,7 +135,7 @@ export function useContratosController() {
   }
 
   async function handleDelete(contrato: Contrato) {
-    const shouldDelete = window.confirm(`¿Eliminar el contrato ${contrato.codigo}?`)
+    const shouldDelete = window.confirm(`¿Eliminar el contrato ${contrato.id}?`)
     if (!shouldDelete) {
       return
     }
@@ -187,7 +162,6 @@ export function useContratosController() {
     feedback,
     filteredContratos,
     openCreateModal,
-    openEditModal,
     openDetail,
     handleSubmit,
     handleDelete,

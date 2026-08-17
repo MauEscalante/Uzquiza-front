@@ -2,7 +2,6 @@ export type ContratoEstado = 'Activo' | 'Próximo a vencer' | 'Finalizado'
 
 export interface Contrato {
   id: string
-  codigo: string
   propiedad: string
   inquilino: string
   fechaInicio: string

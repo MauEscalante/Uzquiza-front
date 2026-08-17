@@ -15,23 +15,7 @@ interface FormState {
   estado: ContratoEstado
 }
 
-export const estadoOptions = [
-  { label: 'Activo', value: 'Activo' },
-  { label: 'Próximo a vencer', value: 'Próximo a vencer' },
-  { label: 'Finalizado', value: 'Finalizado' },
-]
 
-export const tipoAjusteOptions = [
-  { label: 'IPC', value: 'IPC' },
-  { label: 'ICL', value: 'ICL' },
-  { label: 'Fijo', value: 'Fijo' },
-]
-
-export const periodicidadOptions = [
-  { label: 'Trimestral', value: 'Trimestral' },
-  { label: 'Cuatrimestral', value: 'Cuatrimestral' },
-  { label: 'Semestral', value: 'Semestral' },
-]
 
 const emptyForm: FormState = {
   codigo: '',

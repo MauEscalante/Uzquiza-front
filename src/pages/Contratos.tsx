@@ -2,10 +2,10 @@ import Button from '../components/Button'
 import Card from '../components/Card'
 import Input from '../components/Input'
 import Modal from '../components/Modal'
-import Select from '../components/Select'
 import StatusBadge from '../components/StatusBadge'
 import Table from '../components/Table'
-import {  periodicidadOptions, tipoAjusteOptions, useContratosController } from '../controllers/useContratosController'
+import ContratoForm from '../components/ContratoForm.tsx'
+import { useContratosController } from '../controllers/useContratosController'
 
 import styles from './Contratos.module.css'
 
@@ -21,14 +21,14 @@ function Contratos() {
     setDetailOpen,
     selectedContrato,
     editingContrato,
+    feedback,
     form,
     setForm,
     formError,
-    feedback,
+    handleSubmit,
     filteredContratos,
     openCreateModal,
     openDetail,
-    handleSubmit,
     handleDelete,
     formatCurrency,
   } = useContratosController()
@@ -56,7 +56,7 @@ function Contratos() {
       {!loading && filteredContratos.length === 0 ? <Card><div className={styles.emptyState}>No hay contratos para mostrar.</div></Card> : null}
 
       {!loading && filteredContratos.length > 0 ? (
-        <Table headers={[ "Propiedad", "Inquilino", "Inicio", "Fin", "Importe inicial", "Deposito", "Tipo de ajuste", "Periodicidad", "Estado", "Acciones"]}>
+        <Table headers={["Propiedad", "Inquilino", "Inicio", "Fin", "Importe inicial", "Deposito", "Tipo de ajuste", "Periodicidad", "Estado", "Acciones"]}>
           {filteredContratos.map((contrato) => (
             <tr key={contrato.id}>
               <td>{contrato.propiedad}</td>
@@ -92,18 +92,12 @@ function Contratos() {
           </>
         )}
       >
-        <form id="contrato-form" className={styles.form} onSubmit={(event) => void handleSubmit(event)}>
-      
-          <Input label="Propiedad" value={form.propiedad} onChange={(event) => setForm((current) => ({ ...current, propiedad: event.target.value }))} />
-          <Input label="Inquilino" value={form.inquilino} onChange={(event) => setForm((current) => ({ ...current, inquilino: event.target.value }))} />
-          <Input label="Fecha de inicio" type="date" value={form.fechaInicio} onChange={(event) => setForm((current) => ({ ...current, fechaInicio: event.target.value }))} />
-          <Input label="Fecha de finalización" type="date" value={form.fechaFin} onChange={(event) => setForm((current) => ({ ...current, fechaFin: event.target.value }))} />
-          <Input label="Importe inicial" type="number" value={form.importeActual} onChange={(event) => setForm((current) => ({ ...current, importeActual: event.target.value }))} />
-          <Select label="Tipo de ajuste" options={tipoAjusteOptions} value={form.tipoAjuste} onChange={(event) => setForm((current) => ({ ...current, tipoAjuste: event.target.value }))} />
-          <Select label="Periodicidad" options={periodicidadOptions} value={form.periodicidad} onChange={(event) => setForm((current) => ({ ...current, periodicidad: event.target.value }))} />
-          
-          {formError ? <div className={styles.error}>{formError}</div> : null}
-        </form>
+        <ContratoForm 
+          form={form}
+          setForm={setForm}
+          formError={formError}
+          onSubmit={(event) => handleSubmit(event as React.FormEvent<HTMLFormElement>)}
+        />
       </Modal>
 
       <Modal open={detailOpen} title="Detalle de contrato" onClose={() => setDetailOpen(false)} footer={<Button variant="ghost" onClick={() => setDetailOpen(false)}>Cerrar</Button>}>

@@ -6,7 +6,7 @@ export function useAjustesController() {
   const [ajustes, setAjustes] = useState<Ajuste[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [feedback, setFeedback] = useState('')
+  const [feedback] = useState('')
   const [historyOpen, setHistoryOpen] = useState(false)
   const [selectedAjuste, setSelectedAjuste] = useState<Ajuste | null>(null)
 

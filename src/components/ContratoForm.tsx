@@ -150,6 +150,12 @@ export default function ContratoForm({ form, setForm, formError, onSubmit }: Con
                         onChange={handleFieldChange('dniGarante')}
                     />
                     <Input
+                        label="Telefono del garante"
+                        placeholder="Ej: 1155253547"
+                        value={form.telefonoGarante}
+                        onChange={handleFieldChange('telefonoGarante')}
+                    />
+                    <Input
                         label="Dirección de la propiedad en garantía"
                         placeholder="Ej: Av. Siempre Viva 742"
                         value={form.direccionGarantia}

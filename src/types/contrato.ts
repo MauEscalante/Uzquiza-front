@@ -1,14 +1,15 @@
-export type ContratoEstado = 'Activo' | 'Próximo a vencer' | 'Finalizado'
+export type ContratoEstado = 'Activo' | 'Inactivo'
+export type TipoAjuste = 'IPC' | 'ICL'
 
 export interface Contrato {
-  id: string
+  contrato_id: string
   propiedad: string
-  inquilino: string
-  fechaInicio: string
+  fecha_inicio: string
+  fecha_fin: string
   fechaFin: string
-  importeActual: number
-  tipoAjuste: string
-  periodicidad: string
+  importe_inicial: number
+  tipo_ajuste: TipoAjuste
+  periodicidad: number
   estado: ContratoEstado
 }
 

@@ -38,51 +38,51 @@ export default function ContratoForm({ form, setForm, formError, onSubmit }: Con
     }
     return (
         <form id="contrato-form" className={styles.form} onSubmit={onSubmit}>
-            <Input 
-                label="Propiedad" 
-                value={form.propiedad} 
-                onChange={handleFieldChange('propiedad')} 
+            <Input
+                label="Propiedad"
+                value={form.propiedad}
+                onChange={handleFieldChange('propiedad')}
             />
-            <Input 
-                label="Inquilino" 
-                value={form.inquilino} 
-                onChange={handleFieldChange('inquilino')} 
+            <Input
+                label="Inquilino"
+                value={form.inquilino}
+                onChange={handleFieldChange('inquilino')}
             />
-            <Input 
-                label="Fecha de inicio" 
-                type="date" 
-                value={form.fechaInicio} 
-                onChange={handleFieldChange('fechaInicio')} 
+            <Input
+                label="Fecha de inicio"
+                type="date"
+                value={form.fechaInicio}
+                onChange={handleFieldChange('fechaInicio')}
             />
-            <Input 
-                label="Fecha de finalización" 
-                type="date" 
-                value={form.fechaFin} 
-                onChange={handleFieldChange('fechaFin')} 
+            <Input
+                label="Fecha de finalización"
+                type="date"
+                value={form.fechaFin}
+                onChange={handleFieldChange('fechaFin')}
             />
-            <Input 
-                label="Importe inicial" 
-                type="number" 
-                value={form.importeActual} 
-                onChange={handleFieldChange('importeActual')} 
+            <Input
+                label="Importe inicial"
+                type="number"
+                value={form.importeActual}
+                onChange={handleFieldChange('importeActual')}
             />
-            <Select 
-                label="Tipo de ajuste" 
-                options={tipoAjusteOptions} 
-                value={form.tipoAjuste} 
-                onChange={handleFieldChange('tipoAjuste')} 
+            <Select
+                label="Tipo de ajuste"
+                options={tipoAjusteOptions}
+                value={form.tipoAjuste}
+                onChange={handleFieldChange('tipoAjuste')}
             />
-            <Select 
-                label="Periodicidad" 
-                options={periodicidadOptions} 
-                value={form.periodicidad} 
-                onChange={handleFieldChange('periodicidad')} 
+            <Select
+                label="Periodicidad"
+                options={periodicidadOptions}
+                value={form.periodicidad}
+                onChange={handleFieldChange('periodicidad')}
             />
-            <Select 
-                label="Garantia" 
-                options={tipoGarantias} 
-                value={form.garantia} 
-                onChange={handleFieldChange('garantia')} 
+            <Select
+                label="Garantia"
+                options={tipoGarantias}
+                value={form.garantia}
+                onChange={handleFieldChange('garantia')}
             />
             {/* OPCIONES SEGÚN GARANTÍA */}
             {form.garantia === "Garantia Propietaria" && (
@@ -120,7 +120,11 @@ export default function ContratoForm({ form, setForm, formError, onSubmit }: Con
             )}
 
             {form.garantia === "Garantes" && (
-                <GarantesForm form={form} handleFieldChange={handleFieldChange}/>
+                <>
+                    <h4 >Garante 1</h4>
+                    <GarantesForm form={form} handleFieldChange={handleFieldChange} />
+                </>
+
             )}
             {formError ? (
                 <div className={styles.error}>{formError}</div>

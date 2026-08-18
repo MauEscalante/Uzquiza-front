@@ -2,7 +2,6 @@ import Button from '../components/Button'
 import Card from '../components/Card'
 import Input from '../components/Input'
 import Modal from '../components/Modal'
-import StatusBadge from '../components/StatusBadge'
 import Table from '../components/Table'
 import ContratoForm from '../components/ContratoForm.tsx'
 import { useContratosController } from '../controllers/useContratosController'
@@ -32,7 +31,7 @@ function Contratos() {
     handleDelete,
     formatCurrency,
   } = useContratosController()
-
+  
   return (
     <div className={styles.page}>
       <Card>
@@ -56,20 +55,19 @@ function Contratos() {
       {!loading && filteredContratos.length === 0 ? <Card><div className={styles.emptyState}>No hay contratos para mostrar.</div></Card> : null}
 
       {!loading && filteredContratos.length > 0 ? (
-        <Table headers={["Propiedad", "Inquilino", "Inicio", "Fin", "Importe inicial", "Deposito", "Tipo de ajuste", "Periodicidad", "Estado", "Acciones"]}>
+        <Table headers={["Propiedad", "Inicio", "Fin", "Importe inicial", "Deposito", "Tipo de ajuste", "Periodicidad", "Estado", "Acciones"]}>
+          
           {filteredContratos.map((contrato) => (
-            <tr key={contrato.id}>
+            <tr key={contrato.contrato_id}>
               <td>{contrato.propiedad}</td>
-              <td>{contrato.inquilino}</td>
-              <td>{contrato.fechaInicio}</td>
-              <td>{contrato.fechaFin}</td>
-              <td>{formatCurrency(contrato.importeActual)}</td>
-              <td>{formatCurrency(contrato.importeActual)}</td>
-              <td>{contrato.tipoAjuste}</td>
+              <td>{contrato.fecha_inicio}</td>
+              <td>{contrato.fecha_fin}</td>
+              <td>{formatCurrency(contrato.importe_inicial)}</td>
+              <td>{formatCurrency(contrato.importe_inicial)}</td>
+              
+              <td>{contrato.tipo_ajuste}</td>
               <td>{contrato.periodicidad}</td>
-              <td>
-                <StatusBadge variant={contrato.estado === 'Activo' ? 'success' : contrato.estado === 'Próximo a vencer' ? 'warning' : 'neutral'}>{contrato.estado}</StatusBadge>
-              </td>
+              <td>{contrato.estado}</td>
               <td>
                 <div className={styles.actions}>
                   <Button variant="ghost" onClick={() => openDetail(contrato)}>Ver detalles</Button>
@@ -80,7 +78,7 @@ function Contratos() {
           ))}
         </Table>
       ) : null}
-
+      
       <Modal
         open={modalOpen}
         title={editingContrato ? 'Editar contrato' : 'Crear contrato'}
@@ -104,11 +102,10 @@ function Contratos() {
         {selectedContrato ? (
           <div className={styles.detailGrid}>
             <div><span>Propiedad</span><strong>{selectedContrato.propiedad}</strong></div>
-            <div><span>Inquilino</span><strong>{selectedContrato.inquilino}</strong></div>
-            <div><span>Inicio</span><strong>{selectedContrato.fechaInicio}</strong></div>
-            <div><span>Fin</span><strong>{selectedContrato.fechaFin}</strong></div>
-            <div><span>Importe actual</span><strong>{formatCurrency(selectedContrato.importeActual)}</strong></div>
-            <div><span>Tipo de ajuste</span><strong>{selectedContrato.tipoAjuste}</strong></div>
+            <div><span>Inicio</span><strong>{selectedContrato.fecha_inicio}</strong></div>
+            <div><span>Fin</span><strong>{selectedContrato.fecha_fin}</strong></div>
+            <div><span>Importe actual</span><strong>{formatCurrency(selectedContrato.importe_inicial)}</strong></div>
+            <div><span>Tipo de ajuste</span><strong>{selectedContrato.tipo_ajuste}</strong></div>
             <div><span>Periodicidad</span><strong>{selectedContrato.periodicidad}</strong></div>
           </div>
         ) : null}

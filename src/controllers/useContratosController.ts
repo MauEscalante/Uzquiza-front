@@ -50,6 +50,7 @@ export function useContratosController() {
         const data = await listContratos()
         if (mounted) {
           setContratos(data)
+          
         }
       } catch {
         if (mounted) {
@@ -76,8 +77,8 @@ export function useContratosController() {
       return contratos
     }
 
-    return contratos.filter((contrato) => [contrato.id, contrato.propiedad, contrato.inquilino, contrato.estado, contrato.tipoAjuste, contrato.periodicidad]
-      .some((value) => value.toLowerCase().includes(normalizedSearch)))
+    return contratos.filter((contrato) => [contrato.contrato_id, contrato.propiedad, contrato.estado, contrato.tipo_ajuste, contrato.periodicidad]
+      .some((value) => value.toString().toLowerCase().includes(normalizedSearch)))
   }, [contratos, search])
 
   function openCreateModal() {
@@ -103,10 +104,15 @@ export function useContratosController() {
 
     const payload: ContratoFormValues = {
       ...form,
-      importeActual: Number(form.importeActual),
+      importe_inicial: Number(form.importeActual),
+      contrato_id: '',
+      fecha_inicio: '',
+      fecha_fin: '',
+      periodicidad: 0,
+      tipo_ajuste: 'IPC',
     }
 
-    if (Number.isNaN(payload.importeActual) || payload.importeActual <= 0) {
+    if (Number.isNaN(payload.importe_inicial) || payload.importe_inicial <= 0) {
       setFormError('El importe actual debe ser un valor numérico válido.')
       return
     }
@@ -119,13 +125,13 @@ export function useContratosController() {
   }
 
   async function handleDelete(contrato: Contrato) {
-    const shouldDelete = window.confirm(`¿Eliminar el contrato ${contrato.id}?`)
+    const shouldDelete = window.confirm(`¿Eliminar el contrato ${contrato.contrato_id}?`)
     if (!shouldDelete) {
       return
     }
 
-    await deleteContrato(contrato.id)
-    setContratos((current) => current.filter((entry) => entry.id !== contrato.id))
+    await deleteContrato(contrato.contrato_id)
+    setContratos((current) => current.filter((entry) => entry.contrato_id !== contrato.contrato_id))
     setFeedback('Contrato eliminado.')
   }
 
@@ -145,6 +151,7 @@ export function useContratosController() {
     formError,
     feedback,
     filteredContratos,
+    contratos,
     openCreateModal,
     openDetail,
     handleSubmit,

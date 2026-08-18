@@ -56,6 +56,31 @@
   gap: 14px;
 }
 
+.sectionDivider {
+  grid-column: 1 / -1;
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+  margin-top: 0.25rem;
+}
+
+.sectionTitle {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.sectionHeader {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.addButtonRow {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
+
 
 .detailGrid {
   display: grid;

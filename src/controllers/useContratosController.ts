@@ -1,18 +1,37 @@
 import { useEffect, useMemo, useState } from 'react'
 import { formatCurrency } from '../services/api'
 import { createContrato, deleteContrato, listContratos } from '../services/contratosService'
-import type { Contrato, ContratoEstado, ContratoFormValues } from '../types/contrato'
+import type { Contrato, ContratoEstado, ContratoFormValues, InquilinoFormValue } from '../types/contrato'
+import { emptyInquilino } from '../types/contrato'
 
 interface FormState {
   codigo: string
   propiedad: string
-  inquilino: string
+  inquilinos: InquilinoFormValue[]
   fechaInicio: string
   fechaFin: string
   importeActual: string
   tipoAjuste: string
   periodicidad: string
   estado: ContratoEstado
+  garantia: string
+  // Garantia Propietaria
+  garante: string
+  dniGarante: string
+  direccionGarantia: string
+  // Seguro de caución (GPremier)
+  aseguradora: string
+  numeroPoliza: string
+  // Garantes (hasta 3)
+  nombreGarante1: string
+  sueldoGarante1: string
+  telefonoGarante1: string
+  nombreGarante2: string
+  sueldoGarante2: string
+  telefonoGarante2: string
+  nombreGarante3: string
+  sueldoGarante3: string
+  telefonoGarante3: string
 }
 
 
@@ -20,13 +39,28 @@ interface FormState {
 const emptyForm: FormState = {
   codigo: '',
   propiedad: '',
-  inquilino: '',
+  inquilinos: [emptyInquilino],
   fechaInicio: '',
   fechaFin: '',
   importeActual: '',
   tipoAjuste: 'IPC',
   periodicidad: 'Cuatrimestral',
   estado: 'Activo',
+  garantia: 'GPremier',
+  garante: '',
+  dniGarante: '',
+  direccionGarantia: '',
+  aseguradora: 'GPremier',
+  numeroPoliza: '',
+  nombreGarante1: '',
+  sueldoGarante1: '',
+  telefonoGarante1: '',
+  nombreGarante2: '',
+  sueldoGarante2: '',
+  telefonoGarante2: '',
+  nombreGarante3: '',
+  sueldoGarante3: '',
+  telefonoGarante3: '',
 }
 
 export function useContratosController() {
@@ -97,7 +131,7 @@ export function useContratosController() {
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
-    if (!form.codigo || !form.propiedad || !form.inquilino || !form.fechaInicio || !form.fechaFin || !form.importeActual) {
+    if (!form.codigo || !form.propiedad || !form.inquilinos.length || !form.inquilinos[0].nombreCompleto || !form.fechaInicio || !form.fechaFin || !form.importeActual) {
       setFormError('Completá todos los campos del contrato.')
       return
     }

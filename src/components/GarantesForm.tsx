@@ -1,40 +1,38 @@
 import React from 'react';
 import Input from './Input';
-import styles from "../pages/Contratos.module.css"
+import styles from '../pages/Contratos.module.css';
 
 interface GarantesFormProps {
+    index: number;
     form: any;
     handleFieldChange: (field: string) => (
         event: React.ChangeEvent<HTMLInputElement>
     ) => void;
 }
 
-
-
-
-export default function GarantesForm({ form, handleFieldChange }: GarantesFormProps) {
+export default function GarantesForm({ index, form, handleFieldChange }: GarantesFormProps) {
     return (
-        
-        < >
-            <h4></h4>
+        <>
+            {index > 1 ? <div className={styles.sectionDivider} /> : null}
+            <h4 className={styles.sectionTitle}>Garante {index}</h4>
             <Input
                 label="Nombre"
                 placeholder="Ej: Juan García López"
-                value={form.nombreGarante}
-                onChange={handleFieldChange('nombreGarante')}
+                value={form[`nombreGarante${index}`] ?? ''}
+                onChange={handleFieldChange(`nombreGarante${index}`)}
             />
             <Input
                 label="Sueldo"
                 type="number"
                 placeholder="Ej: 2000"
-                value={form.sueldo}
-                onChange={handleFieldChange('sueldo')}
+                value={form[`sueldoGarante${index}`] ?? ''}
+                onChange={handleFieldChange(`sueldoGarante${index}`)}
             />
             <Input
                 label="Teléfono"
                 placeholder="Ej: +34 612 345 678"
-                value={form.telefono}
-                onChange={handleFieldChange('telefono')}
+                value={form[`telefonoGarante${index}`] ?? ''}
+                onChange={handleFieldChange(`telefonoGarante${index}`)}
             />
         </>
     )

@@ -14,3 +14,21 @@ export interface Contrato {
 }
 
 export type ContratoFormValues = Omit<Contrato, 'id'>
+
+export interface InquilinoFormValue {
+  nombreCompleto: string
+  nacionalidad: string
+  dni: string
+  cuil: string
+  domicilioLegal: string
+  domicilioElectronico: string
+}
+
+export const emptyInquilino: InquilinoFormValue = {
+  nombreCompleto: '',
+  nacionalidad: '',
+  dni: '',
+  cuil: '',
+  domicilioLegal: '',
+  domicilioElectronico: '',
+}

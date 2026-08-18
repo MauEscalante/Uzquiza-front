@@ -27,8 +27,7 @@ function Clientes() {
     openCreateModal,
     openEditModal,
     openDetailModal,
-    handleSubmit,
-    handleDelete,
+    handleSubmit
   } = useClientesController()
 
   return (
@@ -56,20 +55,20 @@ function Clientes() {
       ) : null}
 
       {!loading && filteredClientes.length > 0 ? (
-        <Table headers={["Número de cliente", "Nombre", "Apellido", "DNI", "Teléfono", "Email", "Acciones"]}>
+        <Table headers={["Dirección", "Nombre", "Apellido", "Teléfono", "Inquilino/Propietario", "Acciones"]}>
           {filteredClientes.map((cliente) => (
             <tr key={cliente.id}>
-              <td><StatusBadge variant="info">{cliente.numeroCliente}</StatusBadge></td>
+              <td>{cliente.direccion}</td>
               <td>{cliente.nombre}</td>
               <td>{cliente.apellido}</td>
-              <td>{cliente.dni}</td>
               <td>{cliente.telefono}</td>
-              <td>{cliente.email}</td>
+              <td>
+                <StatusBadge variant={cliente.tipo === 'Propietario' ? 'success' : 'info'}>{cliente.tipo}</StatusBadge>
+              </td>
               <td>
                 <div className={styles.actions}>
                   <Button variant="ghost" onClick={() => openDetailModal(cliente)}>Ver</Button>
                   <Button variant="secondary" onClick={() => openEditModal(cliente)}>Editar</Button>
-                  <Button variant="danger" onClick={() => void handleDelete(cliente)}>Eliminar</Button>
                 </div>
               </td>
             </tr>
@@ -94,6 +93,9 @@ function Clientes() {
           <Input label="DNI" value={form.dni} onChange={(event) => setForm((current) => ({ ...current, dni: event.target.value }))} />
           <Input label="Teléfono" value={form.telefono} onChange={(event) => setForm((current) => ({ ...current, telefono: event.target.value }))} />
           <Input label="Email" type="email" value={form.email} onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))} />
+          <Input label="Dirección" value={form.direccion} onChange={(event) => setForm((current) => ({ ...current, direccion: event.target.value }))} />
+          <Input label="CUIL" value={form.cuil} onChange={(event) => setForm((current) => ({ ...current, cuil: event.target.value }))} />
+          <Input label="Nacionalidad" value={form.nacionalidad} onChange={(event) => setForm((current) => ({ ...current, nacionalidad: event.target.value }))} />
           {formError ? <div className={styles.error}>{formError}</div> : null}
         </form>
       </Modal>
@@ -107,6 +109,10 @@ function Clientes() {
             <div><span>DNI</span><strong>{selectedCliente.dni}</strong></div>
             <div><span>Teléfono</span><strong>{selectedCliente.telefono}</strong></div>
             <div><span>Email</span><strong>{selectedCliente.email}</strong></div>
+            <div><span>Dirección</span><strong>{selectedCliente.direccion}</strong></div>
+            <div><span>CUIL</span><strong>{selectedCliente.cuil}</strong></div>
+            <div><span>Nacionalidad</span><strong>{selectedCliente.nacionalidad}</strong></div>
+            <div><span>Inquilino/Propietario</span><strong>{selectedCliente.tipo}</strong></div>
           </div>
         ) : null}
       </Modal>

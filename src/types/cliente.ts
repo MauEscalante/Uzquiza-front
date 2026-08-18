@@ -1,3 +1,5 @@
+export type ClienteTipo = 'Inquilino' | 'Propietario'
+
 export interface Cliente {
   id: string
   numeroCliente: string
@@ -6,6 +8,10 @@ export interface Cliente {
   dni: string
   telefono: string
   email: string
+  direccion: string
+  cuil: string
+  nacionalidad: string
+  tipo: ClienteTipo
 }
 
-export type ClienteFormValues = Omit<Cliente, 'id' | 'numeroCliente'>
+export type ClienteFormValues = Omit<Cliente, 'id' | 'numeroCliente' | 'tipo'>

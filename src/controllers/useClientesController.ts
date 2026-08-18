@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { createCliente, deleteCliente, listClientes, updateCliente } from '../services/clientesService'
+import { createCliente, listClientes, updateCliente } from '../services/clientesService'
 import type { Cliente, ClienteFormValues } from '../types/cliente'
 
 const emptyForm: ClienteFormValues = {
@@ -8,6 +8,9 @@ const emptyForm: ClienteFormValues = {
   dni: '',
   telefono: '',
   email: '',
+  direccion: '',
+  cuil: '',
+  nacionalidad: '',
 }
 
 export function useClientesController() {
@@ -57,7 +60,7 @@ export function useClientesController() {
       return clientes
     }
 
-    return clientes.filter((cliente) => [cliente.numeroCliente, cliente.nombre, cliente.apellido, cliente.dni, cliente.telefono, cliente.email]
+    return clientes.filter((cliente) => [cliente.numeroCliente, cliente.nombre, cliente.apellido, cliente.dni, cliente.telefono, cliente.email, cliente.direccion, cliente.cuil, cliente.nacionalidad, cliente.tipo]
       .some((value) => value.toLowerCase().includes(normalizedSearch)))
   }, [clientes, search])
 
@@ -76,6 +79,9 @@ export function useClientesController() {
       dni: cliente.dni,
       telefono: cliente.telefono,
       email: cliente.email,
+      direccion: cliente.direccion,
+      cuil: cliente.cuil,
+      nacionalidad: cliente.nacionalidad,
     })
     setFormError('')
     setModalOpen(true)
@@ -89,7 +95,7 @@ export function useClientesController() {
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
-    if (!form.nombre || !form.apellido || !form.dni || !form.telefono || !form.email) {
+    if (!form.nombre || !form.apellido || !form.dni || !form.telefono || !form.email || !form.direccion || !form.cuil || !form.nacionalidad) {
       setFormError('Completá todos los campos del cliente.')
       return
     }
@@ -110,17 +116,7 @@ export function useClientesController() {
     setForm(emptyForm)
   }
 
-  async function handleDelete(cliente: Cliente) {
-    const shouldDelete = window.confirm(`¿Eliminar a ${cliente.nombre} ${cliente.apellido}?`)
-    if (!shouldDelete) {
-      return
-    }
-
-    await deleteCliente(cliente.id)
-    setClientes((current) => current.filter((entry) => entry.id !== cliente.id))
-    setFeedback('Cliente eliminado.')
-  }
-
+ 
   return {
     loading,
     error,
@@ -141,6 +137,5 @@ export function useClientesController() {
     openEditModal,
     openDetailModal,
     handleSubmit,
-    handleDelete,
   }
 }

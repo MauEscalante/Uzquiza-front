@@ -69,18 +69,3 @@ export async function createContrato(values: ContratoFormValues) {
 
 
 
-export async function deleteContrato(id: string) {
-  const response = await fetch(`http://127.0.0.1:8000/resumen/${id}`, {
-    method: 'DELETE',
-    headers: {
-      Accept: 'application/json',
-    },
-  })
-
-  if (!response.ok) {
-    throw new Error(`Error al eliminar contrato: ${response.status}`)
-  }
-
-  return response.json()
-}
-

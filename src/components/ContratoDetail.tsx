@@ -43,7 +43,7 @@ export default function ContratoDetail({ contrato, loading, error }: ContratoDet
             <div><span>Fecha de inicio</span><strong>{contrato.fecha_inicio}</strong></div>
             <div><span>Fecha de fin</span><strong>{contrato.fecha_fin}</strong></div>
             <div><span>Tipo de ajuste</span><strong>{contrato.tipo_ajuste}</strong></div>
-            <div><span>Periodicidad</span><strong>{contrato.periodicidad_label}</strong></div>
+            <div><span>Periodicidad</span><strong>{contrato.periodicidad}</strong></div>
             <div><span>Importe inicial</span><strong>{formatCurrency(contrato.importe_inicial)}</strong></div>
             <div><span>Depósito</span><strong>{contrato.deposito != null ? formatCurrency(contrato.deposito) : 'Sin depósito'}</strong></div>
             <div className={styles.sectionDivider} />

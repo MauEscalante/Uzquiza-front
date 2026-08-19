@@ -1,3 +1,4 @@
+import { useRef } from "react"
 import Input from "./Input"
 import Select from "./Select"
 import Button from "./Button"
@@ -41,6 +42,24 @@ export default function ContratoForm({ form, setForm, formError, onSubmit, propi
             ...current,
             [field]: event.target.value
         }))
+    }
+
+    // El depósito arranca igual al importe inicial y se mantiene sincronizado
+    // hasta que el usuario lo edite a mano.
+    const depositoTouched = useRef(false)
+
+    const handleImporteChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value
+        setForm((current) => ({
+            ...current,
+            importeActual: value,
+            deposito: depositoTouched.current ? current.deposito : value,
+        }))
+    }
+
+    const handleDepositoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        depositoTouched.current = true
+        handleFieldChange('deposito')(event)
     }
 
     // Manejo de la lista dinámica de inquilinos (co-inquilinos)
@@ -139,13 +158,13 @@ export default function ContratoForm({ form, setForm, formError, onSubmit, propi
                 label="Importe inicial"
                 type="number"
                 value={form.importeActual}
-                onChange={handleFieldChange('importeActual')}
+                onChange={handleImporteChange}
             />
             <Input
                 label="Depósito"
                 type="number"
                 value={form.deposito}
-                onChange={handleFieldChange('deposito')}
+                onChange={handleDepositoChange}
             />
             <Select
                 label="Tipo de ajuste"

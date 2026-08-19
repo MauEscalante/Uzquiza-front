@@ -1,25 +1,41 @@
 import { useEffect, useMemo, useState } from 'react'
-import { createPropiedad, deletePropiedad, listPropiedades, updatePropiedad } from '../services/propiedadesService'
-import type { Propiedad, PropiedadEstado, PropiedadFormValues } from '../types/propiedad'
+import {
+  createPropiedad,
+  deletePropiedad,
+  formatPropiedadId,
+  getPropiedad,
+  listPropiedades,
+  updatePropiedad,
+} from '../services/propiedadesService'
+import type {
+  EstadoAlquiler,
+  Propiedad,
+  PropiedadDetalle,
+  PropiedadEstado,
+} from '../types/propiedad'
 
 interface FormState {
   direccion: string
-  propietario: string
-  inquilino: string
+  ambientes: string
   estado: PropiedadEstado
+  estadoAlquiler: EstadoAlquiler
 }
 
 export const estadoOptions = [
-  { label: 'Disponible', value: 'Disponible' },
-  { label: 'Alquilada', value: 'Alquilada' },
-  { label: 'Mantenimiento', value: 'Mantenimiento' },
+  { label: 'Activa', value: 'Activa' },
+  { label: 'Inactiva', value: 'Inactiva' },
+]
+
+export const estadoAlquilerOptions = [
+  { label: 'Abono', value: 'Abono' },
+  { label: 'Adeuda', value: 'Adeuda' },
 ]
 
 const emptyForm: FormState = {
   direccion: '',
-  propietario: '',
-  inquilino: '',
-  estado: 'Disponible',
+  ambientes: '',
+  estado: 'Activa',
+  estadoAlquiler: 'Adeuda',
 }
 
 export function usePropiedadesController() {
@@ -29,7 +45,9 @@ export function usePropiedadesController() {
   const [search, setSearch] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
   const [detailOpen, setDetailOpen] = useState(false)
-  const [selectedPropiedad, setSelectedPropiedad] = useState<Propiedad | null>(null)
+  const [selectedPropiedad, setSelectedPropiedad] = useState<PropiedadDetalle | null>(null)
+  const [detailLoading, setDetailLoading] = useState(false)
+  const [detailError, setDetailError] = useState('')
   const [editingPropiedad, setEditingPropiedad] = useState<Propiedad | null>(null)
   const [form, setForm] = useState<FormState>(emptyForm)
   const [formError, setFormError] = useState('')
@@ -69,8 +87,14 @@ export function usePropiedadesController() {
       return propiedades
     }
 
-    return propiedades.filter((propiedad) => [propiedad.id, propiedad.direccion, propiedad.propietario, propiedad.inquilino, propiedad.estado]
-      .some((value) => value.toLowerCase().includes(normalizedSearch)))
+    return propiedades.filter((propiedad) => [
+      formatPropiedadId(propiedad.propiedad_id),
+      propiedad.direccion,
+      propiedad.propietario ?? '',
+      propiedad.inquilino ?? '',
+      propiedad.estado,
+      propiedad.estado_alquiler,
+    ].some((value) => value.toLowerCase().includes(normalizedSearch)))
   }, [propiedades, search])
 
   function openCreateModal() {
@@ -84,36 +108,66 @@ export function usePropiedadesController() {
     setEditingPropiedad(propiedad)
     setForm({
       direccion: propiedad.direccion,
-      propietario: propiedad.propietario,
-      inquilino: propiedad.inquilino,
+      ambientes: propiedad.ambientes != null ? String(propiedad.ambientes) : '',
       estado: propiedad.estado,
+      estadoAlquiler: propiedad.estado_alquiler,
     })
     setFormError('')
     setModalOpen(true)
   }
 
-  function openDetail(propiedad: Propiedad) {
-    setSelectedPropiedad(propiedad)
+  async function openDetail(propiedad: Propiedad) {
+    setSelectedPropiedad(null)
+    setDetailError('')
     setDetailOpen(true)
+    setDetailLoading(true)
+
+    try {
+      const detalle = await getPropiedad(propiedad.propiedad_id)
+      setSelectedPropiedad(detalle)
+    } catch {
+      setDetailError('No se pudo cargar el detalle de la propiedad.')
+    } finally {
+      setDetailLoading(false)
+    }
   }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    setFormError('')
 
-    if (!form.direccion || !form.propietario || !form.estado) {
-      setFormError('Completá la dirección, el propietario y el estado.')
+    if (!form.direccion.trim()) {
+      setFormError('Completá la dirección.')
       return
     }
 
-    const payload: PropiedadFormValues = form
-    const saved = editingPropiedad ? await updatePropiedad(editingPropiedad.id, payload) : await createPropiedad(payload)
+    const ambientes = form.ambientes.trim() ? Number(form.ambientes) : null
 
-    if (editingPropiedad) {
-      setPropiedades((current) => current.map((propiedad) => (propiedad.id === editingPropiedad.id ? saved : propiedad)))
-      setFeedback('Propiedad actualizada correctamente.')
-    } else {
-      setPropiedades((current) => [saved, ...current])
-      setFeedback('Propiedad creada correctamente.')
+    if (ambientes !== null && (!Number.isInteger(ambientes) || ambientes < 0)) {
+      setFormError('Los ambientes deben ser un número entero mayor o igual a 0.')
+      return
+    }
+
+    try {
+      if (editingPropiedad) {
+        const saved = await updatePropiedad(editingPropiedad.propiedad_id, {
+          direccion: form.direccion.trim(),
+          ambientes,
+          estado: form.estado,
+          estado_alquiler: form.estadoAlquiler,
+        })
+        setPropiedades((current) => current.map((propiedad) => (
+          propiedad.propiedad_id === editingPropiedad.propiedad_id ? saved : propiedad
+        )))
+        setFeedback('Propiedad actualizada correctamente.')
+      } else {
+        const saved = await createPropiedad({ direccion: form.direccion.trim(), ambientes })
+        setPropiedades((current) => [saved, ...current])
+        setFeedback('Propiedad creada correctamente.')
+      }
+    } catch {
+      setFormError('No se pudo guardar la propiedad.')
+      return
     }
 
     setModalOpen(false)
@@ -127,8 +181,15 @@ export function usePropiedadesController() {
       return
     }
 
-    await deletePropiedad(propiedad.id)
-    setPropiedades((current) => current.filter((entry) => entry.id !== propiedad.id))
+    try {
+      await deletePropiedad(propiedad.propiedad_id)
+    } catch {
+      setError('No se pudo eliminar la propiedad. Puede tener contratos asociados.')
+      return
+    }
+
+    setPropiedades((current) => current.filter((entry) => entry.propiedad_id !== propiedad.propiedad_id))
+    setError('')
     setFeedback('Propiedad eliminada.')
   }
 
@@ -143,6 +204,8 @@ export function usePropiedadesController() {
     detailOpen,
     setDetailOpen,
     selectedPropiedad,
+    detailLoading,
+    detailError,
     editingPropiedad,
     form,
     setForm,
@@ -154,5 +217,6 @@ export function usePropiedadesController() {
     openDetail,
     handleSubmit,
     handleDelete,
+    formatPropiedadId,
   }
 }

@@ -27,10 +27,22 @@ export default function InquilinoForm({ index, inquilino, onChange, onRemove, ca
                 ) : null}
             </div>
             <Input
-                label="Nombre completo"
-                placeholder="Ej: Juan García López"
-                value={inquilino.nombreCompleto}
-                onChange={onChange('nombreCompleto')}
+                label="Nombre"
+                placeholder="Ej: Juan"
+                value={inquilino.nombre}
+                onChange={onChange('nombre')}
+            />
+            <Input
+                label="Apellido"
+                placeholder="Ej: García López"
+                value={inquilino.apellido}
+                onChange={onChange('apellido')}
+            />
+            <Input
+                label="Teléfono"
+                placeholder="Ej: 1155253547"
+                value={inquilino.telefono}
+                onChange={onChange('telefono')}
             />
             <Input
                 label="Nacionalidad"

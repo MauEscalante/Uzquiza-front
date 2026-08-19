@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react'
 import { formatCurrency } from '../services/api'
 import {
   createContrato,
-  deleteContrato,
   getContratoDetails,
   listContratos,
   listPropiedadesResumen,
@@ -10,12 +9,6 @@ import {
 } from '../services/contratosService'
 import type { Contrato, ContratoDetalle, ContratoEstado, ContratoFormValues, GaranteInput, GarantePropietarioFormValue, InquilinoFormValue, TipoGarantia } from '../types/contrato'
 import { emptyGarantePropietario, emptyInquilino } from '../types/contrato'
-
-const PERIODICIDAD_TO_NUMBER: Record<string, number> = {
-  Trimestral: 3,
-  Cuatrimestral: 4,
-  Semestral: 6,
-}
 
 interface FormState {
   propiedad: string
@@ -181,6 +174,11 @@ export function useContratosController() {
       .some((value) => value.toString().toLowerCase().includes(normalizedSearch)))
   }, [contratos, search])
 
+  function getPropiedadDireccion(propiedadId: string | number): string {
+    const propiedad = propiedades.find((entry) => String(entry.propiedad_id) === String(propiedadId))
+    return propiedad?.direccion ?? String(propiedadId)
+  }
+
   function openCreateModal() {
     setEditingContrato(null)
     setForm(emptyForm)
@@ -230,7 +228,7 @@ export function useContratosController() {
       importe_inicial: importeInicial,
       deposito: form.deposito ? Number(form.deposito) : null,
       tipo_ajuste: form.tipoAjuste as ContratoFormValues['tipo_ajuste'],
-      periodicidad: PERIODICIDAD_TO_NUMBER[form.periodicidad] ?? 0,
+      periodicidad: form.periodicidad as ContratoFormValues['periodicidad'],
       estado: form.estado,
       inquilinos: form.inquilinos.map((inquilino) => ({
         nombre: inquilino.nombre,
@@ -257,16 +255,7 @@ export function useContratosController() {
     setContratos(data)
   }
 
-  async function handleDelete(contrato: Contrato) {
-    const shouldDelete = window.confirm(`¿Eliminar el contrato ${contrato.contrato_id}?`)
-    if (!shouldDelete) {
-      return
-    }
 
-    await deleteContrato(contrato.contrato_id)
-    setContratos((current) => current.filter((entry) => entry.contrato_id !== contrato.contrato_id))
-    setFeedback('Contrato eliminado.')
-  }
 
   return {
     loading,
@@ -291,7 +280,7 @@ export function useContratosController() {
     openCreateModal,
     openDetail,
     handleSubmit,
-    handleDelete,
     formatCurrency,
+    getPropiedadDireccion,
   }
 }

@@ -32,8 +32,8 @@ function Contratos() {
     propiedades,
     openCreateModal,
     openDetail,
-    handleDelete,
     formatCurrency,
+    getPropiedadDireccion,
   } = useContratosController()
   
   return (
@@ -63,7 +63,7 @@ function Contratos() {
           
           {filteredContratos.map((contrato) => (
             <tr key={contrato.contrato_id}>
-              <td>{contrato.propiedad}</td>
+              <td>{getPropiedadDireccion(contrato.propiedad)}</td>
               <td>{contrato.fecha_inicio}</td>
               <td>{contrato.fecha_fin}</td>
               <td>{formatCurrency(contrato.importe_inicial)}</td>
@@ -74,7 +74,6 @@ function Contratos() {
               <td>
                 <div className={styles.actions}>
                   <Button variant="ghost" onClick={() => openDetail(contrato)}>Ver detalles</Button>
-                  <Button variant="danger" onClick={() => void handleDelete(contrato)}>Eliminar</Button>
                 </div>
               </td>
             </tr>

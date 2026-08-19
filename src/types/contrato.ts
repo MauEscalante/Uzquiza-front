@@ -5,14 +5,14 @@ export type TipoGarantia = 'GPremier' | 'Garantia Propietaria' | 'Garantes'
 
 export interface Contrato {
   contrato_id: string
-  propiedad: string
+  propiedad: number
   fecha_inicio: string
   fecha_fin: string
   fechaFin: string
   importe_inicial: number
   deposito: number | null
   tipo_ajuste: TipoAjuste
-  periodicidad: number
+  periodicidad: PeriodicidadLabel
   estado: ContratoEstado
 }
 
@@ -56,8 +56,7 @@ export interface ContratoDetalle {
   importe_inicial: number
   deposito: number | null
   tipo_ajuste: TipoAjuste
-  periodicidad: number
-  periodicidad_label: PeriodicidadLabel | number
+  periodicidad: PeriodicidadLabel
   estado: ContratoEstado
 }
 
@@ -88,7 +87,7 @@ export interface ContratoFormValues {
   importe_inicial: number
   deposito: number | null
   tipo_ajuste: TipoAjuste
-  periodicidad: number
+  periodicidad: PeriodicidadLabel
   estado: ContratoEstado
   inquilinos: ContratoInquilinoInput[]
   garantia: TipoGarantia

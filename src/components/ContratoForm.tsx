@@ -4,7 +4,9 @@ import Button from "./Button"
 import styles from "../pages/Contratos.module.css"
 import GarantesForm from "./GarantesForm"
 import InquilinoForm from "./InquilinoForm"
-import { emptyInquilino, type InquilinoFormValue } from "../types/contrato"
+import GarantePropietarioForm from "./GarantePropietarioForm"
+import { emptyGarantePropietario, emptyInquilino, type GarantePropietarioFormValue, type InquilinoFormValue } from "../types/contrato"
+import type { PropiedadResumen } from "../services/contratosService"
 
 export const tipoAjusteOptions = [
     { label: 'IPC', value: 'IPC' },
@@ -29,24 +31,15 @@ interface ContratoFormProps {
     setForm: (updater: (current: any) => any) => void
     formError?: string
     onSubmit: (event: React.FormEvent<HTMLFormElement>) => void
+    propiedades: PropiedadResumen[]
 }
 
-export default function ContratoForm({ form, setForm, formError, onSubmit }: ContratoFormProps) {
+export default function ContratoForm({ form, setForm, formError, onSubmit, propiedades }: ContratoFormProps) {
     // Función helper para manejar cambios de input
     const handleFieldChange = (field: string) => (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setForm((current) => ({
             ...current,
             [field]: event.target.value
-        }))
-    }
-
-    // Al elegir Seguro de caución, la compañía es siempre GPremier por defecto
-    const handleGarantiaChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const value = event.target.value
-        setForm((current) => ({
-            ...current,
-            garantia: value,
-            ...(value === 'GPremier' ? { aseguradora: 'GPremier' } : {}),
         }))
     }
 
@@ -72,10 +65,43 @@ export default function ContratoForm({ form, setForm, formError, onSubmit }: Con
             inquilinos: current.inquilinos.filter((_: InquilinoFormValue, i: number) => i !== index),
         }))
     }
+
+    // Manejo de la lista dinámica de garantes propietarios
+    const handleGarantePropietarioChange = (index: number, field: keyof GarantePropietarioFormValue) => (event: React.ChangeEvent<HTMLInputElement>) => {
+        setForm((current) => {
+            const garantesPropietarios = [...current.garantesPropietarios]
+            garantesPropietarios[index] = { ...garantesPropietarios[index], [field]: event.target.value }
+            return { ...current, garantesPropietarios }
+        })
+    }
+
+    const addGarantePropietario = () => {
+        setForm((current) => ({
+            ...current,
+            garantesPropietarios: [...current.garantesPropietarios, emptyGarantePropietario],
+        }))
+    }
+
+    const removeGarantePropietario = (index: number) => {
+        setForm((current) => ({
+            ...current,
+            garantesPropietarios: current.garantesPropietarios.filter((_: GarantePropietarioFormValue, i: number) => i !== index),
+        }))
+    }
+
+    const propiedadOptions = [
+        { label: 'Seleccioná una propiedad', value: '' },
+        ...propiedades.map((propiedad) => ({
+            label: propiedad.direccion,
+            value: String(propiedad.propiedad_id),
+        })),
+    ]
+
     return (
         <form id="contrato-form" className={styles.form} onSubmit={onSubmit}>
-            <Input
+            <Select
                 label="Propiedad"
+                options={propiedadOptions}
                 value={form.propiedad}
                 onChange={handleFieldChange('propiedad')}
             />
@@ -115,6 +141,12 @@ export default function ContratoForm({ form, setForm, formError, onSubmit }: Con
                 value={form.importeActual}
                 onChange={handleFieldChange('importeActual')}
             />
+            <Input
+                label="Depósito"
+                type="number"
+                value={form.deposito}
+                onChange={handleFieldChange('deposito')}
+            />
             <Select
                 label="Tipo de ajuste"
                 options={tipoAjusteOptions}
@@ -131,49 +163,34 @@ export default function ContratoForm({ form, setForm, formError, onSubmit }: Con
                 label="Garantia"
                 options={tipoGarantias}
                 value={form.garantia}
-                onChange={handleGarantiaChange}
+                onChange={handleFieldChange('garantia')}
             />
             {/* OPCIONES SEGÚN GARANTÍA */}
             {form.garantia === "Garantia Propietaria" && (
                 <>
                     <div className={styles.sectionDivider} />
                     <Input
-                        label="Propietario garante"
-                        placeholder="Ej: Juan García López"
-                        value={form.garante}
-                        onChange={handleFieldChange('garante')}
-                    />
-                    <Input
-                        label="DNI del garante"
-                        placeholder="Ej: 12345678A"
-                        value={form.dniGarante}
-                        onChange={handleFieldChange('dniGarante')}
-                    />
-                    <Input
-                        label="Telefono del garante"
-                        placeholder="Ej: 1155253547"
-                        value={form.telefonoGarante}
-                        onChange={handleFieldChange('telefonoGarante')}
-                    />
-                    <Input
                         label="Dirección de la propiedad en garantía"
                         placeholder="Ej: Av. Siempre Viva 742"
                         value={form.direccionGarantia}
                         onChange={handleFieldChange('direccionGarantia')}
                     />
-                </>
-            )}
-
-            {form.garantia === "GPremier" && (
-                <>
                     <div className={styles.sectionDivider} />
-                    <Input
-                        label="Compañía aseguradora"
-                        value="GPremier"
-                        disabled
-                        readOnly
-                    />
-                   
+                    {form.garantesPropietarios.map((garante: GarantePropietarioFormValue, index: number) => (
+                        <GarantePropietarioForm
+                            key={index}
+                            index={index}
+                            garante={garante}
+                            onChange={(field) => handleGarantePropietarioChange(index, field)}
+                            onRemove={() => removeGarantePropietario(index)}
+                            canRemove={form.garantesPropietarios.length > 1}
+                        />
+                    ))}
+                    <div className={styles.addButtonRow}>
+                        <Button type="button" variant="secondary" onClick={addGarantePropietario}>
+                            + Agregar otro garante
+                        </Button>
+                    </div>
                 </>
             )}
 

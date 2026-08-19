@@ -17,9 +17,15 @@ export default function GarantesForm({ index, form, handleFieldChange }: Garante
             <h4 className={styles.sectionTitle}>Garante {index}</h4>
             <Input
                 label="Nombre"
-                placeholder="Ej: Juan García López"
+                placeholder="Ej: Juan"
                 value={form[`nombreGarante${index}`] ?? ''}
                 onChange={handleFieldChange(`nombreGarante${index}`)}
+            />
+            <Input
+                label="Apellido"
+                placeholder="Ej: García López"
+                value={form[`apellidoGarante${index}`] ?? ''}
+                onChange={handleFieldChange(`apellidoGarante${index}`)}
             />
             <Input
                 label="Sueldo"
@@ -33,6 +39,13 @@ export default function GarantesForm({ index, form, handleFieldChange }: Garante
                 placeholder="Ej: +34 612 345 678"
                 value={form[`telefonoGarante${index}`] ?? ''}
                 onChange={handleFieldChange(`telefonoGarante${index}`)}
+            />
+            <Input
+                label="Email"
+                type="email"
+                placeholder="Ej: garante@email.com"
+                value={form[`emailGarante${index}`] ?? ''}
+                onChange={handleFieldChange(`emailGarante${index}`)}
             />
         </>
     )

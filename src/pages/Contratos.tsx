@@ -4,6 +4,7 @@ import Input from '../components/Input'
 import Modal from '../components/Modal'
 import Table from '../components/Table'
 import ContratoForm from '../components/ContratoForm.tsx'
+import ContratoDetail from '../components/ContratoDetail.tsx'
 import { useContratosController } from '../controllers/useContratosController'
 
 import styles from './Contratos.module.css'
@@ -19,6 +20,8 @@ function Contratos() {
     detailOpen,
     setDetailOpen,
     selectedContrato,
+    detailLoading,
+    detailError,
     editingContrato,
     feedback,
     form,
@@ -26,6 +29,7 @@ function Contratos() {
     formError,
     handleSubmit,
     filteredContratos,
+    propiedades,
     openCreateModal,
     openDetail,
     handleDelete,
@@ -63,8 +67,7 @@ function Contratos() {
               <td>{contrato.fecha_inicio}</td>
               <td>{contrato.fecha_fin}</td>
               <td>{formatCurrency(contrato.importe_inicial)}</td>
-              <td>{formatCurrency(contrato.importe_inicial)}</td>
-              
+              <td>{contrato.deposito != null ? formatCurrency(contrato.deposito) : '—'}</td>
               <td>{contrato.tipo_ajuste}</td>
               <td>{contrato.periodicidad}</td>
               <td>{contrato.estado}</td>
@@ -90,25 +93,17 @@ function Contratos() {
           </>
         )}
       >
-        <ContratoForm 
+        <ContratoForm
           form={form}
           setForm={setForm}
           formError={formError}
           onSubmit={(event) => handleSubmit(event as React.FormEvent<HTMLFormElement>)}
+          propiedades={propiedades}
         />
       </Modal>
 
       <Modal open={detailOpen} title="Detalle de contrato" onClose={() => setDetailOpen(false)} footer={<Button variant="ghost" onClick={() => setDetailOpen(false)}>Cerrar</Button>}>
-        {selectedContrato ? (
-          <div className={styles.detailGrid}>
-            <div><span>Propiedad</span><strong>{selectedContrato.propiedad}</strong></div>
-            <div><span>Inicio</span><strong>{selectedContrato.fecha_inicio}</strong></div>
-            <div><span>Fin</span><strong>{selectedContrato.fecha_fin}</strong></div>
-            <div><span>Importe actual</span><strong>{formatCurrency(selectedContrato.importe_inicial)}</strong></div>
-            <div><span>Tipo de ajuste</span><strong>{selectedContrato.tipo_ajuste}</strong></div>
-            <div><span>Periodicidad</span><strong>{selectedContrato.periodicidad}</strong></div>
-          </div>
-        ) : null}
+        <ContratoDetail contrato={selectedContrato} loading={detailLoading} error={detailError} />
       </Modal>
     </div>
   )

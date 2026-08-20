@@ -1,4 +1,4 @@
-import type { Propiedad, PropiedadCreateValues, PropiedadDetalle, PropiedadUpdateValues } from '../types/propiedad'
+import type { Propiedad, PropiedadCreateValues, PropiedadDetalle, PropiedadUpdateValues, PropietarioResumen } from '../types/propiedad'
 
 /** El id de la propiedad se muestra siempre con 6 dígitos: 1 -> "000001". */
 export function formatPropiedadId(id: number) {
@@ -30,6 +30,22 @@ export async function getPropiedad(id: number): Promise<PropiedadDetalle> {
 
   if (!response.ok) {
     throw new Error(`Error al cargar detalle de la propiedad: ${response.status}`)
+  }
+
+  return await response.json()
+}
+
+/** Clientes que ya son propietarios, para el selector del alta de propiedad. */
+export async function listPropietarios(): Promise<PropietarioResumen[]> {
+  const response = await fetch(`http://127.0.0.1:8000/propietarios/`, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(`Error al cargar propietarios: ${response.status}`)
   }
 
   return await response.json()

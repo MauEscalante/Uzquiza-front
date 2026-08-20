@@ -2,6 +2,7 @@ import Button from '../components/Button'
 import Card from '../components/Card'
 import Input from '../components/Input'
 import Modal from '../components/Modal'
+import PropietarioForm from '../components/PropietarioForm'
 import Select from '../components/Select'
 import StatusBadge from '../components/StatusBadge'
 import Table from '../components/Table'
@@ -39,6 +40,12 @@ function Propiedades() {
     handleSubmit,
     handleDelete,
     formatPropiedadId,
+    propietariosDisponibles,
+    variosPropietarios,
+    sumaPorcentajes,
+    handlePropietarioChange,
+    addPropietario,
+    removePropietario,
   } = usePropiedadesController()
 
   return (
@@ -109,7 +116,35 @@ function Propiedades() {
               <Select label="Estado" options={estadoOptions} value={form.estado} onChange={(event) => setForm((current) => ({ ...current, estado: event.target.value as PropiedadEstado }))} />
               <Select label="Alquiler" options={estadoAlquilerOptions} value={form.estadoAlquiler} onChange={(event) => setForm((current) => ({ ...current, estadoAlquiler: event.target.value as EstadoAlquiler }))} />
             </>
-          ) : null}
+          ) : (
+            <>
+              <div className={styles.sectionDivider} />
+              <Input label="Comisión (%)" type="number" min={0} step="0.01" placeholder="Ej: 6" value={form.comision} onChange={(event) => setForm((current) => ({ ...current, comision: event.target.value }))} />
+              {form.propietarios.map((propietario, index) => (
+                <PropietarioForm
+                  key={index}
+                  index={index}
+                  propietario={propietario}
+                  disponibles={propietariosDisponibles}
+                  mostrarPorcentaje={variosPropietarios}
+                  onChange={(field) => handlePropietarioChange(index, field)}
+                  onRemove={() => removePropietario(index)}
+                  canRemove={variosPropietarios}
+                />
+              ))}
+              {variosPropietarios ? (
+                <div className={styles.totalPorcentaje}>
+                  Total repartido: <strong>{sumaPorcentajes}%</strong>
+                  {Math.abs(sumaPorcentajes - 100) > 0.01 ? ' — debe sumar 100%' : ''}
+                </div>
+              ) : null}
+              <div className={styles.addButtonRow}>
+                <Button type="button" variant="secondary" onClick={addPropietario}>
+                  + Agregar otro propietario
+                </Button>
+              </div>
+            </>
+          )}
           {formError ? <div className={styles.error}>{formError}</div> : null}
         </form>
       </Modal>

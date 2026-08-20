@@ -27,12 +27,68 @@ export interface PropiedadDetalle extends Propiedad {
   propietarios: PropiedadPropietarioDetalle[]
 }
 
+/** Fila del selector de propietarios existentes (GET /propietarios/). */
+export interface PropietarioResumen {
+  cliente_num: number
+  nombre: string
+  apellido: string
+  dni: string
+  comision: number | null
+}
+
+/** Propietario dentro del alta: o uno existente por cliente_num, o uno a crear. */
+export interface PropiedadPropietarioInput {
+  cliente_num?: number
+  porcentaje: number
+  nombre?: string
+  apellido?: string
+  telefono?: string
+  nacionalidad?: string
+  dni?: string
+  cuil?: string
+  direccion?: string
+  email?: string
+}
+
+/** Estado del formulario. clienteNum vacío significa propietario nuevo. */
+export interface PropietarioFormValue {
+  clienteNum: string
+  porcentaje: string
+  nombre: string
+  apellido: string
+  telefono: string
+  nacionalidad: string
+  dni: string
+  cuil: string
+  domicilioLegal: string
+  domicilioElectronico: string
+}
+
+export const emptyPropietario: PropietarioFormValue = {
+  clienteNum: '',
+  porcentaje: '',
+  nombre: '',
+  apellido: '',
+  telefono: '',
+  nacionalidad: '',
+  dni: '',
+  cuil: '',
+  domicilioLegal: '',
+  domicilioElectronico: '',
+}
+
 export interface PropiedadCreateValues {
   direccion: string
   ambientes: number | null
+  /** Es una sola para la propiedad: la comparten todos sus propietarios. */
+  comision: number
+  propietarios: PropiedadPropietarioInput[]
 }
 
-export interface PropiedadUpdateValues extends PropiedadCreateValues {
+/** La edición no toca propietarios ni comisión, por eso no extiende el alta. */
+export interface PropiedadUpdateValues {
+  direccion: string
+  ambientes: number | null
   estado: PropiedadEstado
   estado_alquiler: EstadoAlquiler
 }

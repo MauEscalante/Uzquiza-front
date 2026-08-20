@@ -80,6 +80,18 @@
   font-size: 0.98rem;
 }
 
+/* Separa el bloque de propietarios del resto del detalle. Gana en especificidad
+   sobre `.detailGrid div` para no heredar el recuadro de las celdas. */
+.detailGrid .sectionDivider {
+  grid-column: 1 / -1;
+  border: none;
+  border-top: 1px solid var(--border);
+  border-radius: 0;
+  padding: 0;
+  margin-top: 0.25rem;
+  background: none;
+}
+
 @media (max-width: 720px) {
   .toolbar {
     flex-direction: column;

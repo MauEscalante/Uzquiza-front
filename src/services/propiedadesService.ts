@@ -1,42 +1,83 @@
-import {
-  createPropiedadController,
-  deletePropiedadController,
-  listPropiedadesController,
-  updatePropiedadController,
-} from '../controllers/propiedadesController'
-import type { Propiedad, PropiedadFormValues } from '../types/propiedad'
+import type { Propiedad, PropiedadCreateValues, PropiedadDetalle, PropiedadUpdateValues } from '../types/propiedad'
 
-let propiedades: Propiedad[] = [
-  { id: 'prop-001', direccion: 'Av. San Martín 1234', propietario: 'María López', inquilino: 'Ana Pérez', estado: 'Alquilada' },
-  { id: 'prop-002', direccion: 'Belgrano 456', propietario: 'Jorge Díaz', inquilino: '', estado: 'Disponible' },
-  { id: 'prop-003', direccion: 'Italia 789', propietario: 'Sofía Torres', inquilino: 'Julián Gómez', estado: 'Mantenimiento' },
-]
-
-export async function listPropiedades() {
-  return listPropiedadesController()
+/** El id de la propiedad se muestra siempre con 6 dígitos: 1 -> "000001". */
+export function formatPropiedadId(id: number) {
+  return String(id).padStart(6, '0')
 }
 
-export async function createPropiedad(values: PropiedadFormValues) {
-  const created: Propiedad = {
-    id: `prop-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
-    ...values,
+export async function listPropiedades(): Promise<Propiedad[]> {
+  const response = await fetch(`http://127.0.0.1:8000/propiedades/`, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(`Error al cargar propiedades: ${response.status}`)
   }
 
-  propiedades = [created, ...propiedades]
-  return createPropiedadController(created)
+  return await response.json()
 }
 
-export async function updatePropiedad(id: string, values: PropiedadFormValues) {
-  const updated: Propiedad = {
-    ...(propiedades.find((propiedad) => propiedad.id === id) ?? { id }),
-    ...values,
+export async function getPropiedad(id: number): Promise<PropiedadDetalle> {
+  const response = await fetch(`http://127.0.0.1:8000/propiedades/${id}`, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(`Error al cargar detalle de la propiedad: ${response.status}`)
   }
 
-  propiedades = propiedades.map((propiedad) => (propiedad.id === id ? updated : propiedad))
-  return updatePropiedadController(id, updated)
+  return await response.json()
 }
 
-export async function deletePropiedad(id: string) {
-  propiedades = propiedades.filter((propiedad) => propiedad.id !== id)
-  return deletePropiedadController(id)
+export async function createPropiedad(values: PropiedadCreateValues): Promise<PropiedadDetalle> {
+  const response = await fetch(`http://127.0.0.1:8000/propiedades/register`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(values),
+  })
+
+  if (!response.ok) {
+    throw new Error(`Error al crear la propiedad: ${response.status}`)
+  }
+
+  return await response.json()
+}
+
+export async function updatePropiedad(id: number, values: PropiedadUpdateValues): Promise<PropiedadDetalle> {
+  const response = await fetch(`http://127.0.0.1:8000/propiedades/update/${id}`, {
+    method: 'PUT',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(values),
+  })
+
+  if (!response.ok) {
+    throw new Error(`Error al actualizar la propiedad: ${response.status}`)
+  }
+
+  return await response.json()
+}
+
+export async function deletePropiedad(id: number): Promise<void> {
+  const response = await fetch(`http://127.0.0.1:8000/propiedades/${id}`, {
+    method: 'DELETE',
+    headers: {
+      Accept: 'application/json',
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(`Error al eliminar la propiedad: ${response.status}`)
+  }
 }

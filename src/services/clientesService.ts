@@ -1,4 +1,4 @@
-import type { Cliente, ClienteFormValues } from '../types/cliente'
+import type { ClienteFormValues } from '../types/cliente'
 
 export async function listClientes() {
   const response = await fetch(`http://127.0.0.1:8000/clientes/`, {

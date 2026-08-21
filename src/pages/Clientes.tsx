@@ -5,7 +5,14 @@ import Modal from '../components/Modal'
 import StatusBadge from '../components/StatusBadge'
 import Table from '../components/Table'
 import { useClientesController } from '../controllers/useClientesController'
+import type { ClienteTipo } from '../types/cliente'
 import styles from './Clientes.module.css'
+
+function badgeVariant(tipo: ClienteTipo) {
+  if (tipo === 'Propietario') return 'success' as const
+  if (tipo === 'Ambos') return 'warning' as const
+  return 'info' as const
+}
 
 function Clientes() {
   const {
@@ -17,14 +24,12 @@ function Clientes() {
     setModalOpen,
     detailOpen,
     setDetailOpen,
-    editingCliente,
     selectedCliente,
     form,
     setForm,
     formError,
     feedback,
     filteredClientes,
-    openCreateModal,
     openEditModal,
     openDetailModal,
     handleSubmit
@@ -36,13 +41,12 @@ function Clientes() {
         <div className={styles.toolbar}>
           <div>
             <h2>Clientes</h2>
-            <p>Gestión mock preparada para integrarse luego con FastAPI.</p>
+            <p>Los clientes se registran automáticamente al crear contratos y propiedades.</p>
           </div>
-          <Button onClick={openCreateModal}>Nuevo cliente</Button>
         </div>
 
         <div className={styles.filters}>
-          <Input placeholder="Buscar por nombre, DNI, email o número" value={search} onChange={(event) => setSearch(event.target.value)} />
+          <Input placeholder="Buscar por nombre, DNI, teléfono o dirección" value={search} onChange={(event) => setSearch(event.target.value)} />
           {feedback ? <div className={styles.feedback}>{feedback}</div> : null}
           {error ? <div className={styles.error}>{error}</div> : null}
         </div>
@@ -57,13 +61,13 @@ function Clientes() {
       {!loading && filteredClientes.length > 0 ? (
         <Table headers={["Dirección", "Nombre", "Apellido", "Teléfono", "Inquilino/Propietario", "Acciones"]}>
           {filteredClientes.map((cliente) => (
-            <tr key={cliente.id}>
-              <td>{cliente.direccion}</td>
+            <tr key={cliente.cliente_num}>
+              <td>{cliente.direccion ?? '—'}</td>
               <td>{cliente.nombre}</td>
               <td>{cliente.apellido}</td>
               <td>{cliente.telefono}</td>
               <td>
-                <StatusBadge variant={cliente.tipo === 'Propietario' ? 'success' : 'info'}>{cliente.tipo}</StatusBadge>
+                {cliente.tipo ? <StatusBadge variant={badgeVariant(cliente.tipo)}>{cliente.tipo}</StatusBadge> : '—'}
               </td>
               <td>
                 <div className={styles.actions}>
@@ -78,7 +82,7 @@ function Clientes() {
 
       <Modal
         open={modalOpen}
-        title={editingCliente ? 'Editar cliente' : 'Nuevo cliente'}
+        title="Editar cliente"
         onClose={() => setModalOpen(false)}
         footer={(
           <>
@@ -92,10 +96,10 @@ function Clientes() {
           <Input label="Apellido" value={form.apellido} onChange={(event) => setForm((current) => ({ ...current, apellido: event.target.value }))} />
           <Input label="DNI" value={form.dni} onChange={(event) => setForm((current) => ({ ...current, dni: event.target.value }))} />
           <Input label="Teléfono" value={form.telefono} onChange={(event) => setForm((current) => ({ ...current, telefono: event.target.value }))} />
-          <Input label="Email" type="email" value={form.email} onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))} />
-          <Input label="Dirección" value={form.direccion} onChange={(event) => setForm((current) => ({ ...current, direccion: event.target.value }))} />
-          <Input label="CUIL" value={form.cuil} onChange={(event) => setForm((current) => ({ ...current, cuil: event.target.value }))} />
-          <Input label="Nacionalidad" value={form.nacionalidad} onChange={(event) => setForm((current) => ({ ...current, nacionalidad: event.target.value }))} />
+          <Input label="Email (opcional)" type="email" value={form.email ?? ''} onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))} />
+          <Input label="Dirección (opcional)" value={form.direccion ?? ''} onChange={(event) => setForm((current) => ({ ...current, direccion: event.target.value }))} />
+          <Input label="CUIL (opcional)" value={form.cuil ?? ''} onChange={(event) => setForm((current) => ({ ...current, cuil: event.target.value }))} />
+          <Input label="Nacionalidad (opcional)" value={form.nacionalidad ?? ''} onChange={(event) => setForm((current) => ({ ...current, nacionalidad: event.target.value }))} />
           {formError ? <div className={styles.error}>{formError}</div> : null}
         </form>
       </Modal>
@@ -103,16 +107,16 @@ function Clientes() {
       <Modal open={detailOpen} title="Detalle de cliente" onClose={() => setDetailOpen(false)} footer={<Button variant="ghost" onClick={() => setDetailOpen(false)}>Cerrar</Button>}>
         {selectedCliente ? (
           <div className={styles.detailGrid}>
-            <div><span>Número</span><strong>{selectedCliente.numeroCliente}</strong></div>
+            <div><span>Número</span><strong>{selectedCliente.cliente_num}</strong></div>
             <div><span>Nombre</span><strong>{selectedCliente.nombre}</strong></div>
             <div><span>Apellido</span><strong>{selectedCliente.apellido}</strong></div>
             <div><span>DNI</span><strong>{selectedCliente.dni}</strong></div>
             <div><span>Teléfono</span><strong>{selectedCliente.telefono}</strong></div>
-            <div><span>Email</span><strong>{selectedCliente.email}</strong></div>
-            <div><span>Dirección</span><strong>{selectedCliente.direccion}</strong></div>
-            <div><span>CUIL</span><strong>{selectedCliente.cuil}</strong></div>
-            <div><span>Nacionalidad</span><strong>{selectedCliente.nacionalidad}</strong></div>
-            <div><span>Inquilino/Propietario</span><strong>{selectedCliente.tipo}</strong></div>
+            <div><span>Email</span><strong>{selectedCliente.email ?? '—'}</strong></div>
+            <div><span>Dirección</span><strong>{selectedCliente.direccion ?? '—'}</strong></div>
+            <div><span>CUIL</span><strong>{selectedCliente.cuil ?? '—'}</strong></div>
+            <div><span>Nacionalidad</span><strong>{selectedCliente.nacionalidad ?? '—'}</strong></div>
+            <div><span>Inquilino/Propietario</span><strong>{selectedCliente.tipo ?? '—'}</strong></div>
           </div>
         ) : null}
       </Modal>

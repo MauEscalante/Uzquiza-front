@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
-import { formatCurrency, formatPercent } from '../services/api'
-import { descargarExcelMock, generarRecibo, listHistorialIngreso, obtenerRecibosAjustar, obtenerRecibosReAjustar, obtenerResumen } from '../services/recibosService'
+import { formatCurrency, formatPercent, mensajeDe } from '../services/api'
+import { descargarExcel, esperarAjuste, generarRecibo, listHistorialIngreso, obtenerResumen } from '../services/recibosService'
+import type { EstadoAjuste } from '../services/recibosService'
 import type { Recibo, ReciboFormValues } from '../types/recibo'
 
 const monthNames = [
@@ -59,6 +60,11 @@ export function useRecibosController() {
 	const [cantidadRecibosActivos, setCantidadRecibosActivos] = useState(0);
 	const [aumentoPorcentual, setAumentoPorcentual] = useState(0);
 	const [aumentoMonetario, setAumentoMonetario] = useState(0);
+	// Generar recibos reescribe la planilla y marca las propiedades como impagas,
+	// así que al terminar hay que volver a pedir el historial y el resumen.
+	const [generando, setGenerando] = useState(false);
+	const [estadoAjuste, setEstadoAjuste] = useState<EstadoAjuste | null>(null);
+	const [recarga, setRecarga] = useState(0);
 
 	useEffect(() => {
 		let mounted = true
@@ -81,12 +87,18 @@ export function useRecibosController() {
 		}
 
 		const cargarResumen = async () => {
-			console.log('Cargando resumen...')
-			const resumen = await obtenerResumen();
-			setTotalIngresos(resumen.totalIngresos);
-			setCantidadRecibosActivos(resumen.cantidadRecibosActivos);
-			setAumentoPorcentual(resumen.aumentoPorcentual);
-			setAumentoMonetario(resumen.aumentoMonetario);
+			try {
+				const resumen = await obtenerResumen()
+				if (!mounted) return
+				setTotalIngresos(resumen.totalIngresos)
+				setCantidadRecibosActivos(resumen.cantidadRecibosActivos)
+				setAumentoPorcentual(resumen.aumentoPorcentual)
+				setAumentoMonetario(resumen.aumentoMonetario)
+			} catch {
+				if (mounted) {
+					setError('No se pudo cargar el resumen.')
+				}
+			}
 		};
 
 		void loadRecibos()
@@ -94,7 +106,7 @@ export function useRecibosController() {
 		return () => {
 			mounted = false
 		}
-	}, [])
+	}, [recarga])
 
 	const sortedRecibos = useMemo(() => sortRecibosDescendente(recibos), [recibos])
 
@@ -112,18 +124,37 @@ export function useRecibosController() {
 			anio: form.anio,
 		}
 
-		//obtengo que recibos tengo que hacer el ajuste inicial
-		const recibosAjustar = await obtenerRecibosAjustar(payload.mes, payload.anio)
-		//obtengo recibos q tienen re ajuste
-		const recibosReAjuste = await obtenerRecibosReAjustar(payload.mes, payload.anio)
-		//generate recibo
-		await generarRecibo(payload, recibosAjustar, recibosReAjuste)
+		// El backend resuelve solo qué contratos ajustar; antes se le mandaban dos
+		// listas en el body que ignoraba por completo.
+		setGenerando(true)
+		setFeedback('')
+		setEstadoAjuste('pendiente')
+		try {
+			// El POST solo encola: vuelve al instante con el trabajo. Ajustar la
+			// planilla tarda más de un minuto, así que el progreso se consulta aparte.
+			const encolado = await generarRecibo(payload)
+			const terminado = await esperarAjuste(encolado.ajuste_id, setEstadoAjuste)
+			setFeedback(
+				`Recibos generados para ${payload.mes}/${payload.anio}: ` +
+				`${terminado.contratos_ajustados ?? 0} contratos ajustados, ` +
+				`${terminado.propiedades_marcadas_adeuda ?? 0} propiedades marcadas como impagas.`,
+			)
+			setRecarga((n) => n + 1)
+		} catch (e) {
+			setError(mensajeDe(e, 'No se pudieron generar los recibos.'))
+		} finally {
+			setGenerando(false)
+			setEstadoAjuste(null)
+		}
 	}
 
 	async function handleDownloadExcel() {
 		setError('')
-		const response = await descargarExcelMock()
-		setFeedback(response)
+		try {
+			setFeedback(await descargarExcel())
+		} catch (e) {
+			setError(mensajeDe(e, 'No se pudo descargar la planilla.'))
+		}
 	}
 
 	return {
@@ -133,6 +164,8 @@ export function useRecibosController() {
 		recibos: sortedRecibos,
 		form,
 		setForm,
+		generando,
+		estadoAjuste,
 		handleGenerate,
 		handleDownloadExcel,
 		formatCurrency,

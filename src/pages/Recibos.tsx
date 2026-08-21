@@ -12,6 +12,8 @@ function Recibos() {
     recibos,
     form,
     setForm,
+    generando,
+    estadoAjuste,
     handleGenerate,
     handleDownloadExcel,
     formatCurrency,
@@ -42,7 +44,11 @@ function Recibos() {
           </div>
 
           <div className={styles.actions}>
-            <Button onClick={() => void handleGenerate()}>Hacer recibos</Button>
+            <Button onClick={() => void handleGenerate()} disabled={generando}>
+              {generando
+                ? (estadoAjuste === 'en_proceso' ? 'Ajustando la planilla…' : 'Encolando…')
+                : 'Hacer recibos'}
+            </Button>
             <Button variant="secondary" onClick={() => void handleDownloadExcel()}>Descargar Excel</Button>
           </div>
         </Card>

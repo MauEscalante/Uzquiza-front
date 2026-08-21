@@ -35,24 +35,13 @@ const mockAjustes: Ajuste[] = [
   },
 ]
 
+// Los ajustes todavía no tienen backend: esta pantalla se sirve de datos de ejemplo.
 export async function listAjustes(): Promise<Ajuste[]> {
   return mockAjustes
 }
 
-export async function chequearHistorial(ajusteId: string): Promise<Ajuste | null> {
-  const response = await fetch(`http://127.0.0.1:8000/ajuste/historial/${ajusteId}/`, {
-    method: 'GET',
-    headers: {
-      Accept: 'application/json',
-    },
-  })
-
-  if (!response.ok) {
-    throw new Error(`Error al cargar recibos a ajustar: ${response.status}`)
-  }
-
-  return response.json()
-}
+// Se eliminó chequearHistorial: apuntaba a /ajuste/historial/{id}/, un endpoint
+// que no existe en el backend, y no la llamaba nadie.
 
 
 

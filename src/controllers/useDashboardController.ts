@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { mensajeDe } from '../services/api'
 import { listAjustes } from '../services/ajustesService'
 import { listClientes } from '../services/clientesService'
 import { listContratos } from '../services/contratosService'
@@ -44,9 +45,9 @@ export function useDashboardController() {
         }
 
         setState({ clientes, propiedades, contratos, ajustes })
-      } catch {
+      } catch (e) {
         if (mounted) {
-          setError('No se pudo cargar el dashboard.')
+          setError(mensajeDe(e, 'No se pudo cargar el dashboard.'))
         }
       } finally {
         if (mounted) {

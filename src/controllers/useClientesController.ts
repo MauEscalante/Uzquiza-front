@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
-import { createCliente, listClientes, updateCliente } from '../services/clientesService'
-import type { Cliente, ClienteFormValues } from '../types/cliente'
+import { mensajeDe } from '../services/api'
+import { listClientes, updateCliente } from '../services/clientesService'
+import type { Cliente, ClienteUpdateValues } from '../types/cliente'
 
-const emptyForm: ClienteFormValues = {
+const emptyForm: ClienteUpdateValues = {
   nombre: '',
   apellido: '',
   dni: '',
@@ -22,7 +23,7 @@ export function useClientesController() {
   const [detailOpen, setDetailOpen] = useState(false)
   const [editingCliente, setEditingCliente] = useState<Cliente | null>(null)
   const [selectedCliente, setSelectedCliente] = useState<Cliente | null>(null)
-  const [form, setForm] = useState<ClienteFormValues>(emptyForm)
+  const [form, setForm] = useState<ClienteUpdateValues>(emptyForm)
   const [formError, setFormError] = useState('')
   const [feedback, setFeedback] = useState('')
 
@@ -35,9 +36,9 @@ export function useClientesController() {
         if (mounted) {
           setClientes(data)
         }
-      } catch {
+      } catch (e) {
         if (mounted) {
-          setError('No se pudieron cargar los clientes.')
+          setError(mensajeDe(e, 'No se pudieron cargar los clientes.'))
         }
       } finally {
         if (mounted) {
@@ -60,16 +61,10 @@ export function useClientesController() {
       return clientes
     }
 
-    return clientes.filter((cliente) => [cliente.numeroCliente, cliente.nombre, cliente.apellido, cliente.dni, cliente.telefono, cliente.email, cliente.direccion, cliente.cuil, cliente.nacionalidad, cliente.tipo]
-      .some((value) => value.toLowerCase().includes(normalizedSearch)))
+    // Varios campos son opcionales y llegan en null, por eso el String(value ?? '').
+    return clientes.filter((cliente) => [cliente.nombre, cliente.apellido, cliente.dni, cliente.telefono, cliente.email, cliente.direccion, cliente.cuil, cliente.nacionalidad, cliente.tipo]
+      .some((value) => String(value ?? '').toLowerCase().includes(normalizedSearch)))
   }, [clientes, search])
-
-  function openCreateModal() {
-    setEditingCliente(null)
-    setForm(emptyForm)
-    setFormError('')
-    setModalOpen(true)
-  }
 
   function openEditModal(cliente: Cliente) {
     setEditingCliente(cliente)
@@ -78,10 +73,10 @@ export function useClientesController() {
       apellido: cliente.apellido,
       dni: cliente.dni,
       telefono: cliente.telefono,
-      email: cliente.email,
-      direccion: cliente.direccion,
-      cuil: cliente.cuil,
-      nacionalidad: cliente.nacionalidad,
+      email: cliente.email ?? '',
+      direccion: cliente.direccion ?? '',
+      cuil: cliente.cuil ?? '',
+      nacionalidad: cliente.nacionalidad ?? '',
     })
     setFormError('')
     setModalOpen(true)
@@ -95,20 +90,24 @@ export function useClientesController() {
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
-    if (!form.nombre || !form.apellido || !form.dni || !form.telefono || !form.email || !form.direccion || !form.cuil || !form.nacionalidad) {
-      setFormError('Completá todos los campos del cliente.')
+    if (!editingCliente) {
       return
     }
 
-    const action = editingCliente ? updateCliente(editingCliente.id, form) : createCliente(form)
-    const saved = await action
+    if (!form.nombre || !form.apellido || !form.dni || !form.telefono) {
+      setFormError('Nombre, apellido, DNI y teléfono son obligatorios.')
+      return
+    }
 
-    if (editingCliente) {
-      setClientes((current) => current.map((cliente) => (cliente.id === editingCliente.id ? saved : cliente)))
+    try {
+      const saved = await updateCliente(editingCliente.cliente_num, form)
+      setClientes((current) => current.map((cliente) => (
+        cliente.cliente_num === editingCliente.cliente_num ? saved : cliente
+      )))
       setFeedback('Cliente actualizado correctamente.')
-    } else {
-      setClientes((current) => [saved, ...current])
-      setFeedback('Cliente creado correctamente.')
+    } catch (e) {
+      setFormError(mensajeDe(e, 'No se pudo actualizar el cliente.'))
+      return
     }
 
     setModalOpen(false)
@@ -116,7 +115,6 @@ export function useClientesController() {
     setForm(emptyForm)
   }
 
- 
   return {
     loading,
     error,
@@ -126,14 +124,12 @@ export function useClientesController() {
     setModalOpen,
     detailOpen,
     setDetailOpen,
-    editingCliente,
     selectedCliente,
     form,
     setForm,
     formError,
     feedback,
     filteredClientes,
-    openCreateModal,
     openEditModal,
     openDetailModal,
     handleSubmit,

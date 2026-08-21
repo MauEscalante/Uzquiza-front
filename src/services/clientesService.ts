@@ -1,6 +1,9 @@
-import type { ClienteFormValues } from '../types/cliente'
+import type { Cliente, ClienteUpdateValues } from '../types/cliente'
 
-export async function listClientes() {
+// No hay createCliente: los clientes se dan de alta solos al crear un contrato
+// (inquilino) o una propiedad (propietario). El backend tampoco expone el alta.
+
+export async function listClientes(): Promise<Cliente[]> {
   const response = await fetch(`http://127.0.0.1:8000/clientes/`, {
     method: 'GET',
     headers: {
@@ -15,25 +18,8 @@ export async function listClientes() {
   return await response.json()
 }
 
-export async function createCliente(values: ClienteFormValues) {
-  const response = await fetch(`http://127.0.0.1:8000/clientes/register`, {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(values),
-  })
-
-  if (!response.ok) {
-    throw new Error(`Error al cargar clientes: ${response.status}`)
-  }
-
-  return await response.json()
-}
-
-export async function updateCliente(id: string, values: ClienteFormValues) {
-  const response = await fetch(`http://127.0.0.1:8000/clientes/${id}`, {
+export async function updateCliente(clienteNum: number, values: ClienteUpdateValues): Promise<Cliente> {
+  const response = await fetch(`http://127.0.0.1:8000/clientes/${clienteNum}`, {
     method: 'PUT',
     headers: {
       Accept: 'application/json',
@@ -43,7 +29,7 @@ export async function updateCliente(id: string, values: ClienteFormValues) {
   })
 
   if (!response.ok) {
-    throw new Error(`Error al cargar clientes: ${response.status}`)
+    throw new Error(`Error al actualizar el cliente: ${response.status}`)
   }
 
   return await response.json()

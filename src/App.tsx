@@ -7,9 +7,10 @@ import Propiedades from './pages/Propiedades'
 import Contratos from './pages/Contratos'
 import Ajustes from './pages/Ajustes'
 import Recibos from './pages/Recibos'
+import LibroDiario from './pages/LibroDiario'
 import styles from './App.module.css'
 
-export type SectionId = 'dashboard' | 'clientes' | 'propiedades' | 'contratos' | 'ajustes' | 'recibos'
+export type SectionId = 'dashboard' | 'clientes' | 'propiedades' | 'contratos' | 'ajustes' | 'recibos' | 'libroDiario'
 
 const sections: Array<{ id: SectionId; label: string; title: string }> = [
   { id: 'dashboard', label: 'Dashboard', title: 'Dashboard' },
@@ -18,6 +19,7 @@ const sections: Array<{ id: SectionId; label: string; title: string }> = [
   { id: 'contratos', label: 'Contratos', title: 'Contratos' },
   { id: 'ajustes', label: 'Ajustes', title: 'Ajustes' },
   { id: 'recibos', label: 'Recibos', title: 'Recibos' },
+  { id: 'libroDiario', label: 'Libro diario', title: 'Libro diario' },
 ]
 
 function App() {
@@ -37,6 +39,7 @@ function App() {
           {activeSection === 'contratos' && <Contratos />}
           {activeSection === 'ajustes' && <Ajustes />}
           {activeSection === 'recibos' && <Recibos />}
+          {activeSection === 'libroDiario' && <LibroDiario />}
         </main>
       </div>
     </div>

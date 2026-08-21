@@ -10,8 +10,15 @@
     color 160ms ease;
 }
 
-.button:hover {
+.button:hover:not(:disabled) {
   transform: translateY(-1px);
+}
+
+/* Sin esto un botón deshabilitado se ve idéntico a uno activo. */
+.button:disabled {
+  opacity: 0.45;
+  box-shadow: none;
+  cursor: not-allowed;
 }
 
 .button:focus-visible {

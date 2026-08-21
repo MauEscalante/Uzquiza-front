@@ -47,3 +47,9 @@ export function formatPercent(value: number)  {
     maximumFractionDigits: 2,
   }).format(value/100)
 }
+
+/** "2026-08-10" -> "10/08/2026". El backend siempre manda fechas ISO. */
+export function formatDate(value: string) {
+  const [anio, mes, dia] = value.slice(0, 10).split('-')
+  return `${dia}/${mes}/${anio}`
+}

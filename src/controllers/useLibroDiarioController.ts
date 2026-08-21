@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { formatCurrency, formatDate } from '../services/api'
+import { formatCurrency, formatDate, mensajeDe } from '../services/api'
 import { crearMovimiento, eliminarMovimiento, listMovimientos, listRetiros, obtenerResumenCaja } from '../services/libroDiarioService'
 import { listPropiedades } from '../services/propiedadesService'
 import { crearMovimientoVacio, hoy } from '../types/libroDiario'
@@ -92,9 +92,9 @@ export function useLibroDiarioController() {
 			setError('')
 			try {
 				await cargarMes()
-			} catch {
+			} catch (e) {
 				if (mounted) {
-					setError('No se pudo cargar el libro diario.')
+					setError(mensajeDe(e, 'No se pudo cargar el libro diario.'))
 				}
 			} finally {
 				if (mounted) {
@@ -119,9 +119,9 @@ export function useLibroDiarioController() {
 				if (mounted) {
 					setPropiedades(data)
 				}
-			} catch {
+			} catch (e) {
 				if (mounted) {
-					setError('No se pudieron cargar las propiedades.')
+					setError(mensajeDe(e, 'No se pudieron cargar las propiedades.'))
 				}
 			}
 		}
@@ -257,8 +257,8 @@ export function useLibroDiarioController() {
 			await eliminarMovimiento(movimiento.movimiento_id)
 			await cargarMes()
 			setFeedback('Movimiento eliminado.')
-		} catch {
-			setError('No se pudo eliminar el movimiento.')
+		} catch (e) {
+			setError(mensajeDe(e, 'No se pudo eliminar el movimiento.'))
 		}
 	}
 

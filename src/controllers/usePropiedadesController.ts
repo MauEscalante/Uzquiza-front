@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { mensajeDe } from '../services/api'
 import {
   createPropiedad,
   deletePropiedad,
@@ -73,9 +74,9 @@ export function usePropiedadesController() {
         if (mounted) {
           setPropiedades(data)
         }
-      } catch {
+      } catch (e) {
         if (mounted) {
-          setError('No se pudieron cargar las propiedades.')
+          setError(mensajeDe(e, 'No se pudieron cargar las propiedades.'))
         }
       } finally {
         if (mounted) {
@@ -90,9 +91,10 @@ export function usePropiedadesController() {
         if (mounted) {
           setPropietariosDisponibles(data)
         }
-      } catch {
+      } catch (e) {
         // La grilla ya muestra su propio error; el selector queda vacío y solo
-        // se pueden cargar propietarios nuevos.
+        // se pueden cargar propietarios nuevos. Se deja rastro para poder diagnosticar.
+        console.error('No se pudieron cargar los propietarios:', e)
       }
     }
 
@@ -198,8 +200,8 @@ export function usePropiedadesController() {
     try {
       const detalle = await getPropiedad(propiedad.propiedad_id)
       setSelectedPropiedad(detalle)
-    } catch {
-      setDetailError('No se pudo cargar el detalle de la propiedad.')
+    } catch (e) {
+      setDetailError(mensajeDe(e, 'No se pudo cargar el detalle de la propiedad.'))
     } finally {
       setDetailLoading(false)
     }
@@ -303,8 +305,8 @@ export function usePropiedadesController() {
         setPropiedades((current) => [saved, ...current])
         setFeedback('Propiedad creada correctamente.')
       }
-    } catch {
-      setFormError('No se pudo guardar la propiedad.')
+    } catch (e) {
+      setFormError(mensajeDe(e, 'No se pudo guardar la propiedad.'))
       return
     }
 
@@ -321,8 +323,8 @@ export function usePropiedadesController() {
 
     try {
       await deletePropiedad(propiedad.propiedad_id)
-    } catch {
-      setError('No se pudo eliminar la propiedad. Puede tener contratos asociados.')
+    } catch (e) {
+      setError(mensajeDe(e, 'No se pudo eliminar la propiedad. Puede tener contratos asociados.'))
       return
     }
 

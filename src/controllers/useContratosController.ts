@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { formatCurrency } from '../services/api'
+import { formatCurrency, mensajeDe } from '../services/api'
 import {
   createContrato,
   getContratoDetails,
@@ -133,9 +133,9 @@ export function useContratosController() {
           setContratos(data)
 
         }
-      } catch {
+      } catch (e) {
         if (mounted) {
-          setError('No se pudieron cargar los contratos.')
+          setError(mensajeDe(e, 'No se pudieron cargar los contratos.'))
         }
       } finally {
         if (mounted) {
@@ -150,8 +150,9 @@ export function useContratosController() {
         if (mounted) {
           setPropiedades(data)
         }
-      } catch {
+      } catch (e) {
         // La lista de contratos ya muestra su propio error; el selector queda vacío.
+        console.error('No se pudieron cargar las propiedades del selector:', e)
       }
     }
 
@@ -196,8 +197,8 @@ export function useContratosController() {
     try {
       const detalle = await getContratoDetails(contrato.contrato_id)
       setSelectedContrato(detalle)
-    } catch {
-      setDetailError('No se pudo cargar el detalle del contrato.')
+    } catch (e) {
+      setDetailError(mensajeDe(e, 'No se pudo cargar el detalle del contrato.'))
     } finally {
       setDetailLoading(false)
     }

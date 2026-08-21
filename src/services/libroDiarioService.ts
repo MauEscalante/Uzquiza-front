@@ -1,85 +1,63 @@
+import { apiRequest, construirQuery, fetchAllPages } from './api'
 import type { MovimientoDiario, MovimientoFormValues, ResumenCaja } from '../types/libroDiario'
 
+/**
+ * Movimientos del mes, sin los retiros.
+ *
+ * Los retiros de caja se listan aparte, así que se piden explícitamente los otros
+ * tres tipos. Antes esto era `/libroDiario/{anio}/{mes}`, que traía el filtro
+ * `tipo <> 'RETIRO'` escondido en el backend.
+ */
 export async function listMovimientos(anio: string, mes: string): Promise<MovimientoDiario[]> {
-  const response = await fetch(`http://127.0.0.1:8000/libroDiario/${anio}/${mes}`, {
-    method: 'GET',
-    headers: {
-      Accept: 'application/json',
-    },
+  return fetchAllPages<MovimientoDiario>('/movimientos', 'Error al cargar el libro diario', {
+    anio,
+    mes,
+    tipo: ['INGRESO', 'DEPOSITO', 'EGRESO'],
+    sort: '-fecha',
   })
-
-  if (!response.ok) {
-    throw new Error(`Error al cargar el libro diario: ${response.status}`)
-  }
-
-  return await response.json()
 }
 
+/** Retiros de caja del mes: el mismo recurso, filtrado por tipo. */
 export async function listRetiros(anio: string, mes: string): Promise<MovimientoDiario[]> {
-  const response = await fetch(`http://127.0.0.1:8000/libroDiario/retiros/${anio}/${mes}`, {
-    method: 'GET',
-    headers: {
-      Accept: 'application/json',
-    },
+  return fetchAllPages<MovimientoDiario>('/movimientos', 'Error al cargar los retiros de caja', {
+    anio,
+    mes,
+    tipo: 'RETIRO',
+    sort: 'fecha',
   })
-
-  if (!response.ok) {
-    throw new Error(`Error al cargar los retiros de caja: ${response.status}`)
-  }
-
-  return await response.json()
 }
 
 export async function obtenerResumenCaja(anio: string, mes: string): Promise<ResumenCaja> {
-  const response = await fetch(`http://127.0.0.1:8000/libroDiario/resumen/${anio}/${mes}`, {
-    method: 'GET',
-    headers: {
-      Accept: 'application/json',
-    },
-  })
-
-  if (!response.ok) {
-    throw new Error(`Error al cargar el estado de la caja: ${response.status}`)
-  }
-
-  return await response.json()
+  const query = construirQuery({ anio, mes })
+  return apiRequest<ResumenCaja>(
+    `/caja/resumen?${query}`,
+    { method: 'GET' },
+    'Error al cargar el estado de la caja',
+  )
 }
 
 export async function crearMovimiento(values: MovimientoFormValues): Promise<MovimientoDiario> {
-  const response = await fetch(`http://127.0.0.1:8000/libroDiario/`, {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
+  return apiRequest<MovimientoDiario>(
+    '/movimientos',
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        fecha: values.fecha,
+        tipo: values.tipo,
+        propiedad_id: values.propiedadId ? Number(values.propiedadId) : null,
+        concepto: values.concepto,
+        monto: Number(values.monto),
+        cuenta: values.cuenta || null,
+      }),
     },
-    body: JSON.stringify({
-      fecha: values.fecha,
-      tipo: values.tipo,
-      propiedad_id: values.propiedadId ? Number(values.propiedadId) : null,
-      concepto: values.concepto,
-      monto: Number(values.monto),
-      cuenta: values.cuenta || null,
-    }),
-  })
-
-  if (!response.ok) {
-    // El backend explica el motivo en `detail`; sin eso el error no le sirve al usuario.
-    const detalle = await response.json().catch(() => null)
-    throw new Error(detalle?.detail ?? `Error al registrar el movimiento: ${response.status}`)
-  }
-
-  return await response.json()
+    'Error al registrar el movimiento',
+  )
 }
 
 export async function eliminarMovimiento(id: number): Promise<void> {
-  const response = await fetch(`http://127.0.0.1:8000/libroDiario/${id}`, {
-    method: 'DELETE',
-    headers: {
-      Accept: 'application/json',
-    },
-  })
-
-  if (!response.ok) {
-    throw new Error(`Error al eliminar el movimiento: ${response.status}`)
-  }
+  await apiRequest<null>(
+    `/movimientos/${id}`,
+    { method: 'DELETE' },
+    'Error al eliminar el movimiento',
+  )
 }

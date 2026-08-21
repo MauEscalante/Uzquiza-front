@@ -1,36 +1,31 @@
+import { apiRequest, fetchAllPages } from './api'
 import type { Cliente, ClienteUpdateValues } from '../types/cliente'
 
 // No hay createCliente: los clientes se dan de alta solos al crear un contrato
 // (inquilino) o una propiedad (propietario). El backend tampoco expone el alta.
 
 export async function listClientes(): Promise<Cliente[]> {
-  const response = await fetch(`http://127.0.0.1:8000/clientes/`, {
-    method: 'GET',
-    headers: {
-      Accept: 'application/json',
-    },
-  })
-
-  if (!response.ok) {
-    throw new Error(`Error al cargar clientes: ${response.status}`)
-  }
-
-  return await response.json()
+  return fetchAllPages<Cliente>('/clientes', 'Error al cargar clientes')
 }
 
 export async function updateCliente(clienteNum: number, values: ClienteUpdateValues): Promise<Cliente> {
-  const response = await fetch(`http://127.0.0.1:8000/clientes/${clienteNum}`, {
-    method: 'PUT',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(values),
-  })
+  return apiRequest<Cliente>(
+    `/clientes/${clienteNum}`,
+    { method: 'PUT', body: JSON.stringify(values) },
+    'Error al actualizar el cliente',
+  )
+}
 
-  if (!response.ok) {
-    throw new Error(`Error al actualizar el cliente: ${response.status}`)
-  }
-
-  return await response.json()
+/**
+ * Actualiza solo los campos indicados.
+ *
+ * Reemplaza a los viejos PUT /clientes/email/{id} y /clientes/telefono/{id}, que
+ * mandaban el valor nuevo por query string.
+ */
+export async function patchCliente(clienteNum: number, cambios: Partial<ClienteUpdateValues>): Promise<Cliente> {
+  return apiRequest<Cliente>(
+    `/clientes/${clienteNum}`,
+    { method: 'PATCH', body: JSON.stringify(cambios) },
+    'Error al actualizar el cliente',
+  )
 }

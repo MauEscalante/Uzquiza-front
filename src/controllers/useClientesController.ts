@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { mensajeDe } from '../services/api'
 import { listClientes, updateCliente } from '../services/clientesService'
 import type { Cliente, ClienteUpdateValues } from '../types/cliente'
 
@@ -35,9 +36,9 @@ export function useClientesController() {
         if (mounted) {
           setClientes(data)
         }
-      } catch {
+      } catch (e) {
         if (mounted) {
-          setError('No se pudieron cargar los clientes.')
+          setError(mensajeDe(e, 'No se pudieron cargar los clientes.'))
         }
       } finally {
         if (mounted) {
@@ -104,8 +105,8 @@ export function useClientesController() {
         cliente.cliente_num === editingCliente.cliente_num ? saved : cliente
       )))
       setFeedback('Cliente actualizado correctamente.')
-    } catch {
-      setFormError('No se pudo actualizar el cliente.')
+    } catch (e) {
+      setFormError(mensajeDe(e, 'No se pudo actualizar el cliente.'))
       return
     }
 

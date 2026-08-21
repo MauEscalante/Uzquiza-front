@@ -39,3 +39,10 @@
 .table tbody tr:last-child td {
   border-bottom: 0;
 }
+
+.table tfoot td {
+  background: var(--surface-muted);
+  font-weight: 700;
+  border-bottom: 0;
+  border-top: 1px solid var(--border);
+}

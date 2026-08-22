@@ -5,7 +5,11 @@ import Modal from '../components/Modal'
 import Table from '../components/Table'
 import ContratoForm from '../components/ContratoForm.tsx'
 import ContratoDetail from '../components/ContratoDetail.tsx'
-import { useContratosController } from '../controllers/useContratosController'
+import RescisionForm from '../components/RescisionForm.tsx'
+import EntregaLlavesForm from '../components/EntregaLlavesForm.tsx'
+import StatusBadge from '../components/StatusBadge'
+import { formatDate } from '../services/api'
+import { tieneRescisionPendiente, useContratosController } from '../controllers/useContratosController'
 
 import styles from './Contratos.module.css'
 
@@ -34,6 +38,26 @@ function Contratos() {
     openDetail,
     formatCurrency,
     getPropiedadDireccion,
+    rescisionContrato,
+    rescisionMes,
+    setRescisionMes,
+    rescisionCalculo,
+    rescisionLoading,
+    rescisionSubmitting,
+    rescisionError,
+    rescisionMesesOptions,
+    openRescision,
+    closeRescision,
+    confirmRescision,
+    entregaContrato,
+    entregaFecha,
+    setEntregaFecha,
+    entregaImporte,
+    setEntregaImporte,
+    openEntregaLlaves,
+    closeEntregaLlaves,
+    confirmEntregaLlaves,
+    cancelarAviso,
   } = useContratosController()
   
   return (
@@ -70,10 +94,32 @@ function Contratos() {
               <td>{contrato.deposito != null ? formatCurrency(contrato.deposito) : '—'}</td>
               <td>{contrato.tipo_ajuste}</td>
               <td>{contrato.periodicidad}</td>
-              <td>{contrato.estado}</td>
+              <td>
+                {tieneRescisionPendiente(contrato) ? (
+                  <StatusBadge variant="warning">
+                    {`Rescisión ${formatDate(contrato.fecha_rescision as string)}`}
+                  </StatusBadge>
+                ) : (
+                  contrato.estado
+                )}
+              </td>
               <td>
                 <div className={styles.actions}>
                   <Button variant="ghost" onClick={() => openDetail(contrato)}>Ver detalles</Button>
+                  {/*
+                    Las acciones siguen las tres fases: sin aviso se rescinde, con aviso
+                    pendiente se cierra por entrega de llaves (o se cancela el aviso), y un
+                    contrato ya cerrado no ofrece ninguna.
+                  */}
+                  {contrato.estado === 'Activo' && !tieneRescisionPendiente(contrato) ? (
+                    <Button variant="danger" onClick={() => openRescision(contrato)}>Rescindir</Button>
+                  ) : null}
+                  {tieneRescisionPendiente(contrato) ? (
+                    <>
+                      <Button onClick={() => openEntregaLlaves(contrato)}>Entregar llaves</Button>
+                      <Button variant="ghost" onClick={() => cancelarAviso(contrato)}>Cancelar rescisión</Button>
+                    </>
+                  ) : null}
                 </div>
               </td>
             </tr>
@@ -98,6 +144,68 @@ function Contratos() {
           formError={formError}
           onSubmit={(event) => handleSubmit(event as React.FormEvent<HTMLFormElement>)}
           propiedades={propiedades}
+        />
+      </Modal>
+
+      <Modal
+        open={rescisionContrato !== null}
+        title="Rescindir contrato"
+        onClose={closeRescision}
+        footer={(
+          <>
+            <Button variant="ghost" onClick={closeRescision}>Cancelar</Button>
+            <Button
+              type="submit"
+              form="rescision-form"
+              variant="danger"
+              disabled={rescisionSubmitting || rescisionLoading || !rescisionCalculo}
+            >
+              {rescisionSubmitting ? 'Registrando...' : 'Registrar rescisión'}
+            </Button>
+          </>
+        )}
+      >
+        <RescisionForm
+          direccion={rescisionContrato ? getPropiedadDireccion(rescisionContrato.propiedad) : ''}
+          mesesOptions={rescisionMesesOptions}
+          mesSeleccionado={rescisionMes}
+          onMesChange={setRescisionMes}
+          calculo={rescisionCalculo}
+          loading={rescisionLoading}
+          error={rescisionError}
+          onSubmit={confirmRescision}
+        />
+      </Modal>
+
+      <Modal
+        open={entregaContrato !== null}
+        title="Entrega de llaves"
+        onClose={closeEntregaLlaves}
+        footer={(
+          <>
+            <Button variant="ghost" onClick={closeEntregaLlaves}>Cancelar</Button>
+            <Button
+              type="submit"
+              form="entrega-llaves-form"
+              variant="danger"
+              disabled={rescisionSubmitting || rescisionLoading || !rescisionCalculo}
+            >
+              {rescisionSubmitting ? 'Cerrando...' : 'Cerrar contrato'}
+            </Button>
+          </>
+        )}
+      >
+        <EntregaLlavesForm
+          direccion={entregaContrato ? getPropiedadDireccion(entregaContrato.propiedad) : ''}
+          fechaSalidaAgendada={entregaContrato?.fecha_rescision ?? null}
+          fecha={entregaFecha}
+          onFechaChange={setEntregaFecha}
+          importe={entregaImporte}
+          onImporteChange={setEntregaImporte}
+          calculo={rescisionCalculo}
+          loading={rescisionLoading}
+          error={rescisionError}
+          onSubmit={confirmEntregaLlaves}
         />
       </Modal>
 

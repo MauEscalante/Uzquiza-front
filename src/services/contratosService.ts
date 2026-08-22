@@ -1,5 +1,5 @@
-import { apiRequest, fetchAllPages } from './api'
-import type { Contrato, ContratoDetalle, ContratoFormValues } from '../types/contrato'
+import { apiRequest, construirQuery, fetchAllPages } from './api'
+import type { Contrato, ContratoDetalle, ContratoFormValues, RescisionCalculo } from '../types/contrato'
 import type { ContratoGarante, ContratoInquilino } from '../types/contrato'
 
 export interface PropiedadResumen {
@@ -55,5 +55,62 @@ export async function listGarantesDeContrato(id: string): Promise<ContratoGarant
     `/contratos/${id}/garantes`,
     { method: 'GET' },
     'Error al cargar los garantes del contrato',
+  )
+}
+
+/**
+ * Cuánto sale irse en un mes dado, sin persistir nada.
+ *
+ * El día dentro del mes es indistinto: el backend toma siempre el cierre del mes.
+ */
+export async function calcularRescision(id: string, anio: number, mes: number): Promise<RescisionCalculo> {
+  const query = construirQuery({ anio: String(anio), mes: String(mes) })
+  return apiRequest<RescisionCalculo>(
+    `/contratos/${id}/rescision?${query}`,
+    { method: 'GET' },
+    'Error al calcular la rescisión',
+  )
+}
+
+/**
+ * Registra el aviso: el inquilino se va tal mes. NO cierra el contrato.
+ *
+ * Queda Activo con la salida agendada, porque ese mes lo paga y tiene que seguir
+ * liquidando. La penalidad se calcula al entregar las llaves.
+ */
+export async function registrarRescision(id: string, anio: number, mes: number): Promise<RescisionCalculo> {
+  return apiRequest<RescisionCalculo>(
+    `/contratos/${id}/rescision`,
+    { method: 'POST', body: JSON.stringify({ anio, mes }) },
+    'Error al registrar la rescisión',
+  )
+}
+
+/**
+ * Cierra la rescisión con la fecha real de entrega de llaves.
+ *
+ * `importe` solo hace falta cuando el mes de la entrega todavía no tiene su alquiler
+ * cargado; el preview lo anticipa con `importe_estimado`.
+ */
+export async function entregarLlaves(id: string, fechaEntrega: string, importe?: number): Promise<RescisionCalculo> {
+  return apiRequest<RescisionCalculo>(
+    `/contratos/${id}/entrega-llaves`,
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        fecha_entrega: fechaEntrega,
+        importe_alquiler: importe ?? null,
+      }),
+    },
+    'Error al registrar la entrega de llaves',
+  )
+}
+
+/** Deshace un aviso mal cargado. */
+export async function cancelarRescision(id: string): Promise<void> {
+  await apiRequest<null>(
+    `/contratos/${id}/rescision`,
+    { method: 'DELETE' },
+    'Error al cancelar la rescisión',
   )
 }

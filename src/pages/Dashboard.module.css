@@ -31,10 +31,6 @@
 }
 
 .metricHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
   margin-bottom: 18px;
   color: var(--text-secondary);
   font-size: 0.88rem;
@@ -62,9 +58,25 @@
 
 .list li {
   position: relative;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
   padding-left: 16px;
   color: var(--text-primary);
   line-height: 1.5;
+}
+
+.list time {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.empty {
+  margin: 0;
+  padding: 20px;
+  color: var(--text-secondary);
 }
 
 .list li::before {
@@ -78,13 +90,13 @@
   background: var(--secondary-orange);
 }
 
-.adjustmentList {
+.vencimientoList {
   display: grid;
   gap: 12px;
   padding: 20px;
 }
 
-.adjustmentItem {
+.vencimientoItem {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -94,8 +106,8 @@
   padding: 14px 16px;
 }
 
-.adjustmentItem p,
-.adjustmentItem span {
+.vencimientoItem p,
+.vencimientoItem span {
   margin: 0;
   color: var(--text-secondary);
 }
@@ -115,7 +127,7 @@
     grid-template-columns: 1fr;
   }
 
-  .adjustmentItem {
+  .vencimientoItem {
     align-items: flex-start;
     flex-direction: column;
   }

@@ -1,11 +1,26 @@
 import Card from '../components/Card'
 import StatusBadge from '../components/StatusBadge'
-import { formatCurrency } from '../services/api'
-import { useDashboardController } from '../controllers/useDashboardController'
+import { formatDate } from '../services/api'
+import { DIAS_POR_VENCER, useDashboardController } from '../controllers/useDashboardController'
 import styles from './Dashboard.module.css'
 
+/** Cuanto más cerca del vencimiento, más fuerte el color. */
+function urgencia(diasRestantes: number) {
+  if (diasRestantes <= 15) {
+    return 'danger' as const
+  }
+  return diasRestantes <= 30 ? ('warning' as const) : ('info' as const)
+}
+
+function textoRestante(diasRestantes: number) {
+  if (diasRestantes <= 0) {
+    return 'Vence hoy'
+  }
+  return diasRestantes === 1 ? 'Falta 1 día' : `Faltan ${diasRestantes} días`
+}
+
 function Dashboard() {
-  const { loading, error, metrics, recentActivity, state } = useDashboardController()
+  const { loading, error, metrics, contratosPorVencer, actividad, diasActividad } = useDashboardController()
 
   return (
     <div className={styles.page}>
@@ -17,7 +32,6 @@ function Dashboard() {
           <Card key={metric.label} className={styles.metricCard}>
             <div className={styles.metricHeader}>
               <span>{metric.label}</span>
-              <StatusBadge variant={metric.accent}>{metric.label.split(' ')[0]}</StatusBadge>
             </div>
             <strong>{metric.value}</strong>
           </Card>
@@ -25,30 +39,42 @@ function Dashboard() {
       </section>
 
       <section className={styles.twoColumn}>
-        <Card title="Actividad reciente" subtitle="Últimos movimientos del sistema">
-          <ul className={styles.list}>
-            {recentActivity.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
+        <Card title="Actividad reciente" subtitle={`Altas de los últimos ${diasActividad} días`}>
+          {actividad.length === 0 ? (
+            <p className={styles.empty}>Sin actividad en los últimos {diasActividad} días.</p>
+          ) : (
+            <ul className={styles.list}>
+              {actividad.map((evento) => (
+                <li key={evento.evento_id}>
+                  <span>{evento.descripcion}</span>
+                  <time dateTime={evento.creado_en}>{formatDate(evento.creado_en)}</time>
+                </li>
+              ))}
+            </ul>
+          )}
         </Card>
 
-        //aca van los contratos que se vencen/////////////////////////////////////////////////
-        <Card title="Próximos contratos a vencer" subtitle="Contratos que vencen en el corto plazo">
-          <div className={styles.adjustmentList}>
-            {state.ajustes.slice(0, 3).map((ajuste) => (
-              <article key={ajuste.id} className={styles.adjustmentItem}>
-                <div>
-                  <strong>{ajuste.inquilino}</strong>
-                  <p>{ajuste.propiedad}</p>
-                </div>
-                <div>
-                  <StatusBadge variant={ajuste.estado === 'Ajuste realizado' ? 'success' : ajuste.estado === 'Ajuste pendiente' ? 'warning' : 'info'}>{ajuste.estado}</StatusBadge>
-                  <span>{formatCurrency(ajuste.nuevoImporte)}</span>
-                </div>
-              </article>
-            ))}
-          </div>
+        <Card title="Próximos contratos a vencer" subtitle={`Contratos que terminan dentro de ${DIAS_POR_VENCER} días`}>
+          {contratosPorVencer.length === 0 ? (
+            <p className={styles.empty}>No hay contratos por vencer en los próximos {DIAS_POR_VENCER} días.</p>
+          ) : (
+            <div className={styles.vencimientoList}>
+              {contratosPorVencer.map((contrato) => (
+                <article key={contrato.contratoId} className={styles.vencimientoItem}>
+                  <div>
+                    <strong>{contrato.direccion}</strong>
+                    <p>{contrato.inquilino ?? 'Sin inquilino asignado'}</p>
+                  </div>
+                  <div>
+                    <StatusBadge variant={urgencia(contrato.diasRestantes)}>
+                      {textoRestante(contrato.diasRestantes)}
+                    </StatusBadge>
+                    <span>{formatDate(contrato.fechaFin)}</span>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
         </Card>
       </section>
     </div>

@@ -8,12 +8,12 @@
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  padding: 20px;
+  padding: 18px;
 }
 
 .toolbar h2 {
   margin: 0 0 4px;
-  font-size: 1.15rem;
+  font-size: 1.02rem;
 }
 
 .toolbar p,
@@ -21,7 +21,7 @@
 .error,
 .emptyState {
   margin: 0;
-  color: var(--text-secondary);
+  color: var(--texto-suave);
 }
 
 .filters {
@@ -31,12 +31,12 @@
 }
 
 .feedback {
-  color: var(--success);
+  color: var(--exito);
   font-weight: 600;
 }
 
 .error {
-  color: var(--danger);
+  color: var(--peligro);
   font-weight: 600;
 }
 
@@ -58,7 +58,7 @@
 
 .sectionDivider {
   grid-column: 1 / -1;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--borde);
   padding-top: 1rem;
   margin-top: 0.25rem;
 }
@@ -89,16 +89,16 @@
 }
 
 .detailGrid div {
-  border: 1px solid var(--border);
-  border-radius: 14px;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-md);
   padding: 14px 16px;
-  background: var(--surface-muted);
+  background: var(--niebla);
 }
 
 .detailGrid span {
   display: block;
   margin-bottom: 6px;
-  color: var(--text-secondary);
+  color: var(--texto-suave);
   font-size: 0.85rem;
 }
 

@@ -17,10 +17,10 @@ function Sidebar({ sections, activeSection, onChangeSection }: SidebarProps) {
   return (
     <aside className={styles.sidebar}>
       <div className={styles.brand}>
-        <div className={styles.brandMark}>IM</div>
+        <div className={styles.brandMark}>UZ</div>
         <div>
-          <strong>Inmobiliaria</strong>
-          <span>Panel administrativo</span>
+          <strong>Uzquiza</strong>
+          <span>Administración de alquileres</span>
         </div>
       </div>
 

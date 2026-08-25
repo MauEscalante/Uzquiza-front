@@ -1,25 +1,56 @@
 :root {
-  --primary-blue: #1565c0;
-  --primary-blue-dark: #0f4c96;
-  --secondary-orange: #f57c00;
-  --secondary-orange-soft: #fff1e5;
-  --white: #ffffff;
-  --background: #f5f7fa;
-  --surface: #ffffff;
-  --surface-muted: #f8fafc;
-  --border: #dbe4ee;
-  --text-primary: #1f2937;
-  --text-secondary: #6b7280;
-  --success: #15803d;
-  --warning: #c2410c;
-  --danger: #b91c1c;
-  --shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
-  --radius-lg: 18px;
-  --radius-md: 14px;
-  --radius-sm: 10px;
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  color: var(--text-primary);
-  background: var(--background);
+  /* --- Marca ---------------------------------------------------------
+     Azul = estructura y estado en regla. Naranja = requiere accion.
+     El naranja NO pasa contraste AA como texto sobre blanco (2.92:1),
+     asi que se usa como relleno o filo, siempre con --tinta encima.
+     Para naranja tipografico esta --naranja-texto (4.63:1). */
+  --azul: #2d5fd7;
+  --azul-fuerte: #1e47ab;
+  --azul-vela: #eef3fe;
+  --azul-vela-fuerte: #e2ebfd;
+  --azul-borde: #c5d4f7;
+  --naranja: #f07323;
+  --naranja-fuerte: #dd6417;
+  --naranja-texto: #c2521a;
+  --naranja-vela: #fef1e7;
+  --blanco: #ffffff;
+
+  /* --- Neutros --- */
+  --tinta: #12224a;
+  --texto-suave: #5b6b8c;
+  --niebla: #f4f6fb;
+  --borde: #dce3f0;
+  --borde-fuerte: #c3cfe4;
+
+  /* --- Estado ---
+     Los dos colores de marca hacen doble funcion a proposito: son los
+     dos estados que mas aparecen en el panel. */
+  --exito: #15803d;
+  --exito-vela: #dcfce7;
+  --atencion: var(--naranja);
+  --peligro: #b91c1c;
+  --peligro-vela: #fee2e2;
+  --peligro-vela-fuerte: #fde0e0;
+
+  /* --- Forma ---
+     Los paneles se definen por borde, no por sombra. La elevacion queda
+     reservada para lo que de verdad flota (modales). */
+  --radio-lg: 10px;
+  --radio-md: 8px;
+  --radio-sm: 6px;
+  --sombra-flotante: 0 24px 56px rgba(18, 34, 74, 0.18);
+  --anillo-foco: 0 0 0 3px rgba(45, 95, 215, 0.3);
+
+  /* --- Tipografia ---
+     Una sola familia en dos anchos: el contraste viene del eje wdth,
+     no de mezclar familias. Mono solo para cifras. */
+  --fuente: Archivo, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --fuente-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+
+  font-family: var(--fuente);
+  color: var(--tinta);
+  background: var(--niebla);
+  -webkit-font-smoothing: antialiased;
 }
 
 * {
@@ -34,8 +65,17 @@ body,
 
 body {
   margin: 0;
-  background: var(--background);
-  color: var(--text-primary);
+  background: var(--niebla);
+  color: var(--tinta);
+}
+
+/* Titulos y cifras grandes: Archivo ensanchado. */
+h1,
+h2,
+h3 {
+  font-stretch: 118%;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 button,
@@ -51,9 +91,29 @@ button {
 
 table {
   border-collapse: collapse;
+  /* Sin esto los importes bailan de fila en fila. */
+  font-variant-numeric: tabular-nums;
 }
 
 a {
   color: inherit;
   text-decoration: none;
+}
+
+/* Un solo anillo de foco para todo el panel. Los componentes que
+   necesitan otro offset lo redefinen, no lo apagan. */
+:focus-visible {
+  outline: 2px solid var(--azul);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

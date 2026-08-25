@@ -1,50 +1,57 @@
 .button {
   border: 0;
-  border-radius: 999px;
-  padding: 0.8rem 1.15rem;
-  font-weight: 700;
+  border-radius: var(--radio-md);
+  padding: 0.62rem 1.05rem;
+  font-size: 0.92rem;
+  font-weight: 600;
   transition:
-    transform 160ms ease,
-    box-shadow 160ms ease,
-    background-color 160ms ease,
-    color 160ms ease;
-}
-
-.button:hover:not(:disabled) {
-  transform: translateY(-1px);
+    background-color 140ms ease,
+    color 140ms ease,
+    border-color 140ms ease;
 }
 
 /* Sin esto un botón deshabilitado se ve idéntico a uno activo. */
 .button:disabled {
   opacity: 0.45;
-  box-shadow: none;
   cursor: not-allowed;
 }
 
-.button:focus-visible {
-  outline: 3px solid rgba(21, 101, 192, 0.2);
-  outline-offset: 2px;
-}
-
 .primary {
-  background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-dark));
-  color: var(--white);
-  box-shadow: 0 10px 24px rgba(21, 101, 192, 0.24);
+  background: var(--azul);
+  color: var(--blanco);
 }
 
+.primary:hover:not(:disabled) {
+  background: var(--azul-fuerte);
+}
+
+/* Naranja = requiere acción. Lleva tinta encima, no blanco: blanco
+   sobre #f07323 da 2.92:1 y no llega a AA. */
 .secondary {
-  background: var(--secondary-orange);
-  color: var(--white);
+  background: var(--naranja);
+  color: var(--tinta);
+}
+
+.secondary:hover:not(:disabled) {
+  background: var(--naranja-fuerte);
 }
 
 .ghost {
-  background: #eaf2fb;
-  color: var(--primary-blue);
+  background: var(--azul-vela);
+  color: var(--azul);
+}
+
+.ghost:hover:not(:disabled) {
+  background: var(--azul-vela-fuerte);
 }
 
 .danger {
-  background: #fef2f2;
-  color: var(--danger);
+  background: var(--peligro-vela);
+  color: var(--peligro);
+}
+
+.danger:hover:not(:disabled) {
+  background: var(--peligro-vela-fuerte);
 }
 
 .fullWidth {

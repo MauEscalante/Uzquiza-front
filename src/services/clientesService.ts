@@ -1,50 +1,23 @@
-import type { ClienteFormValues } from '../types/cliente'
+import { apiRequest, fetchCollection, fetchPage } from './api'
+import type { Cliente, ClienteFormValues } from '../types/cliente'
 
-export async function listClientes() {
-  const response = await fetch(`http://127.0.0.1:8000/clientes/`, {
-    method: 'GET',
-    headers: {
-      Accept: 'application/json',
-    },
-  })
+// No hay alta de clientes: el back los crea solos al registrar un contrato
+// (inquilino) o una propiedad (propietario).
 
-  if (!response.ok) {
-    throw new Error(`Error al cargar clientes: ${response.status}`)
-  }
-
-  return await response.json()
+export function listClientes(): Promise<Cliente[]> {
+  return fetchCollection<Cliente>('/clientes')
 }
 
-export async function createCliente(values: ClienteFormValues) {
-  const response = await fetch(`http://127.0.0.1:8000/clientes/register`, {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(values),
-  })
-
-  if (!response.ok) {
-    throw new Error(`Error al cargar clientes: ${response.status}`)
-  }
-
-  return await response.json()
+/** Total real de clientes, sin el techo de page_size que tiene el listado. */
+export async function contarClientes(): Promise<number> {
+  const page = await fetchPage<unknown>('/clientes', { page_size: 1 })
+  return page.total
 }
 
-export async function updateCliente(id: string, values: ClienteFormValues) {
-  const response = await fetch(`http://127.0.0.1:8000/clientes/${id}`, {
+export function updateCliente(clienteNum: number, values: ClienteFormValues): Promise<Cliente> {
+  return apiRequest<Cliente>(`/clientes/${clienteNum}`, {
     method: 'PUT',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(values),
   })
-
-  if (!response.ok) {
-    throw new Error(`Error al cargar clientes: ${response.status}`)
-  }
-
-  return await response.json()
 }

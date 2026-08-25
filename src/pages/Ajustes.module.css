@@ -35,36 +35,11 @@
   font-weight: 600;
 }
 
-.actions {
+.filters {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-}
-
-.actions button {
-  padding-inline: 0.85rem;
-}
-
-.historyList {
-  display: grid;
+  align-items: flex-end;
   gap: 12px;
-}
-
-.historyList article {
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 14px 16px;
-  background: var(--surface-muted);
-}
-
-.historyList strong,
-.historyList p {
-  display: block;
-}
-
-.historyList p {
-  margin: 6px 0 0;
-  color: var(--text-secondary);
 }
 
 @media (max-width: 720px) {

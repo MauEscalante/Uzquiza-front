@@ -1,7 +1,8 @@
 import Button from '../components/Button'
 import Card from '../components/Card'
 import Select from '../components/Select'
-import { monthOptions, useRecibosController, yearOptions } from '../controllers/useRecibosController.tsx'
+import { monthOptions, yearOptions } from '../controllers/periodo'
+import { useRecibosController } from '../controllers/useRecibosController.tsx'
 import styles from './Recibos.module.css'
 
 function Recibos() {
@@ -9,6 +10,7 @@ function Recibos() {
     loading,
     error,
     feedback,
+    generating,
     recibos,
     form,
     setForm,
@@ -42,8 +44,10 @@ function Recibos() {
           </div>
 
           <div className={styles.actions}>
-            <Button onClick={() => void handleGenerate()}>Hacer recibos</Button>
-            <Button variant="secondary" onClick={() => void handleDownloadExcel()}>Descargar Excel</Button>
+            <Button onClick={() => void handleGenerate()} disabled={generating}>
+              {generating ? 'Ajustando...' : 'Hacer recibos'}
+            </Button>
+            <Button variant="secondary" onClick={() => void handleDownloadExcel()} disabled={generating}>Descargar Excel</Button>
           </div>
         </Card>
 

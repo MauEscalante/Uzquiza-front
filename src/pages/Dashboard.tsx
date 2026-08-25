@@ -5,7 +5,7 @@ import { useDashboardController } from '../controllers/useDashboardController'
 import styles from './Dashboard.module.css'
 
 function Dashboard() {
-  const { loading, error, metrics, recentActivity, state } = useDashboardController()
+  const { loading, error, metrics, recentActivity, contratosPorVencer } = useDashboardController()
 
   return (
     <div className={styles.page}>
@@ -33,18 +33,18 @@ function Dashboard() {
           </ul>
         </Card>
 
-        //aca van los contratos que se vencen/////////////////////////////////////////////////
-        <Card title="Próximos contratos a vencer" subtitle="Contratos que vencen en el corto plazo">
+        <Card title="Próximos contratos a vencer" subtitle="Contratos activos que vencen en los próximos 90 días">
           <div className={styles.adjustmentList}>
-            {state.ajustes.slice(0, 3).map((ajuste) => (
-              <article key={ajuste.id} className={styles.adjustmentItem}>
+            {contratosPorVencer.length === 0 ? <p>No hay contratos por vencer.</p> : null}
+            {contratosPorVencer.slice(0, 3).map((contrato) => (
+              <article key={contrato.contrato_id} className={styles.adjustmentItem}>
                 <div>
-                  <strong>{ajuste.inquilino}</strong>
-                  <p>{ajuste.propiedad}</p>
+                  <strong>{contrato.direccion}</strong>
+                  <p>{`Contrato ${contrato.contrato_id}`}</p>
                 </div>
                 <div>
-                  <StatusBadge variant={ajuste.estado === 'Ajuste realizado' ? 'success' : ajuste.estado === 'Ajuste pendiente' ? 'warning' : 'info'}>{ajuste.estado}</StatusBadge>
-                  <span>{formatCurrency(ajuste.nuevoImporte)}</span>
+                  <StatusBadge variant="warning">{`Vence ${contrato.fecha_fin}`}</StatusBadge>
+                  <span>{formatCurrency(contrato.importe_inicial)}</span>
                 </div>
               </article>
             ))}

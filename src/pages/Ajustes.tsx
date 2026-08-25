@@ -1,21 +1,21 @@
-import Button from '../components/Button'
 import Card from '../components/Card'
-import Modal from '../components/Modal'
+import Select from '../components/Select'
 import Table from '../components/Table'
 import { formatCurrency } from '../services/api'
+import { monthOptions, yearOptions } from '../controllers/periodo'
 import { useAjustesController } from '../controllers/useAjustesController'
+import { formatPropiedadId } from '../services/propiedadesService'
 import styles from './Ajustes.module.css'
 
 function Ajustes() {
   const {
     loading,
     error,
-    feedback,
-    visibleAjustes,
-    historyOpen,
-    setHistoryOpen,
-    selectedAjuste,
-    openHistory,
+    ajustes,
+    mes,
+    setMes,
+    anio,
+    setAnio,
   } = useAjustesController()
 
   return (
@@ -24,51 +24,36 @@ function Ajustes() {
         <div className={styles.toolbar}>
           <div>
             <h2>Ajustes</h2>
-            <p>Tabla de ajustes y re ajustes de alquileres</p>
+            <p>Contratos a los que les toca ajuste en el período seleccionado</p>
           </div>
-          {feedback ? <div className={styles.feedback}>{feedback}</div> : null}
+          <div className={styles.filters}>
+            <Select label="Mes" options={monthOptions} value={mes} onChange={(event) => setMes(event.target.value)} />
+            <Select label="Año" options={yearOptions} value={anio} onChange={(event) => setAnio(event.target.value)} />
+          </div>
         </div>
         {error ? <div className={styles.error}>{error}</div> : null}
       </Card>
 
       {loading ? <Card><div className={styles.emptyState}>Cargando ajustes...</div></Card> : null}
 
-      {!loading && visibleAjustes.length === 0 ? <Card><div className={styles.emptyState}>No hay ajustes para mostrar.</div></Card> : null}
+      {!loading && ajustes.length === 0 ? (
+        <Card><div className={styles.emptyState}>No hay ajustes pendientes para {mes} {anio}.</div></Card>
+      ) : null}
 
-      {!loading && visibleAjustes.length > 0 ? (
-        <Table headers={["Propiedad", "Inquilino", "Importe anterior", "Tipo de ajuste", "Periodicidad", "Nuevo importe", "Tipo", "Acciones"]}>
-          {visibleAjustes.map((ajuste) => (
-
-            <tr key={ajuste.id}>
-              <td>{ajuste.propiedad}</td>
-              <td>{ajuste.inquilino}</td>
-              <td>{formatCurrency(ajuste.importeAnterior)}</td>
-              <td>{ajuste.tipoAjuste}</td>
-              <td>{ajuste.periodicidad}</td>
-              <td>{formatCurrency(ajuste.nuevoImporte)}</td>
-              <td>{ajuste.actualizacion}</td>
-              <td>
-                <div className={styles.actions}>
-                  <Button variant="danger" onClick={() => openHistory(ajuste)}>Ver historial</Button>
-                </div>
-              </td>
+      {!loading && ajustes.length > 0 ? (
+        <Table headers={["Contrato", "Propiedad", "Importe vigente", "Tipo de ajuste", "Periodicidad", "Vence"]}>
+          {ajustes.map((ajuste) => (
+            <tr key={ajuste.contrato_id}>
+              <td>{ajuste.contrato_id}</td>
+              <td>{formatPropiedadId(ajuste.propiedad)}</td>
+              <td>{formatCurrency(ajuste.importe_inicial)}</td>
+              <td>{ajuste.tipo_ajuste ?? '—'}</td>
+              <td>{ajuste.periodicidad ?? '—'}</td>
+              <td>{ajuste.fecha_fin}</td>
             </tr>
           ))}
         </Table>
       ) : null}
-
-      <Modal open={historyOpen} title="Historial de ajuste" onClose={() => setHistoryOpen(false)} footer={<Button variant="ghost" onClick={() => setHistoryOpen(false)}>Cerrar</Button>}>
-        {selectedAjuste ? (
-          <div className={styles.historyList}>
-            {selectedAjuste.historial.map((item) => (
-              <article key={`${item.fecha}-${item.detalle}`}>
-                <strong>{item.fecha}</strong>
-                <p>{item.detalle}</p>
-              </article>
-            ))}
-          </div>
-        ) : null}
-      </Modal>
     </div>
   )
 }

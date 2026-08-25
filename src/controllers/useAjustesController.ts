@@ -1,26 +1,28 @@
-import { useEffect, useMemo, useState } from 'react'
-import {   listAjustes } from '../services/ajustesService'
-import type { Ajuste } from '../types/ajuste'
+import { useEffect, useState } from 'react'
+import { listContratosPendientes } from '../services/recibosService'
+import { currentMonthName, currentYearValue, mesANumero } from './periodo'
+import type { ContratoAAjustar } from '../types/recibo'
 
 export function useAjustesController() {
-  const [ajustes, setAjustes] = useState<Ajuste[]>([])
+  const [ajustes, setAjustes] = useState<ContratoAAjustar[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [feedback] = useState('')
-  const [historyOpen, setHistoryOpen] = useState(false)
-  const [selectedAjuste, setSelectedAjuste] = useState<Ajuste | null>(null)
+  const [mes, setMes] = useState(currentMonthName)
+  const [anio, setAnio] = useState(currentYearValue)
 
   useEffect(() => {
     let mounted = true
 
     async function loadAjustes() {
       try {
-        const data = await listAjustes()
+        const data = await listContratosPendientes(mesANumero(mes), Number(anio))
         if (mounted) {
           setAjustes(data)
+          setError('')
         }
       } catch {
         if (mounted) {
+          setAjustes([])
           setError('No se pudieron cargar los ajustes.')
         }
       } finally {
@@ -35,25 +37,27 @@ export function useAjustesController() {
     return () => {
       mounted = false
     }
-  }, [])
+  }, [mes, anio])
 
-  const visibleAjustes = useMemo(() => ajustes, [ajustes])
+  // El spinner se prende desde el handler y no desde el efecto: así el cambio de
+  // período no dispara un render en cascada.
+  function cambiarMes(value: string) {
+    setLoading(true)
+    setMes(value)
+  }
 
-
-
-  function openHistory(ajuste: Ajuste) {
-    setSelectedAjuste(ajuste)
-    setHistoryOpen(true)
+  function cambiarAnio(value: string) {
+    setLoading(true)
+    setAnio(value)
   }
 
   return {
     loading,
     error,
-    feedback,
-    visibleAjustes,
-    historyOpen,
-    setHistoryOpen,
-    selectedAjuste,
-    openHistory,
+    ajustes,
+    mes,
+    setMes: cambiarMes,
+    anio,
+    setAnio: cambiarAnio,
   }
 }

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { ApiError } from '../services/api'
 import {
   createPropiedad,
   deletePropiedad,
@@ -321,8 +322,9 @@ export function usePropiedadesController() {
 
     try {
       await deletePropiedad(propiedad.propiedad_id)
-    } catch {
-      setError('No se pudo eliminar la propiedad. Puede tener contratos asociados.')
+    } catch (caught) {
+      // El back explica por qué no se puede (p. ej. el 409 por contratos asociados).
+      setError(caught instanceof ApiError ? caught.message : 'No se pudo eliminar la propiedad.')
       return
     }
 

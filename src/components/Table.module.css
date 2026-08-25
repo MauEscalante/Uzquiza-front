@@ -39,3 +39,14 @@
 .table tbody tr:last-child td {
   border-bottom: 0;
 }
+
+.clickableRow {
+  cursor: pointer;
+}
+
+/* Offset negativo: el .wrapper tiene overflow auto y recortaría un anillo de foco
+   dibujado hacia afuera. */
+.clickableRow:focus-visible {
+  outline: 3px solid rgba(21, 101, 192, 0.2);
+  outline-offset: -2px;
+}

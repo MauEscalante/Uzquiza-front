@@ -5,7 +5,7 @@ import Modal from '../components/Modal'
 import PropietarioForm from '../components/PropietarioForm'
 import Select from '../components/Select'
 import StatusBadge from '../components/StatusBadge'
-import Table from '../components/Table'
+import Table, { ClickableRow } from '../components/Table'
 import { estadoAlquilerOptions, estadoOptions, usePropiedadesController } from '../controllers/usePropiedadesController'
 import { formatPercent } from '../services/api'
 import type { EstadoAlquiler, PropiedadEstado } from '../types/propiedad'
@@ -73,7 +73,11 @@ function Propiedades() {
       {!loading && filteredPropiedades.length > 0 ? (
         <Table headers={["ID", "Dirección", "Propietario", "Inquilino", "Comisión", "Alquiler", "Estado", "Acciones"]}>
           {filteredPropiedades.map((propiedad) => (
-            <tr key={propiedad.propiedad_id}>
+            <ClickableRow
+              key={propiedad.propiedad_id}
+              onSelect={() => void openDetail(propiedad)}
+              label={`Ver detalle de ${propiedad.direccion}`}
+            >
               <td><StatusBadge variant="info">{formatPropiedadId(propiedad.propiedad_id)}</StatusBadge></td>
               <td>{propiedad.direccion}</td>
               <td>{propiedad.propietario || '—'}</td>
@@ -86,13 +90,13 @@ function Propiedades() {
                 <StatusBadge variant={propiedad.estado === 'Activa' ? 'success' : 'neutral'}>{propiedad.estado}</StatusBadge>
               </td>
               <td>
-                <div className={styles.actions}>
-                  <Button variant="ghost" onClick={() => void openDetail(propiedad)}>Ver</Button>
+                {/* La fila entera abre el detalle: las acciones no deben propagar el click. */}
+                <div className={styles.actions} onClick={(event) => event.stopPropagation()}>
                   <Button variant="secondary" onClick={() => openEditModal(propiedad)}>Editar</Button>
                   <Button variant="danger" onClick={() => void handleDelete(propiedad)}>Eliminar</Button>
                 </div>
               </td>
-            </tr>
+            </ClickableRow>
           ))}
         </Table>
       ) : null}

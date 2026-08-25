@@ -1,31 +1,14 @@
-import { useEffect, useMemo, useState } from 'react'
-import { formatCurrency, formatPercent } from '../services/api'
-import { descargarExcelMock, generarRecibo, listHistorialIngreso, obtenerRecibosAjustar, obtenerRecibosReAjustar, obtenerResumen } from '../services/recibosService'
-import type { Recibo, ReciboFormValues } from '../types/recibo'
-
-const monthNames = [
-	'Enero',
-	'Febrero',
-	'Marzo',
-	'Abril',
-	'Mayo',
-	'Junio',
-	'Julio',
-	'Agosto',
-	'Septiembre',
-	'Octubre',
-	'Noviembre',
-	'Diciembre',
-]
-
-const currentDate = new Date()
-const currentYear = currentDate.getFullYear()
-
-export const monthOptions = monthNames.map((month) => ({ label: month, value: month }))
-export const yearOptions = Array.from({ length: 4 }, (_, index) => String(currentYear - 1 + index)).map((year) => ({
-	label: year,
-	value: year,
-}))
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { ApiError, formatCurrency, formatPercent } from '../services/api'
+import { contarContratosActivos } from '../services/contratosService'
+import {
+	descargarPlanilla,
+	getAjuste,
+	listHistorialIngreso,
+	solicitarAjuste,
+} from '../services/recibosService'
+import { currentMonthName, currentYearValue, mesANumero, monthOrder } from './periodo'
+import type { Recibo } from '../types/recibo'
 
 interface FormState {
 	mes: string
@@ -33,11 +16,9 @@ interface FormState {
 }
 
 const emptyForm: FormState = {
-	mes: monthNames[currentDate.getMonth()],
-	anio: String(currentYear),
+	mes: currentMonthName,
+	anio: currentYearValue,
 }
-
-const monthOrder = new Map(monthNames.map((month, index) => [month, index]))
 
 function sortRecibosDescendente(recibos: Recibo[]) {
 	return [...recibos].sort((a, b) => {
@@ -47,7 +28,14 @@ function sortRecibosDescendente(recibos: Recibo[]) {
 	})
 }
 
+// El ajuste tarda más de un minuto (openpyxl parsea las 120 hojas y se consulta
+// el IPC contra un servicio externo), así que se sigue por polling.
+const POLL_INTERVAL_MS = 3000
+const POLL_TIMEOUT_MS = 5 * 60 * 1000
 
+function sleep(ms: number) {
+	return new Promise((resolve) => window.setTimeout(resolve, ms))
+}
 
 export function useRecibosController() {
 	const [recibos, setRecibos] = useState<Recibo[]>([])
@@ -55,81 +43,150 @@ export function useRecibosController() {
 	const [error, setError] = useState('')
 	const [feedback, setFeedback] = useState('')
 	const [form, setForm] = useState<FormState>(emptyForm)
-	const [totalIngresos, setTotalIngresos] = useState(0);
-	const [cantidadRecibosActivos, setCantidadRecibosActivos] = useState(0);
-	const [aumentoPorcentual, setAumentoPorcentual] = useState(0);
-	const [aumentoMonetario, setAumentoMonetario] = useState(0);
+	const [cantidadRecibosActivos, setCantidadRecibosActivos] = useState(0)
+	const [generating, setGenerating] = useState(false)
+	const mountedRef = useRef(true)
 
 	useEffect(() => {
-		let mounted = true
+		mountedRef.current = true
 
 		async function loadRecibos() {
 			try {
 				const data = await listHistorialIngreso()
-				if (mounted) {
+				if (mountedRef.current) {
 					setRecibos(data)
 				}
 			} catch {
-				if (mounted) {
+				if (mountedRef.current) {
 					setError('No se pudieron cargar los recibos.')
 				}
 			} finally {
-				if (mounted) {
+				if (mountedRef.current) {
 					setLoading(false)
 				}
 			}
 		}
 
-		const cargarResumen = async () => {
-			console.log('Cargando resumen...')
-			const resumen = await obtenerResumen();
-			setTotalIngresos(resumen.totalIngresos);
-			setCantidadRecibosActivos(resumen.cantidadRecibosActivos);
-			setAumentoPorcentual(resumen.aumentoPorcentual);
-			setAumentoMonetario(resumen.aumentoMonetario);
-		};
+		async function loadContratosActivos() {
+			try {
+				const total = await contarContratosActivos()
+				if (mountedRef.current) {
+					setCantidadRecibosActivos(total)
+				}
+			} catch {
+				// El historial ya muestra su propio error; la métrica queda en 0.
+			}
+		}
 
 		void loadRecibos()
-		void cargarResumen()
+		void loadContratosActivos()
+
 		return () => {
-			mounted = false
+			mountedRef.current = false
 		}
 	}, [])
 
 	const sortedRecibos = useMemo(() => sortRecibosDescendente(recibos), [recibos])
 
+	// El back no expone estos totales: se derivan de los dos últimos meses del
+	// historial de ingresos.
+	const { totalIngresos, aumentoMonetario, aumentoPorcentual } = useMemo(() => {
+		const actual = sortedRecibos[0]?.total ?? 0
+
+		// Con un solo mes cargado no hay contra qué comparar: mostrar el total del
+		// mes como si fuera todo aumento sería mentir.
+		if (sortedRecibos.length < 2) {
+			return { totalIngresos: actual, aumentoMonetario: 0, aumentoPorcentual: 0 }
+		}
+
+		const anterior = sortedRecibos[1].total
+		const diferencia = actual - anterior
+
+		return {
+			totalIngresos: actual,
+			aumentoMonetario: diferencia,
+			// formatPercent divide por 100, así que va en puntos porcentuales.
+			aumentoPorcentual: anterior ? (diferencia / anterior) * 100 : 0,
+		}
+	}, [sortedRecibos])
 
 	async function handleGenerate() {
 		setError('')
+		setFeedback('')
 
 		if (!form.mes || !form.anio) {
 			setError('Seleccioná un mes y un año para generar el recibo.')
 			return
 		}
 
-		const payload: ReciboFormValues = {
-			mes: form.mes,
-			anio: form.anio,
-		}
+		setGenerating(true)
 
-		//obtengo que recibos tengo que hacer el ajuste inicial
-		const recibosAjustar = await obtenerRecibosAjustar(payload.mes, payload.anio)
-		//obtengo recibos q tienen re ajuste
-		const recibosReAjuste = await obtenerRecibosReAjustar(payload.mes, payload.anio)
-		//generate recibo
-		await generarRecibo(payload, recibosAjustar, recibosReAjuste)
+		try {
+			const ajuste = await solicitarAjuste(mesANumero(form.mes), Number(form.anio))
+			setFeedback('Ajuste encolado, esperando que termine...')
+
+			const limite = Date.now() + POLL_TIMEOUT_MS
+
+			while (Date.now() < limite) {
+				await sleep(POLL_INTERVAL_MS)
+
+				if (!mountedRef.current) {
+					return
+				}
+
+				const estadoActual = await getAjuste(ajuste.ajuste_id)
+
+				if (estadoActual.estado === 'completado') {
+					setFeedback(
+						`Ajuste completado: ${estadoActual.contratos_ajustados ?? 0} contratos ajustados, `
+						+ `${estadoActual.propiedades_marcadas_adeuda ?? 0} propiedades marcadas como adeuda.`,
+					)
+					return
+				}
+
+				if (estadoActual.estado === 'fallido') {
+					setError(`El ajuste falló: ${estadoActual.error ?? 'sin detalle'}`)
+					setFeedback('')
+					return
+				}
+
+				setFeedback('Ajuste en proceso...')
+			}
+
+			setFeedback('')
+			setError('El ajuste sigue corriendo y tardó más de lo esperado. Revisalo más tarde.')
+		} catch (caught) {
+			setFeedback('')
+
+			if (caught instanceof ApiError && caught.status === 409) {
+				setError('Ya hay un ajuste en curso. Esperá a que termine antes de lanzar otro.')
+				return
+			}
+
+			setError(caught instanceof ApiError ? caught.message : 'No se pudo generar el ajuste.')
+		} finally {
+			if (mountedRef.current) {
+				setGenerating(false)
+			}
+		}
 	}
 
 	async function handleDownloadExcel() {
 		setError('')
-		const response = await descargarExcelMock()
-		setFeedback(response)
+
+		try {
+			await descargarPlanilla()
+			setFeedback('Planilla descargada.')
+		} catch {
+			setError('No se pudo descargar la planilla.')
+		}
 	}
 
 	return {
 		loading,
 		error,
 		feedback,
+		generating,
 		recibos: sortedRecibos,
 		form,
 		setForm,

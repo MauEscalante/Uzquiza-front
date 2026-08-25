@@ -27,7 +27,7 @@ export interface PropiedadDetalle extends Propiedad {
   propietarios: PropiedadPropietarioDetalle[]
 }
 
-/** Fila del selector de propietarios existentes (GET /propietarios/). */
+/** Fila del selector de propietarios existentes (GET /clientes?tipo=Propietario). */
 export interface PropietarioResumen {
   cliente_num: number
   nombre: string

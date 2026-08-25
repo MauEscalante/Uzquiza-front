@@ -2,7 +2,7 @@ import Button from '../components/Button'
 import Card from '../components/Card'
 import Input from '../components/Input'
 import Modal from '../components/Modal'
-import Table from '../components/Table'
+import Table, { ClickableRow } from '../components/Table'
 import ContratoForm from '../components/ContratoForm.tsx'
 import ContratoDetail from '../components/ContratoDetail.tsx'
 import { useContratosController } from '../controllers/useContratosController'
@@ -59,10 +59,14 @@ function Contratos() {
       {!loading && filteredContratos.length === 0 ? <Card><div className={styles.emptyState}>No hay contratos para mostrar.</div></Card> : null}
 
       {!loading && filteredContratos.length > 0 ? (
-        <Table headers={["Propiedad", "Inicio", "Fin", "Importe inicial", "Deposito", "Tipo de ajuste", "Periodicidad", "Estado", "Acciones"]}>
+        <Table headers={["Propiedad", "Inicio", "Fin", "Importe inicial", "Deposito", "Tipo de ajuste", "Periodicidad", "Estado"]}>
           
           {filteredContratos.map((contrato) => (
-            <tr key={contrato.contrato_id}>
+            <ClickableRow
+              key={contrato.contrato_id}
+              onSelect={() => openDetail(contrato)}
+              label={`Ver detalle del contrato ${contrato.contrato_id}`}
+            >
               <td>{getPropiedadDireccion(contrato.propiedad)}</td>
               <td>{contrato.fecha_inicio}</td>
               <td>{contrato.fecha_fin}</td>
@@ -71,12 +75,7 @@ function Contratos() {
               <td>{contrato.tipo_ajuste}</td>
               <td>{contrato.periodicidad}</td>
               <td>{contrato.estado}</td>
-              <td>
-                <div className={styles.actions}>
-                  <Button variant="ghost" onClick={() => openDetail(contrato)}>Ver detalles</Button>
-                </div>
-              </td>
-            </tr>
+            </ClickableRow>
           ))}
         </Table>
       ) : null}

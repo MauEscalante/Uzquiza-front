@@ -5,6 +5,7 @@ import Modal from '../components/Modal'
 import Select from '../components/Select'
 import StatusBadge from '../components/StatusBadge'
 import Table from '../components/Table'
+import { cell } from '../components/tableCells'
 import { cuentaOptions, tipoOptions, useLibroDiarioController } from '../controllers/useLibroDiarioController'
 import type { MovimientoDiario, TipoMovimiento } from '../types/libroDiario'
 import styles from './LibroDiario.module.css'
@@ -79,20 +80,28 @@ function LibroDiario() {
 
       {!loading && movimientos.length > 0 ? (
         <Table
-          headers={['Fecha', 'A qué corresponde', 'Efectivo', 'Depósito', 'Egresos', 'Cuenta', 'Acciones']}
+          headers={[
+            'Fecha',
+            'A qué corresponde',
+            { label: 'Efectivo', money: true },
+            { label: 'Depósito', money: true },
+            { label: 'Egresos', money: true },
+            'Cuenta',
+            'Acciones',
+          ]}
           footer={(
             <tr>
               <td colSpan={2}>Estado de la caja · {periodoLabel}</td>
-              <td>{formatCurrency(resumen.total_efectivo)}</td>
-              <td>{formatCurrency(resumen.total_transferencias)}</td>
-              <td>{formatCurrency(resumen.total_egresos)}</td>
+              <td className={cell.money}>{formatCurrency(resumen.total_efectivo)}</td>
+              <td className={cell.money}>{formatCurrency(resumen.total_transferencias)}</td>
+              <td className={cell.money}>{formatCurrency(resumen.total_egresos)}</td>
               <td colSpan={2} />
             </tr>
           )}
         >
           {movimientos.map((movimiento) => (
             <tr key={movimiento.movimiento_id}>
-              <td>{formatDate(movimiento.fecha)}</td>
+              <td className={cell.dato}>{formatDate(movimiento.fecha)}</td>
               <td>{movimiento.concepto}</td>
               <td className={styles.ingreso}>{montoDe(movimiento, 'INGRESO', formatCurrency)}</td>
               <td className={styles.deposito}>{montoDe(movimiento, 'DEPOSITO', formatCurrency)}</td>

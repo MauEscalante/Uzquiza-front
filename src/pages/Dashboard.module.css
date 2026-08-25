@@ -5,55 +5,66 @@
 
 .statusBox,
 .errorBox {
-  border-radius: 14px;
-  padding: 14px 16px;
-  font-weight: 600;
+  border-radius: var(--radio-md);
+  padding: 12px 16px;
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
 .statusBox {
-  background: #e0f2fe;
-  color: #075985;
+  background: var(--azul-vela);
+  color: var(--azul);
 }
 
 .errorBox {
-  background: #fee2e2;
-  color: var(--danger);
+  background: var(--peligro-vela);
+  color: var(--peligro);
 }
 
 .metricGrid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 16px;
+  /* Eran 5 columnas fijas: a 1180px se rompía a 2 de golpe. */
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px;
 }
 
 .metricCard {
-  padding: 20px;
+  padding: 18px;
 }
 
 .metricHeader {
-  margin-bottom: 18px;
-  color: var(--text-secondary);
-  font-size: 0.88rem;
+  margin-bottom: 14px;
+  color: var(--texto-suave);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
 }
 
+/* La cifra es lo único que se dice fuerte en el dashboard. */
 .metricCard strong {
   display: block;
-  font-size: 2rem;
+  font-stretch: 118%;
+  font-size: 2.4rem;
+  font-weight: 600;
   line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
 }
 
 .twoColumn {
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.95fr);
   gap: 20px;
+  align-items: start;
 }
 
 .list {
   margin: 0;
-  padding: 20px;
+  padding: 18px;
   list-style: none;
   display: grid;
-  gap: 14px;
+  gap: 12px;
 }
 
 .list li {
@@ -62,38 +73,45 @@
   align-items: baseline;
   justify-content: space-between;
   gap: 12px;
-  padding-left: 16px;
-  color: var(--text-primary);
+  padding-left: 14px;
+  color: var(--tinta);
+  font-size: 0.91rem;
   line-height: 1.5;
 }
 
-.list time {
-  flex-shrink: 0;
-  color: var(--text-secondary);
-  font-size: 0.85rem;
-}
-
-.empty {
-  margin: 0;
-  padding: 20px;
-  color: var(--text-secondary);
-}
-
+/* Marcador azul: la actividad es informativa. El naranja queda
+   reservado para lo que espera una acción. */
 .list li::before {
   content: '';
   position: absolute;
   left: 0;
-  top: 0.6rem;
-  width: 7px;
-  height: 7px;
-  border-radius: 999px;
-  background: var(--secondary-orange);
+  top: 0.5rem;
+  width: 3px;
+  height: 0.7rem;
+  border-radius: 1px;
+  background: var(--azul);
+  opacity: 0.45;
+}
+
+.list time {
+  flex-shrink: 0;
+  font-family: var(--fuente-mono);
+  font-size: 0.79rem;
+  color: var(--texto-suave);
+  font-variant-numeric: tabular-nums;
+}
+
+.empty {
+  margin: 0;
+  padding: 18px;
+  color: var(--texto-suave);
+  font-size: 0.9rem;
 }
 
 .vencimientoList {
   display: grid;
-  gap: 12px;
-  padding: 20px;
+  gap: 10px;
+  padding: 18px;
 }
 
 .vencimientoItem {
@@ -101,34 +119,58 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 14px 16px;
+  border: 1px solid var(--borde);
+  border-left-width: 3px;
+  border-radius: var(--radio-md);
+  padding: 12px 14px;
+}
+
+/* Filo de estado: cuanto más cerca del vencimiento, más urgente el
+   borde izquierdo. Mismo lenguaje que las filas de las tablas. */
+.filoAlerta {
+  border-left-color: var(--peligro);
+}
+
+.filoAccion {
+  border-left-color: var(--naranja);
+}
+
+.filoRegla {
+  border-left-color: var(--azul);
+}
+
+.vencimientoItem strong {
+  font-size: 0.93rem;
 }
 
 .vencimientoItem p,
 .vencimientoItem span {
   margin: 0;
-  color: var(--text-secondary);
+  color: var(--texto-suave);
+  font-size: 0.84rem;
 }
 
-@media (max-width: 1180px) {
-  .metricGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.vencimientoItem span {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--fuente-mono);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
 
+@media (max-width: 1080px) {
   .twoColumn {
     grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 720px) {
-  .metricGrid {
-    grid-template-columns: 1fr;
-  }
-
   .vencimientoItem {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .vencimientoItem span {
+    text-align: left;
   }
 }

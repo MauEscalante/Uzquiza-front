@@ -1,29 +1,35 @@
 .field {
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .label {
-  font-size: 0.92rem;
+  font-size: 0.82rem;
   font-weight: 600;
+  color: var(--texto-suave);
+  letter-spacing: 0.02em;
 }
 
 .select {
   width: 100%;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 0.85rem 0.95rem;
-  background: var(--white);
-  color: var(--text-primary);
+  border: 1px solid var(--borde-fuerte);
+  border-radius: var(--radio-md);
+  padding: 0.6rem 0.75rem;
+  background: var(--blanco);
+  color: var(--tinta);
+  font-size: 0.93rem;
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease;
 }
 
 .select:focus {
-  border-color: rgba(21, 101, 192, 0.45);
-  box-shadow: 0 0 0 4px rgba(21, 101, 192, 0.08);
+  border-color: var(--azul);
+  box-shadow: var(--anillo-foco);
   outline: 0;
 }
 
 .error {
-  color: var(--danger);
-  font-size: 0.84rem;
+  color: var(--peligro);
+  font-size: 0.8rem;
 }

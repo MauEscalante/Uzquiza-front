@@ -2,28 +2,35 @@
   display: flex;
   min-height: 100vh;
   flex-direction: column;
-  gap: 22px;
-  padding: 22px 18px;
-  background: linear-gradient(180deg, var(--primary-blue) 0%, #0f4c96 100%);
-  color: var(--white);
+  gap: 26px;
+  padding: 22px 14px;
+  background: var(--tinta);
+  color: var(--blanco);
 }
 
 .brand {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 6px 4px 18px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 6px 6px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* Unica pieza naranja de la barra. Lleva tinta encima: blanco sobre
+   naranja no llega a AA. */
 .brandMark {
   display: grid;
   place-items: center;
-  width: 46px;
-  height: 46px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.08));
-  font-weight: 800;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  border-radius: var(--radio-md);
+  background: var(--naranja);
+  color: var(--tinta);
+  font-stretch: 118%;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .brand strong,
@@ -33,76 +40,93 @@
 }
 
 .brand strong {
-  font-size: 1rem;
+  font-stretch: 118%;
+  font-size: 1.02rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .brand span,
 .footer p {
   margin: 0;
-  color: rgba(255, 255, 255, 0.72);
-  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 0.82rem;
   line-height: 1.5;
 }
 
 .nav {
   display: grid;
-  gap: 8px;
+  gap: 2px;
 }
 
 .navItem {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 11px;
   border: 0;
-  border-radius: 14px;
-  padding: 0.9rem 1rem;
+  border-radius: var(--radio-md);
+  padding: 0.72rem 0.8rem;
   background: transparent;
-  color: rgba(255, 255, 255, 0.88);
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.93rem;
   text-align: left;
   transition:
-    background-color 160ms ease,
-    transform 160ms ease,
-    color 160ms ease;
+    background-color 140ms ease,
+    color 140ms ease;
 }
 
-.navItem:hover {
-  transform: translateX(2px);
-  background: rgba(255, 255, 255, 0.08);
+.navItem:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--blanco);
 }
 
+/* El azul de marca aparece una sola vez en toda la barra. Gana peso
+   por escasez, no por superficie. */
 .active {
-  background: rgba(255, 255, 255, 0.16);
-  color: var(--white);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+  background: var(--azul);
+  color: var(--blanco);
+  font-weight: 500;
+}
+
+/* El anillo global es azul y sobre la barra tinta se pierde. */
+.navItem:focus-visible {
+  outline-color: var(--blanco);
 }
 
 .icon {
   display: grid;
   place-items: center;
-  width: 20px;
-  height: 20px;
-  flex: 0 0 20px;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  opacity: 0.85;
+}
+
+.active .icon {
+  opacity: 1;
 }
 
 .icon svg {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   fill: currentColor;
 }
 
 .footer {
   margin-top: auto;
-  padding: 18px 4px 0;
+  padding: 18px 6px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 @media (max-width: 960px) {
   .sidebar {
     min-height: auto;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    gap: 18px;
   }
 
   .nav {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4px;
   }
 }
 
@@ -113,10 +137,6 @@
 
   .navItem {
     justify-content: center;
-  }
-
-  .navItem span:last-child {
-    font-size: 0.9rem;
   }
 
   .footer {

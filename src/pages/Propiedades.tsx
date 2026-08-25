@@ -6,6 +6,7 @@ import PropietarioForm from '../components/PropietarioForm'
 import Select from '../components/Select'
 import StatusBadge from '../components/StatusBadge'
 import Table from '../components/Table'
+import { cell } from '../components/tableCells'
 import { estadoAlquilerOptions, estadoOptions, usePropiedadesController } from '../controllers/usePropiedadesController'
 import { formatPercent } from '../services/api'
 import type { EstadoAlquiler, PropiedadEstado } from '../types/propiedad'
@@ -71,14 +72,25 @@ function Propiedades() {
       {!loading && filteredPropiedades.length === 0 ? <Card><div className={styles.emptyState}>No hay propiedades para mostrar.</div></Card> : null}
 
       {!loading && filteredPropiedades.length > 0 ? (
-        <Table headers={["ID", "Dirección", "Propietario", "Inquilino", "Comisión", "Alquiler", "Estado", "Acciones"]}>
+        <Table
+          headers={[
+            'ID',
+            'Dirección',
+            'Propietario',
+            'Inquilino',
+            { label: 'Comisión', money: true },
+            'Alquiler',
+            'Estado',
+            'Acciones',
+          ]}
+        >
           {filteredPropiedades.map((propiedad) => (
             <tr key={propiedad.propiedad_id}>
               <td><StatusBadge variant="info">{formatPropiedadId(propiedad.propiedad_id)}</StatusBadge></td>
               <td>{propiedad.direccion}</td>
               <td>{propiedad.propietario || '—'}</td>
               <td>{propiedad.inquilino || '—'}</td>
-              <td>{formatComision(propiedad.comision)}</td>
+              <td className={cell.money}>{formatComision(propiedad.comision)}</td>
               <td>
                 <StatusBadge variant={propiedad.estado_alquiler === 'Abono' ? 'success' : 'danger'}>{propiedad.estado_alquiler}</StatusBadge>
               </td>

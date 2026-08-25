@@ -1,23 +1,24 @@
+/* Panel: se define por borde, no por sombra. La elevación queda
+   reservada para lo que de verdad flota. */
 .card {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  background: var(--surface);
-  box-shadow: var(--shadow);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-lg);
+  background: var(--blanco);
 }
 
 .header {
   display: grid;
-  gap: 0.25rem;
-  padding: 20px 20px 0;
+  gap: 0.2rem;
+  padding: 18px 18px 0;
 }
 
 .header h3 {
   margin: 0;
-  font-size: 1rem;
+  font-size: 0.98rem;
 }
 
 .header p {
   margin: 0;
-  color: var(--text-secondary);
-  font-size: 0.92rem;
+  color: var(--texto-suave);
+  font-size: 0.88rem;
 }

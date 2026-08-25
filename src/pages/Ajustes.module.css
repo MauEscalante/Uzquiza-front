@@ -8,12 +8,12 @@
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  padding: 20px;
+  padding: 18px;
 }
 
 .toolbar h2 {
   margin: 0 0 4px;
-  font-size: 1.15rem;
+  font-size: 1.02rem;
 }
 
 .toolbar p,
@@ -21,17 +21,17 @@
 .error,
 .emptyState {
   margin: 0;
-  color: var(--text-secondary);
+  color: var(--texto-suave);
 }
 
 .feedback {
-  color: var(--success);
+  color: var(--exito);
   font-weight: 600;
 }
 
 .error {
   padding: 0 20px 20px;
-  color: var(--danger);
+  color: var(--peligro);
   font-weight: 600;
 }
 
@@ -51,10 +51,10 @@
 }
 
 .historyList article {
-  border: 1px solid var(--border);
-  border-radius: 14px;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-md);
   padding: 14px 16px;
-  background: var(--surface-muted);
+  background: var(--niebla);
 }
 
 .historyList strong,
@@ -64,7 +64,7 @@
 
 .historyList p {
   margin: 6px 0 0;
-  color: var(--text-secondary);
+  color: var(--texto-suave);
 }
 
 @media (max-width: 720px) {

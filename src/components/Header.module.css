@@ -1,25 +1,26 @@
 .header {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 16px;
-  padding: 24px 24px 18px;
-  border-bottom: 1px solid rgba(219, 228, 238, 0.8);
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(12px);
+  padding: 22px 28px 18px;
+  border-bottom: 1px solid var(--borde);
+  background: var(--blanco);
 }
 
 .kicker {
-  margin: 0 0 6px;
-  color: var(--text-secondary);
-  font-size: 0.82rem;
-  letter-spacing: 0.08em;
+  margin: 0 0 5px;
+  color: var(--azul);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
 }
 
 .header h1 {
   margin: 0;
-  font-size: 1.55rem;
+  font-size: 1.7rem;
+  line-height: 1.1;
 }
 
 .profileArea {
@@ -34,12 +35,13 @@
 }
 
 .userInfo strong {
-  font-size: 0.98rem;
+  font-size: 0.93rem;
+  font-weight: 600;
 }
 
 .userInfo span {
-  color: var(--text-secondary);
-  font-size: 0.85rem;
+  color: var(--texto-suave);
+  font-size: 0.82rem;
 }
 
 .profileButton {
@@ -50,6 +52,7 @@
   .header {
     flex-direction: column;
     align-items: flex-start;
+    padding: 18px;
   }
 
   .profileArea {

@@ -8,12 +8,12 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: 14px;
-  padding: 20px;
+  padding: 18px;
 }
 
 .toolbar h2 {
   margin: 0 0 4px;
-  font-size: 1.15rem;
+  font-size: 1.02rem;
 }
 
 .toolbar p,
@@ -24,7 +24,7 @@
 .summaryGrid span,
 .retiroList span {
   margin: 0;
-  color: var(--text-secondary);
+  color: var(--texto-suave);
 }
 
 .filters {
@@ -35,18 +35,18 @@
 
 .feedback {
   padding: 0 20px 20px;
-  color: var(--success);
+  color: var(--exito);
   font-weight: 600;
 }
 
 .error {
   padding: 0 20px 20px;
-  color: var(--danger);
+  color: var(--peligro);
   font-weight: 600;
 }
 
 .emptyState {
-  padding: 20px;
+  padding: 18px;
 }
 
 .twoColumn {
@@ -60,38 +60,52 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
-  padding: 20px;
+  padding: 18px;
 }
 
 .summaryGrid div {
-  border: 1px solid var(--border);
-  border-radius: 14px;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-md);
   padding: 14px 16px;
-  background: var(--surface-muted);
+  background: var(--niebla);
 }
 
 .summaryGrid strong {
   display: block;
   margin-top: 6px;
-  font-size: 1.08rem;
+  font-family: var(--fuente-mono);
+  font-size: 1.02rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
 }
 
-.totalBox {
+/* Gana por especificidad sobre `.summaryGrid div` en vez de por
+   !important, que era un parche contra esa regla. */
+.summaryGrid .totalBox {
   grid-column: 1 / -1;
-  border-color: rgba(21, 101, 192, 0.18) !important;
-  background: rgba(21, 101, 192, 0.08) !important;
+  border-color: var(--azul-borde);
+  background: var(--azul-vela);
 }
 
 /* Cada importe se pinta con el color de su columna para leer la tabla de un vistazo. */
 .ingreso,
+.deposito,
+.egreso {
+  font-family: var(--fuente-mono);
+  font-size: 0.86rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.ingreso,
 .deposito {
-  color: var(--success);
-  font-weight: 600;
+  color: var(--exito);
 }
 
 .egreso {
-  color: var(--danger);
-  font-weight: 600;
+  color: var(--peligro);
 }
 
 .retiroActions {
@@ -101,7 +115,7 @@
 .retiroList {
   display: grid;
   gap: 12px;
-  padding: 20px;
+  padding: 18px;
 }
 
 .retiroList article {
@@ -109,10 +123,10 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  border: 1px solid var(--border);
-  border-radius: 14px;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-md);
   padding: 14px 16px;
-  background: var(--surface-muted);
+  background: var(--niebla);
 }
 
 .retiroList strong,
@@ -127,14 +141,14 @@
 }
 
 .retiroMonto strong {
-  color: var(--danger);
+  color: var(--peligro);
 }
 
 .form {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
-  padding: 20px;
+  padding: 18px;
 }
 
 .form .hint,

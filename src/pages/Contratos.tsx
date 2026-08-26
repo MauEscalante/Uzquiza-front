@@ -2,7 +2,7 @@ import Button from '../components/Button'
 import Card from '../components/Card'
 import Input from '../components/Input'
 import Modal from '../components/Modal'
-import Table from '../components/Table'
+import Table, { ClickableRow } from '../components/Table'
 import { cell } from '../components/tableCells'
 import ContratoForm from '../components/ContratoForm.tsx'
 import ContratoDetail from '../components/ContratoDetail.tsx'
@@ -70,12 +70,15 @@ function Contratos() {
             'Tipo de ajuste',
             'Periodicidad',
             'Estado',
-            'Acciones',
           ]}
         >
           
           {filteredContratos.map((contrato) => (
-            <tr key={contrato.contrato_id}>
+            <ClickableRow
+              key={contrato.contrato_id}
+              onSelect={() => openDetail(contrato)}
+              label={`Ver detalle del contrato ${contrato.contrato_id}`}
+            >
               <td>{getPropiedadDireccion(contrato.propiedad)}</td>
               <td className={cell.dato}>{contrato.fecha_inicio}</td>
               <td className={cell.dato}>{contrato.fecha_fin}</td>
@@ -84,12 +87,7 @@ function Contratos() {
               <td>{contrato.tipo_ajuste}</td>
               <td>{contrato.periodicidad}</td>
               <td>{contrato.estado}</td>
-              <td>
-                <div className={styles.actions}>
-                  <Button variant="ghost" onClick={() => openDetail(contrato)}>Ver detalles</Button>
-                </div>
-              </td>
-            </tr>
+            </ClickableRow>
           ))}
         </Table>
       ) : null}

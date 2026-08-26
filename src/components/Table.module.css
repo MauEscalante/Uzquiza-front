@@ -52,6 +52,17 @@
   border-bottom: 0;
 }
 
+.clickableRow {
+  cursor: pointer;
+}
+
+/* El :focus-visible global de index.css usa outline-offset positivo; en una fila
+   dentro del .wrapper con overflow auto ese anillo se recorta, así que va hacia
+   adentro. El color lo sigue poniendo la regla global. */
+.clickableRow:focus-visible {
+  outline-offset: -2px;
+}
+
 .table tfoot td {
   position: sticky;
   bottom: 0;

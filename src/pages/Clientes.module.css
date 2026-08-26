@@ -80,6 +80,23 @@
   font-size: 0.98rem;
 }
 
+.sectionTitle {
+  margin: 0;
+  font-size: 1rem;
+}
+
+/* El min-width del sistema de tablas está pensado para el ancho de una página, no
+   para caber en un modal de 760px: sin esto la tabla saca scroll horizontal. */
+.historial table {
+  min-width: 0;
+}
+
+.monto {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
 @media (max-width: 720px) {
   .toolbar {
     flex-direction: column;

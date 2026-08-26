@@ -5,6 +5,7 @@ import Modal from '../components/Modal'
 import StatusBadge from '../components/StatusBadge'
 import Table from '../components/Table'
 import { useClientesController } from '../controllers/useClientesController'
+import { formatCurrency, formatDate } from '../services/api'
 import styles from './Clientes.module.css'
 
 function Clientes() {
@@ -23,6 +24,9 @@ function Clientes() {
     setForm,
     formError,
     feedback,
+    historial,
+    historialLoading,
+    historialError,
     filteredClientes,
     openCreateModal,
     openEditModal,
@@ -57,7 +61,7 @@ function Clientes() {
       {!loading && filteredClientes.length > 0 ? (
         <Table headers={["Dirección", "Nombre", "Apellido", "Teléfono", "Inquilino/Propietario", "Acciones"]}>
           {filteredClientes.map((cliente) => (
-            <tr key={cliente.id}>
+            <tr key={cliente.cliente_num}>
               <td>{cliente.direccion}</td>
               <td>{cliente.nombre}</td>
               <td>{cliente.apellido}</td>
@@ -103,7 +107,7 @@ function Clientes() {
       <Modal open={detailOpen} title="Detalle de cliente" onClose={() => setDetailOpen(false)} footer={<Button variant="ghost" onClick={() => setDetailOpen(false)}>Cerrar</Button>}>
         {selectedCliente ? (
           <div className={styles.detailGrid}>
-            <div><span>Número</span><strong>{selectedCliente.numeroCliente}</strong></div>
+            <div><span>Número</span><strong>{selectedCliente.cliente_num}</strong></div>
             <div><span>Nombre</span><strong>{selectedCliente.nombre}</strong></div>
             <div><span>Apellido</span><strong>{selectedCliente.apellido}</strong></div>
             <div><span>DNI</span><strong>{selectedCliente.dni}</strong></div>
@@ -114,6 +118,31 @@ function Clientes() {
             <div><span>Nacionalidad</span><strong>{selectedCliente.nacionalidad}</strong></div>
             <div><span>Inquilino/Propietario</span><strong>{selectedCliente.tipo}</strong></div>
           </div>
+        ) : null}
+
+        {selectedCliente ? (
+          <>
+            <h3 className={styles.sectionTitle}>Importes históricos</h3>
+            {/* Un renglón por período de vigencia: cada ajuste del alquiler deja el suyo. */}
+            {historialLoading ? <div className={styles.emptyState}>Cargando importes...</div> : null}
+            {historialError ? <div className={styles.error}>{historialError}</div> : null}
+            {!historialLoading && !historialError && historial.length === 0 ? (
+              <div className={styles.emptyState}>Este cliente no tiene importes registrados.</div>
+            ) : null}
+            {!historialLoading && !historialError && historial.length > 0 ? (
+              <Table headers={["Desde", "Hasta", "Propiedad", "Importe"]} className={styles.historial}>
+                {historial.map((valor) => (
+                  // La PK de valor_historico es (contrato, fecha_inicio).
+                  <tr key={`${valor.contrato}-${valor.fecha_inicio}`}>
+                    <td>{formatDate(valor.fecha_inicio)}</td>
+                    <td>{formatDate(valor.fecha_fin)}</td>
+                    <td>{valor.direccion}</td>
+                    <td className={styles.monto}>{formatCurrency(valor.importe_inicial)}</td>
+                  </tr>
+                ))}
+              </Table>
+            ) : null}
+          </>
         ) : null}
       </Modal>
     </div>

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { createCliente, listClientes, updateCliente } from '../services/clientesService'
-import type { Cliente, ClienteFormValues } from '../types/cliente'
+import { createCliente, getClienteHistorial, listClientes, updateCliente } from '../services/clientesService'
+import type { Cliente, ClienteFormValues, ClienteValorHistorico } from '../types/cliente'
 
 const emptyForm: ClienteFormValues = {
   nombre: '',
@@ -25,6 +25,9 @@ export function useClientesController() {
   const [form, setForm] = useState<ClienteFormValues>(emptyForm)
   const [formError, setFormError] = useState('')
   const [feedback, setFeedback] = useState('')
+  const [historial, setHistorial] = useState<ClienteValorHistorico[]>([])
+  const [historialLoading, setHistorialLoading] = useState(false)
+  const [historialError, setHistorialError] = useState('')
 
   useEffect(() => {
     let mounted = true
@@ -60,8 +63,10 @@ export function useClientesController() {
       return clientes
     }
 
-    return clientes.filter((cliente) => [cliente.numeroCliente, cliente.nombre, cliente.apellido, cliente.dni, cliente.telefono, cliente.email, cliente.direccion, cliente.cuil, cliente.nacionalidad, cliente.tipo]
-      .some((value) => value.toLowerCase().includes(normalizedSearch)))
+    // Los campos opcionales del cliente (email, CUIL, dirección…) llegan como null
+    // desde la base, así que el filtro descarta lo que no sea texto antes de bajar.
+    return clientes.filter((cliente) => [cliente.nombre, cliente.apellido, cliente.dni, cliente.telefono, cliente.email, cliente.direccion, cliente.cuil, cliente.nacionalidad, cliente.tipo]
+      .some((value) => typeof value === 'string' && value.toLowerCase().includes(normalizedSearch)))
   }, [clientes, search])
 
   function openCreateModal() {
@@ -87,9 +92,21 @@ export function useClientesController() {
     setModalOpen(true)
   }
 
-  function openDetailModal(cliente: Cliente) {
+  async function openDetailModal(cliente: Cliente) {
+    // La ficha ya la tenemos de la fila; lo único que falta buscar es el historial.
     setSelectedCliente(cliente)
+    setHistorial([])
+    setHistorialError('')
     setDetailOpen(true)
+    setHistorialLoading(true)
+
+    try {
+      setHistorial(await getClienteHistorial(cliente.cliente_num))
+    } catch {
+      setHistorialError('No se pudo cargar el historial de importes.')
+    } finally {
+      setHistorialLoading(false)
+    }
   }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -100,11 +117,11 @@ export function useClientesController() {
       return
     }
 
-    const action = editingCliente ? updateCliente(editingCliente.id, form) : createCliente(form)
+    const action = editingCliente ? updateCliente(editingCliente.cliente_num, form) : createCliente(form)
     const saved = await action
 
     if (editingCliente) {
-      setClientes((current) => current.map((cliente) => (cliente.id === editingCliente.id ? saved : cliente)))
+      setClientes((current) => current.map((cliente) => (cliente.cliente_num === editingCliente.cliente_num ? saved : cliente)))
       setFeedback('Cliente actualizado correctamente.')
     } else {
       setClientes((current) => [saved, ...current])
@@ -132,6 +149,9 @@ export function useClientesController() {
     setForm,
     formError,
     feedback,
+    historial,
+    historialLoading,
+    historialError,
     filteredClientes,
     openCreateModal,
     openEditModal,

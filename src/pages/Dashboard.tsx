@@ -12,6 +12,13 @@ function urgencia(diasRestantes: number) {
   return diasRestantes <= 30 ? ('warning' as const) : ('info' as const)
 }
 
+/** Mismo criterio que `urgencia`, del lado del filo de estado. */
+const FILO = {
+  danger: styles.filoAlerta,
+  warning: styles.filoAccion,
+  info: styles.filoRegla,
+} as const
+
 function textoRestante(diasRestantes: number) {
   if (diasRestantes <= 0) {
     return 'Vence hoy'
@@ -60,7 +67,10 @@ function Dashboard() {
           ) : (
             <div className={styles.vencimientoList}>
               {contratosPorVencer.map((contrato) => (
-                <article key={contrato.contratoId} className={styles.vencimientoItem}>
+                <article
+                  key={contrato.contratoId}
+                  className={[styles.vencimientoItem, FILO[urgencia(contrato.diasRestantes)]].join(' ')}
+                >
                   <div>
                     <strong>{contrato.direccion}</strong>
                     <p>{contrato.inquilino ?? 'Sin inquilino asignado'}</p>

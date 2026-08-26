@@ -1,3 +1,5 @@
+/* Panel: se define por borde, no por sombra. La elevación queda
+   reservada para lo que de verdad flota. */
 .card {
   border-radius: var(--radius-lg);
   background: var(--surface);
@@ -8,8 +10,8 @@
 
 .header {
   display: grid;
-  gap: 0.25rem;
-  padding: 20px 20px 0;
+  gap: 0.2rem;
+  padding: 18px 18px 0;
 }
 
 .header h3 {

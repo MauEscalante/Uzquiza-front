@@ -51,14 +51,14 @@
 .receiptList {
   display: grid;
   gap: 12px;
-  padding: 20px;
+  padding: 18px;
 }
 
 .receiptList article {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 14px 16px;
-  background: var(--surface-muted);
+  background: var(--niebla);
 }
 
 .receiptList strong,

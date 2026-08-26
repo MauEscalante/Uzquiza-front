@@ -62,6 +62,17 @@
 }
 
 .ingreso,
+.deposito,
+.egreso {
+  font-family: var(--fuente-mono);
+  font-size: 0.86rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.ingreso,
 .deposito {
   color: var(--success);
 }
@@ -77,7 +88,7 @@
 .retiroList {
   display: grid;
   gap: 12px;
-  padding: 20px;
+  padding: 18px;
 }
 
 .retiroList article {
@@ -88,7 +99,7 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 14px 16px;
-  background: var(--surface-muted);
+  background: var(--niebla);
 }
 
 .retiroList strong,

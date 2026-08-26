@@ -2,6 +2,7 @@ import Button from '../components/Button'
 import Card from '../components/Card'
 import Modal from '../components/Modal'
 import Table from '../components/Table'
+import { cell } from '../components/tableCells'
 import { formatCurrency } from '../services/api'
 import { useAjustesController } from '../controllers/useAjustesController'
 import styles from './Ajustes.module.css'
@@ -36,16 +37,27 @@ function Ajustes() {
       {!loading && visibleAjustes.length === 0 ? <Card><div className={styles.emptyState}>No hay ajustes para mostrar.</div></Card> : null}
 
       {!loading && visibleAjustes.length > 0 ? (
-        <Table headers={["Propiedad", "Inquilino", "Importe anterior", "Tipo de ajuste", "Periodicidad", "Nuevo importe", "Tipo", "Acciones"]}>
+        <Table
+          headers={[
+            'Propiedad',
+            'Inquilino',
+            { label: 'Importe anterior', money: true },
+            'Tipo de ajuste',
+            'Periodicidad',
+            { label: 'Nuevo importe', money: true },
+            'Tipo',
+            'Acciones',
+          ]}
+        >
           {visibleAjustes.map((ajuste) => (
 
             <tr key={ajuste.id}>
               <td>{ajuste.propiedad}</td>
               <td>{ajuste.inquilino}</td>
-              <td>{formatCurrency(ajuste.importeAnterior)}</td>
+              <td className={cell.money}>{formatCurrency(ajuste.importeAnterior)}</td>
               <td>{ajuste.tipoAjuste}</td>
               <td>{ajuste.periodicidad}</td>
-              <td>{formatCurrency(ajuste.nuevoImporte)}</td>
+              <td className={cell.money}>{formatCurrency(ajuste.nuevoImporte)}</td>
               <td>{ajuste.actualizacion}</td>
               <td>
                 <div className={styles.actions}>

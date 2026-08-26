@@ -3,7 +3,7 @@ import Card from '../components/Card'
 import Input from '../components/Input'
 import Modal from '../components/Modal'
 import StatusBadge from '../components/StatusBadge'
-import Table from '../components/Table'
+import Table, { ClickableRow } from '../components/Table'
 import { useClientesController } from '../controllers/useClientesController'
 import type { ClienteTipo } from '../types/cliente'
 import styles from './Clientes.module.css'
@@ -61,7 +61,11 @@ function Clientes() {
       {!loading && filteredClientes.length > 0 ? (
         <Table headers={["Dirección", "Nombre", "Apellido", "Teléfono", "Inquilino/Propietario", "Acciones"]}>
           {filteredClientes.map((cliente) => (
-            <tr key={cliente.cliente_num}>
+            <ClickableRow
+              key={cliente.cliente_num}
+              onSelect={() => openDetailModal(cliente)}
+              label={`Ver detalle de ${cliente.nombre} ${cliente.apellido}`}
+            >
               <td>{cliente.direccion ?? '—'}</td>
               <td>{cliente.nombre}</td>
               <td>{cliente.apellido}</td>
@@ -70,12 +74,12 @@ function Clientes() {
                 {cliente.tipo ? <StatusBadge variant={badgeVariant(cliente.tipo)}>{cliente.tipo}</StatusBadge> : '—'}
               </td>
               <td>
-                <div className={styles.actions}>
-                  <Button variant="ghost" onClick={() => openDetailModal(cliente)}>Ver</Button>
+                {/* La fila entera abre el detalle: las acciones no deben propagar el click. */}
+                <div className={styles.actions} onClick={(event) => event.stopPropagation()}>
                   <Button variant="secondary" onClick={() => openEditModal(cliente)}>Editar</Button>
                 </div>
               </td>
-            </tr>
+            </ClickableRow>
           ))}
         </Table>
       ) : null}

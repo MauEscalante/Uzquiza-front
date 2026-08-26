@@ -161,6 +161,8 @@ button {
 
 table {
   border-collapse: collapse;
+  /* Sin esto los importes bailan de fila en fila. */
+  font-variant-numeric: tabular-nums;
 }
 
 a {

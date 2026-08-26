@@ -2,7 +2,8 @@ import Button from '../components/Button'
 import Card from '../components/Card'
 import Input from '../components/Input'
 import Modal from '../components/Modal'
-import Table from '../components/Table'
+import Table, { ClickableRow } from '../components/Table'
+import { cell } from '../components/tableCells'
 import ContratoForm from '../components/ContratoForm.tsx'
 import ContratoDetail from '../components/ContratoDetail.tsx'
 import RescisionForm from '../components/RescisionForm.tsx'
@@ -83,15 +84,30 @@ function Contratos() {
       {!loading && filteredContratos.length === 0 ? <Card><div className={styles.emptyState}>No hay contratos para mostrar.</div></Card> : null}
 
       {!loading && filteredContratos.length > 0 ? (
-        <Table headers={["Propiedad", "Inicio", "Fin", "Importe inicial", "Deposito", "Tipo de ajuste", "Periodicidad", "Estado", "Acciones"]}>
+        <Table
+          headers={[
+            'Propiedad',
+            'Inicio',
+            'Fin',
+            { label: 'Importe inicial', money: true },
+            { label: 'Depósito', money: true },
+            'Tipo de ajuste',
+            'Periodicidad',
+            'Estado',
+          ]}
+        >
           
           {filteredContratos.map((contrato) => (
-            <tr key={contrato.contrato_id}>
+            <ClickableRow
+              key={contrato.contrato_id}
+              onSelect={() => openDetail(contrato)}
+              label={`Ver detalle del contrato ${contrato.contrato_id}`}
+            >
               <td>{getPropiedadDireccion(contrato.propiedad)}</td>
-              <td>{contrato.fecha_inicio}</td>
-              <td>{contrato.fecha_fin}</td>
-              <td>{formatCurrency(contrato.importe_inicial)}</td>
-              <td>{contrato.deposito != null ? formatCurrency(contrato.deposito) : '—'}</td>
+              <td className={cell.dato}>{contrato.fecha_inicio}</td>
+              <td className={cell.dato}>{contrato.fecha_fin}</td>
+              <td className={cell.money}>{formatCurrency(contrato.importe_inicial)}</td>
+              <td className={cell.money}>{contrato.deposito != null ? formatCurrency(contrato.deposito) : '—'}</td>
               <td>{contrato.tipo_ajuste}</td>
               <td>{contrato.periodicidad}</td>
               <td>

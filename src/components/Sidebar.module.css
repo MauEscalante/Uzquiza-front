@@ -12,10 +12,12 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 6px 4px 18px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 6px 6px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* Unica pieza naranja de la barra. Lleva tinta encima: blanco sobre
+   naranja no llega a AA. */
 .brandMark {
   display: grid;
   place-items: center;
@@ -47,13 +49,13 @@
 
 .nav {
   display: grid;
-  gap: 8px;
+  gap: 2px;
 }
 
 .navItem {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 11px;
   border: 0;
   border-left: 3px solid transparent;
   border-radius: var(--radius-md);
@@ -92,30 +94,37 @@
 .icon {
   display: grid;
   place-items: center;
-  width: 20px;
-  height: 20px;
-  flex: 0 0 20px;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  opacity: 0.85;
+}
+
+.active .icon {
+  opacity: 1;
 }
 
 .icon svg {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   fill: currentColor;
 }
 
 .footer {
   margin-top: auto;
-  padding: 18px 4px 0;
+  padding: 18px 6px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 @media (max-width: 960px) {
   .sidebar {
     min-height: auto;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    gap: 18px;
   }
 
   .nav {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4px;
   }
 }
 
@@ -126,10 +135,6 @@
 
   .navItem {
     justify-content: center;
-  }
-
-  .navItem span:last-child {
-    font-size: 0.9rem;
   }
 
   .footer {

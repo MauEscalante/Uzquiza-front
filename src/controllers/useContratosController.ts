@@ -1,13 +1,17 @@
 import { useEffect, useMemo, useState } from 'react'
-import { formatCurrency, mensajeDe } from '../services/api'
+import { formatCurrency, formatDate, mensajeDe } from '../services/api'
 import {
+  calcularRescision,
   createContrato,
   getContratoDetails,
+  cancelarRescision,
+  entregarLlaves,
   listContratos,
   listPropiedadesResumen,
+  registrarRescision,
   type PropiedadResumen,
 } from '../services/contratosService'
-import type { Contrato, ContratoDetalle, ContratoEstado, ContratoFormValues, GaranteInput, GarantePropietarioFormValue, InquilinoFormValue, TipoGarantia } from '../types/contrato'
+import type { Contrato, ContratoDetalle, ContratoEstado, ContratoFormValues, GaranteInput, GarantePropietarioFormValue, InquilinoFormValue, RescisionCalculo, TipoGarantia } from '../types/contrato'
 import { emptyGarantePropietario, emptyInquilino } from '../types/contrato'
 
 interface FormState {
@@ -107,6 +111,48 @@ function buildGarantesPayload(form: FormState): { garantes: GaranteInput[]; dire
   return { garantes: [], direccion_garantia: null }
 }
 
+/** "2026-8" -> "2026-08", el formato que espera el value del selector. */
+function claveMes(anio: number, mes: number): string {
+  return `${anio}-${String(mes).padStart(2, '0')}`
+}
+
+/**
+ * Meses en los que se puede rescindir: el actual y el siguiente, nada más.
+ *
+ * Se descartan los anteriores al inicio del contrato, que el backend rechaza con
+ * un 422 (`salida_antes_del_inicio`).
+ */
+function mesesDeSalida(fechaInicio: string): Array<{ label: string; value: string }> {
+  const [anioInicio, mesInicio] = fechaInicio.slice(0, 10).split('-').map(Number)
+  const inicio = anioInicio * 12 + (mesInicio - 1)
+  const hoy = new Date()
+  const formato = new Intl.DateTimeFormat('es-AR', { month: 'long', year: 'numeric' })
+
+  return [0, 1]
+    .map((offset) => new Date(hoy.getFullYear(), hoy.getMonth() + offset, 1))
+    .filter((fecha) => fecha.getFullYear() * 12 + fecha.getMonth() >= inicio)
+    .map((fecha) => ({
+      label: formato.format(fecha),
+      value: claveMes(fecha.getFullYear(), fecha.getMonth() + 1),
+    }))
+}
+
+/**
+ * El aviso quedo registrado pero las llaves todavia no se entregaron.
+ *
+ * En ese tramo el contrato sigue Activo a proposito: el mes de salida se cobra y se
+ * ajusta como cualquier otro, y recien al entregarse las llaves se conoce el alquiler
+ * con el que se calcula la penalidad.
+ */
+export function tieneRescisionPendiente(contrato: Contrato): boolean {
+  return contrato.estado === 'Activo' && contrato.fecha_rescision !== null
+}
+
+/** "2026-09-28" -> "2026-09". El preview se pide por mes. */
+function mesDeFecha(fecha: string): string {
+  return fecha.slice(0, 7)
+}
+
 export function useContratosController() {
   const [contratos, setContratos] = useState<Contrato[]>([])
   const [loading, setLoading] = useState(true)
@@ -122,6 +168,15 @@ export function useContratosController() {
   const [formError, setFormError] = useState('')
   const [feedback, setFeedback] = useState('')
   const [propiedades, setPropiedades] = useState<PropiedadResumen[]>([])
+  const [rescisionContrato, setRescisionContrato] = useState<Contrato | null>(null)
+  const [rescisionMes, setRescisionMes] = useState('')
+  const [rescisionCalculo, setRescisionCalculo] = useState<RescisionCalculo | null>(null)
+  const [rescisionLoading, setRescisionLoading] = useState(false)
+  const [rescisionSubmitting, setRescisionSubmitting] = useState(false)
+  const [rescisionError, setRescisionError] = useState('')
+  const [entregaContrato, setEntregaContrato] = useState<Contrato | null>(null)
+  const [entregaFecha, setEntregaFecha] = useState('')
+  const [entregaImporte, setEntregaImporte] = useState('')
 
   useEffect(() => {
     let mounted = true
@@ -164,6 +219,53 @@ export function useContratosController() {
     }
   }, [])
 
+  // Un solo preview para los dos modales: el del aviso pregunta por el mes del
+  // selector, el de la entrega por el mes de la fecha de entrega. Asi la pantalla de
+  // entrega sabe ANTES de confirmar si el alquiler de ese mes esta cargado o hay que
+  // pedirlo (`importe_estimado`).
+  const previewContratoId = rescisionContrato?.contrato_id ?? entregaContrato?.contrato_id ?? ''
+  const previewMes = rescisionContrato
+    ? rescisionMes
+    : entregaFecha
+      ? mesDeFecha(entregaFecha)
+      : ''
+
+  useEffect(() => {
+    if (!previewContratoId || !previewMes) {
+      setRescisionCalculo(null)
+      return
+    }
+
+    let cancelado = false
+    const [anio, mes] = previewMes.split('-').map(Number)
+
+    setRescisionLoading(true)
+    setRescisionError('')
+
+    calcularRescision(previewContratoId, anio, mes)
+      .then((calculo) => {
+        if (!cancelado) {
+          setRescisionCalculo(calculo)
+        }
+      })
+      .catch((e) => {
+        if (!cancelado) {
+          setRescisionCalculo(null)
+          setRescisionError(mensajeDe(e, 'No se pudo calcular la rescisión.'))
+        }
+      })
+      .finally(() => {
+        if (!cancelado) {
+          setRescisionLoading(false)
+        }
+      })
+
+    // Descarta la respuesta si el usuario ya cambió de mes o cerró el modal.
+    return () => {
+      cancelado = true
+    }
+  }, [previewContratoId, previewMes])
+
   const filteredContratos = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase()
 
@@ -201,6 +303,116 @@ export function useContratosController() {
       setDetailError(mensajeDe(e, 'No se pudo cargar el detalle del contrato.'))
     } finally {
       setDetailLoading(false)
+    }
+  }
+
+  function openRescision(contrato: Contrato) {
+    const opciones = mesesDeSalida(contrato.fecha_inicio)
+
+    setRescisionContrato(contrato)
+    setRescisionCalculo(null)
+    setRescisionError('')
+    setFeedback('')
+    // La primera opción es el mes actual salvo que el contrato arranque el que viene.
+    setRescisionMes(opciones[0]?.value ?? '')
+  }
+
+  function closeRescision() {
+    setRescisionContrato(null)
+    setRescisionMes('')
+    setRescisionCalculo(null)
+    setRescisionError('')
+  }
+
+  async function confirmRescision(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+
+    if (!rescisionContrato || !rescisionMes) {
+      return
+    }
+
+    const [anio, mes] = rescisionMes.split('-').map(Number)
+    setRescisionSubmitting(true)
+
+    try {
+      const calculo = await registrarRescision(rescisionContrato.contrato_id, anio, mes)
+
+      closeRescision()
+      setFeedback(
+        `Rescisión registrada: ${calculo.direccion} se desocupa en ${formatDate(calculo.fecha_salida)}. `
+        + 'La penalidad se calcula al cargar la entrega de llaves.',
+      )
+
+      setContratos(await listContratos())
+    } catch (e) {
+      setRescisionError(mensajeDe(e, 'No se pudo registrar la rescisión.'))
+    } finally {
+      setRescisionSubmitting(false)
+    }
+  }
+
+  function openEntregaLlaves(contrato: Contrato) {
+    setEntregaContrato(contrato)
+    setRescisionCalculo(null)
+    setRescisionError('')
+    setFeedback('')
+    setEntregaImporte('')
+    // Por defecto hoy: las llaves se cargan cuando ya se entregaron.
+    setEntregaFecha(new Date().toISOString().slice(0, 10))
+  }
+
+  function closeEntregaLlaves() {
+    setEntregaContrato(null)
+    setEntregaFecha('')
+    setEntregaImporte('')
+    setRescisionCalculo(null)
+    setRescisionError('')
+  }
+
+  async function confirmEntregaLlaves(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+
+    if (!entregaContrato || !entregaFecha) {
+      return
+    }
+
+    // Solo se manda cuando el mes no esta liquidado; si no, el backend usa el tramo.
+    const importe = rescisionCalculo?.importe_estimado ? Number(entregaImporte) : undefined
+
+    if (rescisionCalculo?.importe_estimado && (!importe || Number.isNaN(importe) || importe <= 0)) {
+      setRescisionError('Indicá el alquiler del mes de salida para poder calcular la penalidad.')
+      return
+    }
+
+    setRescisionSubmitting(true)
+
+    try {
+      const calculo = await entregarLlaves(entregaContrato.contrato_id, entregaFecha, importe)
+
+      closeEntregaLlaves()
+      setFeedback(
+        calculo.anticipada
+          ? `Contrato de ${calculo.direccion} cerrado. Penalidad: ${formatCurrency(calculo.penalidad)}.`
+          : `Contrato de ${calculo.direccion} cerrado a término, sin penalidad.`,
+      )
+
+      setContratos(await listContratos())
+    } catch (e) {
+      setRescisionError(mensajeDe(e, 'No se pudo registrar la entrega de llaves.'))
+    } finally {
+      setRescisionSubmitting(false)
+    }
+  }
+
+  async function cancelarAviso(contrato: Contrato) {
+    setError('')
+
+    try {
+      await cancelarRescision(contrato.contrato_id)
+      setFeedback(`Se canceló la rescisión de ${getPropiedadDireccion(contrato.propiedad)}.`)
+      setContratos(await listContratos())
+    } catch (e) {
+      setError(mensajeDe(e, 'No se pudo cancelar la rescisión.'))
     }
   }
 
@@ -245,7 +457,12 @@ export function useContratosController() {
       ...buildGarantesPayload(form),
     }
 
-    await createContrato(payload)
+    try {
+      await createContrato(payload)
+    } catch (e) {
+      setFormError(mensajeDe(e, 'No se pudo crear el contrato.'))
+      return
+    }
 
     setFeedback('Contrato creado correctamente.')
     setModalOpen(false)
@@ -283,5 +500,25 @@ export function useContratosController() {
     handleSubmit,
     formatCurrency,
     getPropiedadDireccion,
+    rescisionContrato,
+    rescisionMes,
+    setRescisionMes,
+    rescisionCalculo,
+    rescisionLoading,
+    rescisionSubmitting,
+    rescisionError,
+    rescisionMesesOptions: rescisionContrato ? mesesDeSalida(rescisionContrato.fecha_inicio) : [],
+    openRescision,
+    closeRescision,
+    confirmRescision,
+    entregaContrato,
+    entregaFecha,
+    setEntregaFecha,
+    entregaImporte,
+    setEntregaImporte,
+    openEntregaLlaves,
+    closeEntregaLlaves,
+    confirmEntregaLlaves,
+    cancelarAviso,
   }
 }

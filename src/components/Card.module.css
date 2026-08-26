@@ -1,9 +1,11 @@
 /* Panel: se define por borde, no por sombra. La elevación queda
    reservada para lo que de verdad flota. */
 .card {
-  border: 1px solid var(--borde);
-  border-radius: var(--radio-lg);
-  background: var(--blanco);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  /* Una sola estrategia de profundidad: el hairline del shadow hace de borde, así
+   * no conviven un borde sólido y una sombra dramática peleando por el mismo canto. */
+  box-shadow: var(--shadow-sm);
 }
 
 .header {
@@ -14,11 +16,12 @@
 
 .header h3 {
   margin: 0;
-  font-size: 0.98rem;
+  font-size: var(--fs-h3);
+  font-weight: 600;
 }
 
 .header p {
   margin: 0;
-  color: var(--texto-suave);
-  font-size: 0.88rem;
+  color: var(--text-secondary);
+  font-size: var(--fs-meta);
 }

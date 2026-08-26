@@ -3,24 +3,25 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: 16px;
-  padding: 22px 28px 18px;
-  border-bottom: 1px solid var(--borde);
-  background: var(--blanco);
+  padding: 24px 24px 18px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(12px);
 }
 
 .kicker {
-  margin: 0 0 5px;
-  color: var(--azul);
-  font-size: 0.72rem;
+  margin: 0 0 6px;
+  color: var(--text-tertiary);
+  font-size: var(--fs-label);
   font-weight: 600;
-  letter-spacing: 0.09em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
 }
 
 .header h1 {
   margin: 0;
-  font-size: 1.7rem;
-  line-height: 1.1;
+  font-size: var(--fs-h1);
+  font-weight: 600;
 }
 
 .profileArea {
@@ -35,13 +36,13 @@
 }
 
 .userInfo strong {
-  font-size: 0.93rem;
+  font-size: var(--fs-body);
   font-weight: 600;
 }
 
 .userInfo span {
-  color: var(--texto-suave);
-  font-size: 0.82rem;
+  color: var(--text-secondary);
+  font-size: var(--fs-meta);
 }
 
 .profileButton {

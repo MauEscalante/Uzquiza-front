@@ -1,56 +1,121 @@
+/*
+ * Sistema visual — administración de alquileres.
+ *
+ * El producto vive en el mundo del libro diario: recibos, expedientes, plazos, debe y
+ * haber. De ahí salen la paleta (azul de birome y sello, naranja de teja y fachada,
+ * blanco de hoja membretada) y la firma: cifras tabulares y un filete al margen.
+ *
+ * REGLA DEL NARANJA: significa "esto reclama atención" —vencimientos, pendientes,
+ * warning, ítem activo— y nada más. Nunca decorativo.
+ *
+ * ACCESIBILIDAD: medido sobre blanco, el azul da 5.62:1 (pasa AA en los dos sentidos)
+ * pero el naranja da 2.92:1 y NO pasa para texto. Por eso el naranja va a rellenos,
+ * filetes y fondos; cuando hace falta texto naranja se usa --accent-ink.
+ */
+
 :root {
-  /* --- Marca ---------------------------------------------------------
-     Azul = estructura y estado en regla. Naranja = requiere accion.
-     El naranja NO pasa contraste AA como texto sobre blanco (2.92:1),
-     asi que se usa como relleno o filo, siempre con --tinta encima.
-     Para naranja tipografico esta --naranja-texto (4.63:1). */
-  --azul: #2d5fd7;
-  --azul-fuerte: #1e47ab;
-  --azul-vela: #eef3fe;
-  --azul-vela-fuerte: #e2ebfd;
-  --azul-borde: #c5d4f7;
-  --naranja: #f07323;
-  --naranja-fuerte: #dd6417;
-  --naranja-texto: #c2521a;
-  --naranja-vela: #fef1e7;
-  --blanco: #ffffff;
+  /* --- Marca ------------------------------------------------------------- */
+  --blue: #2d5fd7;
+  --blue-strong: #2450b8;      /* hover y press: se oscurece, no se mueve */
+  --blue-deep: #1d3f93;        /* texto azul sobre tinte claro */
+  --blue-tint: #eef3fd;
+  --blue-tint-strong: #dfe9fb;
 
-  /* --- Neutros --- */
-  --tinta: #12224a;
-  --texto-suave: #5b6b8c;
-  --niebla: #f4f6fb;
-  --borde: #dce3f0;
-  --borde-fuerte: #c3cfe4;
+  --accent: #f07323;
+  --accent-strong: #d85f13;   /* hover de rellenos naranjas sin texto encima */
+  --accent-solid: #b04a0a;    /* el único naranja que aguanta texto blanco: 5.48:1 */
+  --accent-tint: #fef2e9;
+  --accent-tint-strong: #fce0cb;
+  --accent-ink: #8f3d06;       /* el único naranja legible como texto */
 
-  /* --- Estado ---
-     Los dos colores de marca hacen doble funcion a proposito: son los
-     dos estados que mas aparecen en el panel. */
-  --exito: #15803d;
-  --exito-vela: #dcfce7;
-  --atencion: var(--naranja);
-  --peligro: #b91c1c;
-  --peligro-vela: #fee2e2;
-  --peligro-vela-fuerte: #fde0e0;
+  --white: #ffffff;
 
-  /* --- Forma ---
-     Los paneles se definen por borde, no por sombra. La elevacion queda
-     reservada para lo que de verdad flota (modales). */
-  --radio-lg: 10px;
-  --radio-md: 8px;
-  --radio-sm: 6px;
-  --sombra-flotante: 0 24px 56px rgba(18, 34, 74, 0.18);
-  --anillo-foco: 0 0 0 3px rgba(45, 95, 215, 0.3);
+  /* --- Superficies -------------------------------------------------------
+   * Un solo hue (gris azulado): entre niveles cambia la claridad, nunca el tono.
+   * Los inputs son ENTRANTES, así que van más oscuros que su contenedor. */
+  --canvas: #f3f6fb;
+  --surface: #ffffff;
+  --surface-muted: #f7f9fd;
+  --surface-sunken: #f6f8fc;
 
-  /* --- Tipografia ---
-     Una sola familia en dos anchos: el contraste viene del eje wdth,
-     no de mezclar familias. Mono solo para cifras. */
-  --fuente: Archivo, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --fuente-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  /* --- Bordes ------------------------------------------------------------
+   * En rgba para que se fundan con el fondo. Un hex sólido se ve duro al lado. */
+  --border-soft: rgba(20, 32, 58, 0.06);
+  --border: rgba(20, 32, 58, 0.11);
+  --border-strong: rgba(20, 32, 58, 0.18);
+  --focus-ring: rgba(45, 95, 215, 0.18);
 
-  font-family: var(--fuente);
-  color: var(--tinta);
-  background: var(--niebla);
+  /* --- Texto, cuatro niveles --------------------------------------------- */
+  --text-primary: #14203a;
+  --text-secondary: #56637d;
+  --text-tertiary: #677487;
+  --text-muted: #8792a6;
+  --text-on-blue: #ffffff;
+
+  /* --- Semánticos --------------------------------------------------------
+   * Verde y rojo son el haber y el debe del libro. El warning ES el naranja de
+   * marca: un solo color para "reclama atención" en todo el producto. */
+  --success: #14713f;
+  --success-tint: #e4f4ea;
+  --danger: #b3261e;
+  --danger-tint: #fbeae9;
+  --warning: var(--accent);
+  --warning-tint: var(--accent-tint);
+  --warning-ink: var(--accent-ink);
+  --info: var(--blue-deep);
+  --info-tint: var(--blue-tint);
+  --neutral-tint: #eef1f6;
+
+  /* --- Profundidad: UNA estrategia ---------------------------------------
+   * Hairline + dos capas suaves. Se siente antes de verse. */
+  --shadow-sm:
+    0 0 0 1px rgba(20, 32, 58, 0.05),
+    0 1px 2px -1px rgba(20, 32, 58, 0.07),
+    0 2px 6px rgba(20, 32, 58, 0.04);
+  --shadow-md:
+    0 0 0 1px rgba(20, 32, 58, 0.06),
+    0 4px 10px -4px rgba(20, 32, 58, 0.12),
+    0 12px 32px -8px rgba(20, 32, 58, 0.14);
+
+  /* --- Radios ------------------------------------------------------------- */
+  --radius-lg: 18px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+  --radius-control: 12px;
+  --radius-pill: 999px;
+
+  /* --- Tipografía ---------------------------------------------------------
+   * Escala en ratio 1.25 redondeada. La jerarquía se arma con TRES palancas
+   * —tamaño, peso y color—, nunca con el tamaño solo. */
+  --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', 'Cascadia Mono', monospace;
+
+  --fs-label: 0.6875rem;  /* 11px — versalita, para rotular */
+  --fs-meta: 0.8125rem;   /* 13px */
+  --fs-body: 0.9375rem;   /* 15px */
+  --fs-h4: 1rem;          /* 16px */
+  --fs-h3: 1.125rem;      /* 18px */
+  --fs-h2: 1.375rem;      /* 22px */
+  --fs-h1: 1.625rem;      /* 26px */
+  --fs-display: 2rem;     /* 32px */
+
+  --tracking-label: 0.07em;
+  --tracking-tight: -0.011em;
+
+  /* --- Movimiento ---------------------------------------------------------
+   * ease-out siempre: ease-in retrasa el primer cuadro, justo cuando el usuario
+   * está mirando, y se siente lento. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --dur-fast: 120ms;
+  --dur: 170ms;
+
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  line-height: 1.5;
+  color: var(--text-primary);
+  background: var(--canvas);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 * {
@@ -65,17 +130,21 @@ body,
 
 body {
   margin: 0;
-  background: var(--niebla);
-  color: var(--tinta);
+  background: var(--canvas);
+  color: var(--text-primary);
 }
 
-/* Titulos y cifras grandes: Archivo ensanchado. */
+/* Los títulos se aprietan ópticamente al crecer; sueltos parecen un documento. */
 h1,
 h2,
-h3 {
-  font-stretch: 118%;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+h3,
+h4 {
+  letter-spacing: var(--tracking-tight);
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
 }
 
 button,
@@ -83,6 +152,7 @@ input,
 select,
 textarea {
   font: inherit;
+  color: inherit;
 }
 
 button {
@@ -100,17 +170,19 @@ a {
   text-decoration: none;
 }
 
-/* Un solo anillo de foco para todo el panel. Los componentes que
-   necesitan otro offset lo redefinen, no lo apagan. */
-:focus-visible {
-  outline: 2px solid var(--azul);
-  outline-offset: 2px;
+/* Toda cifra que cambia va tabular: si no, las columnas de plata bailan al
+ * cambiar de fila. Es la mitad de la firma de este producto. */
+table,
+time,
+[data-numeric] {
+  font-variant-numeric: tabular-nums;
 }
 
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
+    /* Se conservan opacidad y color; se apaga solo el movimiento. */
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;

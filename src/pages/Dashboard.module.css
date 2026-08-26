@@ -1,24 +1,22 @@
-.page {
-  display: grid;
-  gap: 20px;
-}
+.page { composes: page from '../styles/shared.module.css'; }
+.emptyState { composes: emptyState from '../styles/shared.module.css'; }
 
 .statusBox,
 .errorBox {
-  border-radius: var(--radio-md);
-  padding: 12px 16px;
-  font-size: 0.9rem;
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  font-size: var(--fs-meta);
   font-weight: 500;
 }
 
 .statusBox {
-  background: var(--azul-vela);
-  color: var(--azul);
+  background: var(--info-tint);
+  color: var(--info);
 }
 
 .errorBox {
-  background: var(--peligro-vela);
-  color: var(--peligro);
+  background: var(--danger-tint);
+  color: var(--danger);
 }
 
 .metricGrid {
@@ -32,21 +30,26 @@
   padding: 18px;
 }
 
+/* La cifra es el foco de la tarjeta y tiene que ganar sin discusión: el rótulo baja
+ * a versalita de 11px y la cifra sube a 32px en Plex Mono. Antes competían casi al
+ * mismo peso, así que el ojo no sabía dónde posarse. */
 .metricHeader {
-  margin-bottom: 14px;
-  color: var(--texto-suave);
-  font-size: 0.75rem;
+  margin-bottom: 18px;
+  color: var(--text-tertiary);
+  font-size: var(--fs-label);
   font-weight: 600;
-  letter-spacing: 0.07em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
 }
 
 /* La cifra es lo único que se dice fuerte en el dashboard. */
 .metricCard strong {
   display: block;
-  font-stretch: 118%;
-  font-size: 2.4rem;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-display);
   font-weight: 600;
+  letter-spacing: -0.02em;
   line-height: 1;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
@@ -73,9 +76,9 @@
   align-items: baseline;
   justify-content: space-between;
   gap: 12px;
-  padding-left: 14px;
-  color: var(--tinta);
-  font-size: 0.91rem;
+  padding-left: 16px;
+  color: var(--text-primary);
+  font-size: var(--fs-meta);
   line-height: 1.5;
 }
 
@@ -95,17 +98,26 @@
 
 .list time {
   flex-shrink: 0;
-  font-family: var(--fuente-mono);
-  font-size: 0.79rem;
-  color: var(--texto-suave);
-  font-variant-numeric: tabular-nums;
+  color: var(--text-tertiary);
+  font-size: var(--fs-meta);
 }
 
 .empty {
   margin: 0;
-  padding: 18px;
-  color: var(--texto-suave);
-  font-size: 0.9rem;
+  padding: 20px;
+  color: var(--text-tertiary);
+}
+
+/* La viñeta naranja: actividad reciente es justamente lo que reclama una mirada. */
+.list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.55rem;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
 }
 
 .vencimientoList {
@@ -114,40 +126,31 @@
   padding: 18px;
 }
 
+/* Un vencimiento ES el caso testigo de "reclama atención": lleva el filete. */
 .vencimientoItem {
+  composes: attentionRule from '../styles/shared.module.css';
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  border: 1px solid var(--borde);
+  border: 1px solid var(--border);
   border-left-width: 3px;
-  border-radius: var(--radio-md);
-  padding: 12px 14px;
-}
-
-/* Filo de estado: cuanto más cerca del vencimiento, más urgente el
-   borde izquierdo. Mismo lenguaje que las filas de las tablas. */
-.filoAlerta {
-  border-left-color: var(--peligro);
-}
-
-.filoAccion {
-  border-left-color: var(--naranja);
-}
-
-.filoRegla {
-  border-left-color: var(--azul);
-}
-
-.vencimientoItem strong {
-  font-size: 0.93rem;
+  border-left-color: var(--accent);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  background: var(--surface-muted);
 }
 
 .vencimientoItem p,
 .vencimientoItem span {
   margin: 0;
-  color: var(--texto-suave);
-  font-size: 0.84rem;
+  color: var(--text-secondary);
+  font-size: var(--fs-meta);
+}
+
+.vencimientoItem strong {
+  font-size: var(--fs-h4);
+  font-weight: 600;
 }
 
 .vencimientoItem span {
@@ -168,9 +171,5 @@
   .vencimientoItem {
     align-items: flex-start;
     flex-direction: column;
-  }
-
-  .vencimientoItem span {
-    text-align: left;
   }
 }

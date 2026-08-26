@@ -1,5 +1,5 @@
 import styles from "../pages/Contratos.module.css"
-import { formatCurrency } from "../services/api"
+import { formatCurrency, formatDate } from "../services/api"
 import type { ContratoDetalle } from "../types/contrato"
 
 interface ContratoDetailProps {
@@ -58,6 +58,35 @@ export default function ContratoDetail({ contrato, loading, error }: ContratoDet
                     <div><span>Garantes</span><strong>{contrato.garantes.map(nombreCompleto).join(', ')}</strong></div>
                 </>
             )}
+            {contrato.fecha_rescision ? (
+                <>
+                    <div className={styles.sectionDivider} />
+                    {/*
+                      Con el aviso registrado pero sin llaves entregadas el contrato sigue
+                      activo y la penalidad todavía no existe: se calcula al cerrarlo.
+                    */}
+                    {contrato.fecha_entrega_llaves ? (
+                        <>
+                            <div><span>Fecha de salida</span><strong>{formatDate(contrato.fecha_rescision)}</strong></div>
+                            <div><span>Entrega de llaves</span><strong>{formatDate(contrato.fecha_entrega_llaves)}</strong></div>
+                            <div>
+                                <span>Penalidad</span>
+                                <strong>
+                                    {contrato.penalidad ? formatCurrency(contrato.penalidad) : 'Sin penalidad'}
+                                </strong>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <div><span>Salida agendada</span><strong>{formatDate(contrato.fecha_rescision)}</strong></div>
+                            <div>
+                                <span>Penalidad</span>
+                                <strong>Pendiente hasta la entrega de llaves</strong>
+                            </div>
+                        </>
+                    )}
+                </>
+            ) : null}
         </div>
     )
 }

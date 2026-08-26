@@ -5,7 +5,7 @@
   display: grid;
   place-items: center;
   padding: 20px;
-  background: rgba(18, 34, 74, 0.42);
+  background: rgba(20, 32, 58, 0.44);
 }
 
 /* Único componente con elevación: es lo único que de verdad flota. */
@@ -13,10 +13,11 @@
   width: min(760px, 100%);
   max-height: min(90vh, 900px);
   overflow: auto;
-  border: 1px solid var(--borde);
-  border-radius: var(--radio-lg);
-  background: var(--blanco);
-  box-shadow: var(--sombra-flotante);
+  /* Radio concéntrico: el cuerpo tiene 20px de padding y celdas de --radius-md,
+   * así que el exterior necesita ser mayor para no verse "apretado" en la esquina. */
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
 }
 
 .header,
@@ -30,12 +31,13 @@
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  border-bottom: 1px solid var(--borde);
+  border-bottom: 1px solid var(--border-soft);
 }
 
 .header h2 {
   margin: 0;
-  font-size: 1.15rem;
+  font-size: var(--fs-h3);
+  font-weight: 600;
 }
 
 .body {
@@ -47,6 +49,5 @@
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  border-top: 1px solid var(--borde);
-  background: var(--niebla);
+  border-top: 1px solid var(--border-soft);
 }

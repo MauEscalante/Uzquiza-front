@@ -1,39 +1,44 @@
-/* Rol secundario: nombra el estado cuando hace falta leerlo. Para
-   señalizarlo de un vistazo está el filo de estado de la tabla. */
+/*
+ * Cada estado sale de UN hue con su tinte y su tinta, en vez de los cinco pastel
+ * sueltos que había antes (#dcfce7, #dbeafe, #ffedd5, #e5e7eb…), que no pertenecían
+ * a ninguna familia.
+ */
+
 .badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radio-sm);
-  padding: 0.24rem 0.5rem;
-  font-size: 0.76rem;
+  border-radius: var(--radius-pill);
+  padding: 0.35rem 0.65rem;
+  font-size: var(--fs-label);
   font-weight: 600;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.02em;
   white-space: nowrap;
 }
 
 .success {
-  background: var(--exito-vela);
-  color: var(--exito);
+  background: var(--success-tint);
+  color: var(--success);
 }
 
+/* El naranja de marca: acá es donde "reclama atención" se vuelve visible. El texto
+ * usa --accent-ink porque el naranja puro sobre claro no llega a 4.5:1. */
 .warning {
-  background: var(--naranja-vela);
-  color: var(--naranja-texto);
+  background: var(--warning-tint);
+  color: var(--warning-ink);
 }
 
 .danger {
-  background: var(--peligro-vela);
-  color: var(--peligro);
+  background: var(--danger-tint);
+  color: var(--danger);
 }
 
 .info {
-  background: var(--azul-vela);
-  color: var(--azul);
+  background: var(--info-tint);
+  color: var(--info);
 }
 
 .neutral {
-  background: var(--niebla);
-  color: var(--texto-suave);
-  box-shadow: inset 0 0 0 1px var(--borde);
+  background: var(--neutral-tint);
+  color: var(--text-secondary);
 }

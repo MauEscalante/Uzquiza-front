@@ -2,10 +2,10 @@
   display: flex;
   min-height: 100vh;
   flex-direction: column;
-  gap: 26px;
-  padding: 22px 14px;
-  background: var(--tinta);
-  color: var(--blanco);
+  gap: 22px;
+  padding: 22px 18px;
+  background: var(--blue);
+  color: var(--text-on-blue);
 }
 
 .brand {
@@ -21,16 +21,11 @@
 .brandMark {
   display: grid;
   place-items: center;
-  width: 38px;
-  height: 38px;
-  flex: 0 0 38px;
-  border-radius: var(--radio-md);
-  background: var(--naranja);
-  color: var(--tinta);
-  font-stretch: 118%;
-  font-size: 0.9rem;
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.16);
   font-weight: 700;
-  letter-spacing: 0.02em;
 }
 
 .brand strong,
@@ -40,17 +35,15 @@
 }
 
 .brand strong {
-  font-stretch: 118%;
-  font-size: 1.02rem;
+  font-size: var(--fs-h4);
   font-weight: 600;
-  letter-spacing: -0.01em;
 }
 
 .brand span,
 .footer p {
   margin: 0;
-  color: rgba(255, 255, 255, 0.58);
-  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: var(--fs-meta);
   line-height: 1.5;
 }
 
@@ -64,33 +57,38 @@
   align-items: center;
   gap: 11px;
   border: 0;
-  border-radius: var(--radio-md);
-  padding: 0.72rem 0.8rem;
+  border-left: 3px solid transparent;
+  border-radius: var(--radius-md);
+  padding: 0.9rem 1rem;
   background: transparent;
-  color: rgba(255, 255, 255, 0.72);
-  font-size: 0.93rem;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: var(--fs-body);
+  font-weight: 500;
   text-align: left;
   transition:
-    background-color 140ms ease,
-    color 140ms ease;
+    background-color var(--dur) var(--ease-out),
+    border-color var(--dur) var(--ease-out),
+    color var(--dur) var(--ease-out);
 }
 
-.navItem:hover:not(.active) {
-  background: rgba(255, 255, 255, 0.07);
-  color: var(--blanco);
+.navItem:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--white);
 }
 
-/* El azul de marca aparece una sola vez en toda la barra. Gana peso
-   por escasez, no por superficie. */
-.active {
-  background: var(--azul);
-  color: var(--blanco);
-  font-weight: 500;
-}
-
-/* El anillo global es azul y sobre la barra tinta se pierde. */
 .navItem:focus-visible {
-  outline-color: var(--blanco);
+  outline: 2px solid var(--white);
+  outline-offset: -2px;
+}
+
+/* El filete al margen, como la regla de un libro contable: marca dónde estás.
+ * El borde transparente ya está reservado en .navItem, así que activar no
+ * desplaza el texto ni un pixel. */
+.active {
+  border-left-color: var(--accent);
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--white);
+  font-weight: 600;
 }
 
 .icon {

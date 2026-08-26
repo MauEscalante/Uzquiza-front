@@ -1,13 +1,26 @@
+/*
+ * Sólido, no degradado. El gradiente + glow de color + lift en hover es el gesto
+ * por defecto de todo dashboard generado; acá el hover oscurece y el press hunde,
+ * que es lo que el dedo espera de un control.
+ */
+
 .button {
-  border: 0;
-  border-radius: var(--radio-md);
-  padding: 0.62rem 1.05rem;
-  font-size: 0.92rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  padding: 0.8rem 1.15rem;
+  font-size: var(--fs-meta);
   font-weight: 600;
+  line-height: 1.2;
+  /* Nunca `all`: nombrar las propiedades evita repintados que tiran cuadros. */
   transition:
-    background-color 140ms ease,
-    color 140ms ease,
-    border-color 140ms ease;
+    background-color var(--dur) var(--ease-out),
+    border-color var(--dur) var(--ease-out),
+    color var(--dur) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.button:active:not(:disabled) {
+  transform: scale(0.97);
 }
 
 /* Sin esto un botón deshabilitado se ve idéntico a uno activo. */
@@ -16,42 +29,55 @@
   cursor: not-allowed;
 }
 
+.button:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
 .primary {
-  background: var(--azul);
-  color: var(--blanco);
+  background: var(--blue);
+  color: var(--text-on-blue);
 }
 
 .primary:hover:not(:disabled) {
-  background: var(--azul-fuerte);
+  background: var(--blue-strong);
 }
 
-/* Naranja = requiere acción. Lleva tinta encima, no blanco: blanco
-   sobre #f07323 da 2.92:1 y no llega a AA. */
+/* Neutro con borde, no naranja.
+ *
+ * Esta variante son "Editar", "Agregar inquilino", "Descargar Excel": acciones
+ * secundarias que no reclaman nada. Pintarlas de naranja gastaba el color en lo
+ * más común de la pantalla y lo dejaba sin significado —además de dar 2.92:1 con
+ * texto blanco, que no pasa AA. El naranja queda para el filete, los vencimientos
+ * y el ítem activo. */
 .secondary {
-  background: var(--naranja);
-  color: var(--tinta);
+  background: var(--surface);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
 }
 
 .secondary:hover:not(:disabled) {
-  background: var(--naranja-fuerte);
+  background: var(--surface-muted);
+  border-color: var(--text-tertiary);
 }
 
 .ghost {
-  background: var(--azul-vela);
-  color: var(--azul);
+  background: var(--blue-tint);
+  color: var(--blue-deep);
 }
 
 .ghost:hover:not(:disabled) {
-  background: var(--azul-vela-fuerte);
+  background: var(--blue-tint-strong);
 }
 
 .danger {
-  background: var(--peligro-vela);
-  color: var(--peligro);
+  background: var(--danger-tint);
+  color: var(--danger);
 }
 
 .danger:hover:not(:disabled) {
-  background: var(--peligro-vela-fuerte);
+  background: var(--danger);
+  color: var(--white);
 }
 
 .fullWidth {

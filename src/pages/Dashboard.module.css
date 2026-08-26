@@ -1,22 +1,21 @@
-.page {
-  display: grid;
-  gap: 20px;
-}
+.page { composes: page from '../styles/shared.module.css'; }
+.emptyState { composes: emptyState from '../styles/shared.module.css'; }
 
 .statusBox,
 .errorBox {
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   padding: 14px 16px;
-  font-weight: 600;
+  font-size: var(--fs-meta);
+  font-weight: 500;
 }
 
 .statusBox {
-  background: #e0f2fe;
-  color: #075985;
+  background: var(--info-tint);
+  color: var(--info);
 }
 
 .errorBox {
-  background: #fee2e2;
+  background: var(--danger-tint);
   color: var(--danger);
 }
 
@@ -30,15 +29,25 @@
   padding: 20px;
 }
 
+/* La cifra es el foco de la tarjeta y tiene que ganar sin discusión: el rótulo baja
+ * a versalita de 11px y la cifra sube a 32px en Plex Mono. Antes competían casi al
+ * mismo peso, así que el ojo no sabía dónde posarse. */
 .metricHeader {
   margin-bottom: 18px;
-  color: var(--text-secondary);
-  font-size: 0.88rem;
+  color: var(--text-tertiary);
+  font-size: var(--fs-label);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
 }
 
 .metricCard strong {
   display: block;
-  font-size: 2rem;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-display);
+  font-weight: 600;
+  letter-spacing: -0.02em;
   line-height: 1;
 }
 
@@ -64,30 +73,32 @@
   gap: 12px;
   padding-left: 16px;
   color: var(--text-primary);
+  font-size: var(--fs-meta);
   line-height: 1.5;
 }
 
 .list time {
   flex-shrink: 0;
-  color: var(--text-secondary);
-  font-size: 0.85rem;
+  color: var(--text-tertiary);
+  font-size: var(--fs-meta);
 }
 
 .empty {
   margin: 0;
   padding: 20px;
-  color: var(--text-secondary);
+  color: var(--text-tertiary);
 }
 
+/* La viñeta naranja: actividad reciente es justamente lo que reclama una mirada. */
 .list li::before {
   content: '';
   position: absolute;
   left: 0;
-  top: 0.6rem;
-  width: 7px;
-  height: 7px;
-  border-radius: 999px;
-  background: var(--secondary-orange);
+  top: 0.55rem;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
 }
 
 .vencimientoList {
@@ -96,20 +107,31 @@
   padding: 20px;
 }
 
+/* Un vencimiento ES el caso testigo de "reclama atención": lleva el filete. */
 .vencimientoItem {
+  composes: attentionRule from '../styles/shared.module.css';
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-left-width: 3px;
+  border-left-color: var(--accent);
+  border-radius: var(--radius-md);
   padding: 14px 16px;
+  background: var(--surface-muted);
 }
 
 .vencimientoItem p,
 .vencimientoItem span {
   margin: 0;
   color: var(--text-secondary);
+  font-size: var(--fs-meta);
+}
+
+.vencimientoItem strong {
+  font-size: var(--fs-h4);
+  font-weight: 600;
 }
 
 @media (max-width: 1180px) {

@@ -1,31 +1,12 @@
-.page {
-  display: grid;
-  gap: 18px;
-}
+.page { composes: page from '../styles/shared.module.css'; }
+.emptyState { composes: emptyState from '../styles/shared.module.css'; }
 
-.toolbar {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 20px;
-}
+/* Alinea abajo a propósito: la toolbar lleva filtros de distinta altura. */
+.toolbar { composes: toolbarBaseline from '../styles/shared.module.css'; }
 
-.toolbar h2 {
-  margin: 0 0 4px;
-  font-size: 1.15rem;
-}
-
-.toolbar p,
-.feedback,
-.error,
-.emptyState,
-.hint,
-.summaryGrid span,
-.retiroList span {
-  margin: 0;
-  color: var(--text-secondary);
-}
+/* Cuelgan directo de la Card, así que traen su propio padding. */
+.feedback { composes: feedbackBlock from '../styles/shared.module.css'; }
+.error { composes: errorBlock from '../styles/shared.module.css'; }
 
 .filters {
   display: flex;
@@ -33,20 +14,10 @@
   gap: 12px;
 }
 
-.feedback {
-  padding: 0 20px 20px;
-  color: var(--success);
-  font-weight: 600;
-}
-
-.error {
-  padding: 0 20px 20px;
-  color: var(--danger);
-  font-weight: 600;
-}
-
-.emptyState {
-  padding: 20px;
+.hint {
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: var(--fs-meta);
 }
 
 .twoColumn {
@@ -57,41 +28,46 @@
 }
 
 .summaryGrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
+  composes: detailGrid from '../styles/shared.module.css';
   padding: 20px;
 }
 
-.summaryGrid div {
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 14px 16px;
-  background: var(--surface-muted);
-}
-
+/* Plata en Plex Mono con tabulares: la columna se lee como un mayor. */
 .summaryGrid strong {
   display: block;
   margin-top: 6px;
-  font-size: 1.08rem;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-h4);
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
-.totalBox {
+/* Descendiente a propósito: `.detailGrid div` es (0,1,1) y una clase suelta perdería.
+ * Eso es lo que obligaba al `!important` de antes. */
+.summaryGrid .totalBox {
   grid-column: 1 / -1;
-  border-color: rgba(21, 101, 192, 0.18) !important;
-  background: rgba(21, 101, 192, 0.08) !important;
+  border-color: var(--blue-tint-strong);
+  border-left: 3px solid var(--blue);
+  background: var(--blue-tint);
 }
 
-/* Cada importe se pinta con el color de su columna para leer la tabla de un vistazo. */
+/* Debe y haber, como en el libro: cada importe con el color de su columna. */
+.ingreso,
+.deposito,
+.egreso {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
 .ingreso,
 .deposito {
   color: var(--success);
-  font-weight: 600;
 }
 
 .egreso {
   color: var(--danger);
-  font-weight: 600;
 }
 
 .retiroActions {
@@ -110,7 +86,7 @@
   justify-content: space-between;
   gap: 12px;
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   padding: 14px 16px;
   background: var(--surface-muted);
 }
@@ -120,6 +96,12 @@
   display: block;
 }
 
+.retiroList span {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--fs-meta);
+}
+
 .retiroMonto {
   display: flex;
   align-items: center;
@@ -127,13 +109,14 @@
 }
 
 .retiroMonto strong {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
   color: var(--danger);
 }
 
 .form {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
+  composes: form from '../styles/shared.module.css';
   padding: 20px;
 }
 
@@ -154,10 +137,5 @@
   .filters {
     flex-direction: column;
     align-items: stretch;
-  }
-
-  .form,
-  .summaryGrid {
-    grid-template-columns: 1fr;
   }
 }

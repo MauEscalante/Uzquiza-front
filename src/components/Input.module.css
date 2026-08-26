@@ -4,30 +4,49 @@
 }
 
 .label {
-  font-size: 0.92rem;
+  color: var(--text-secondary);
+  font-size: var(--fs-label);
   font-weight: 600;
-  color: var(--text-primary);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
 }
 
+/* Los inputs son ENTRANTES: reciben contenido. Van un punto más oscuros que su
+ * contenedor, que es lo que dice "escribí acá" sin necesidad de un borde grueso. */
 .input {
   width: 100%;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-control);
   padding: 0.85rem 0.95rem;
-  background: var(--white);
+  background: var(--surface-sunken);
   color: var(--text-primary);
   transition:
-    border-color 160ms ease,
-    box-shadow 160ms ease;
+    border-color var(--dur) var(--ease-out),
+    box-shadow var(--dur) var(--ease-out),
+    background-color var(--dur) var(--ease-out);
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+.input:hover:not(:disabled):not(:focus) {
+  border-color: var(--border-strong);
 }
 
 .input:focus {
-  border-color: rgba(21, 101, 192, 0.45);
-  box-shadow: 0 0 0 4px rgba(21, 101, 192, 0.08);
+  border-color: var(--blue);
+  background: var(--surface);
+  box-shadow: 0 0 0 4px var(--focus-ring);
   outline: 0;
+}
+
+.input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .error {
   color: var(--danger);
-  font-size: 0.84rem;
+  font-size: var(--fs-meta);
 }

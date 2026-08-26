@@ -1,39 +1,42 @@
 .wrapper {
   overflow: auto;
-  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  background: var(--white);
-  box-shadow: var(--shadow);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
 }
 
 .table {
   width: 100%;
   min-width: 780px;
+  font-size: var(--fs-body);
+  /* Toda la tabla en cifras tabulares: sin esto las columnas de plata se corren
+   * de fila en fila, que es el defecto más visible de una app de administración. */
+  font-variant-numeric: tabular-nums;
 }
 
 .table th,
 .table td {
   padding: 14px 16px;
   text-align: left;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-soft);
   vertical-align: middle;
 }
 
 .table thead th {
   background: var(--surface-muted);
-  color: var(--text-secondary);
-  font-size: 0.82rem;
-  font-weight: 700;
-  letter-spacing: 0.03em;
+  color: var(--text-tertiary);
+  font-size: var(--fs-label);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
 }
 
 .table tbody tr {
-  transition: background-color 150ms ease;
+  transition: background-color var(--dur-fast) var(--ease-out);
 }
 
 .table tbody tr:hover {
-  background: rgba(21, 101, 192, 0.04);
+  background: var(--blue-tint);
 }
 
 .table tbody tr:last-child td {
@@ -42,7 +45,7 @@
 
 .table tfoot td {
   background: var(--surface-muted);
-  font-weight: 700;
+  font-weight: 600;
   border-bottom: 0;
   border-top: 1px solid var(--border);
 }

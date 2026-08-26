@@ -1,42 +1,10 @@
-.page {
-  display: grid;
-  gap: 18px;
-}
+.page { composes: page from '../styles/shared.module.css'; }
+.toolbar { composes: toolbar from '../styles/shared.module.css'; }
+.emptyState { composes: emptyState from '../styles/shared.module.css'; }
 
-.toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 20px;
-}
-
-.toolbar h2 {
-  margin: 0 0 4px;
-  font-size: 1.15rem;
-}
-
-.toolbar p,
-.feedback,
-.error,
-.emptyState,
-.summaryGrid span,
-.receiptList p,
-.receiptList span {
-  margin: 0;
-  color: var(--text-secondary);
-}
-
-.feedback {
-  color: var(--success);
-  font-weight: 600;
-}
-
-.error {
-  padding: 0 20px 20px;
-  color: var(--danger);
-  font-weight: 600;
-}
+/* Cuelgan directo de la Card, así que traen su propio padding. */
+.feedback { composes: feedback from '../styles/shared.module.css'; }
+.error { composes: errorBlock from '../styles/shared.module.css'; }
 
 .twoColumn {
   display: grid;
@@ -45,41 +13,39 @@
 }
 
 .form {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
+  composes: form from '../styles/shared.module.css';
   padding: 20px;
 }
 
 .actions {
-  display: flex;
+  composes: actions from '../styles/shared.module.css';
+  flex-wrap: nowrap;
   gap: 10px;
   padding: 0 20px 20px;
 }
 
 .summaryGrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
+  composes: detailGrid from '../styles/shared.module.css';
   padding: 20px;
 }
 
-.summaryGrid div {
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 14px 16px;
-  background: var(--surface-muted);
-}
-
+/* Plata en Plex Mono con tabulares: la columna se lee como un mayor. */
 .summaryGrid strong {
   display: block;
   margin-top: 6px;
-  font-size: 1.08rem;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-h4);
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
-.totalBox {
-  border-color: rgba(21, 101, 192, 0.18) !important;
-  background: rgba(21, 101, 192, 0.08) !important;
+/* Descendiente a propósito: `.detailGrid div` es (0,1,1) y una clase suelta perdería.
+ * Eso es lo que obligaba al `!important` de antes. */
+.summaryGrid .totalBox {
+  border-color: var(--blue-tint-strong);
+  border-left: 3px solid var(--blue);
+  background: var(--blue-tint);
 }
 
 .receiptList {
@@ -90,7 +56,7 @@
 
 .receiptList article {
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   padding: 14px 16px;
   background: var(--surface-muted);
 }
@@ -98,6 +64,18 @@
 .receiptList strong,
 .receiptList span {
   display: block;
+}
+
+.receiptList strong {
+  font-size: var(--fs-h4);
+  font-weight: 600;
+}
+
+.receiptList p,
+.receiptList span {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--fs-meta);
 }
 
 .receiptList p {
@@ -111,16 +89,6 @@
 }
 
 @media (max-width: 720px) {
-  .toolbar {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .form,
-  .summaryGrid {
-    grid-template-columns: 1fr;
-  }
-
   .actions {
     flex-direction: column;
   }

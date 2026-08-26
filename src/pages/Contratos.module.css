@@ -1,88 +1,25 @@
-.page {
-  display: grid;
-  gap: 18px;
-}
+.page { composes: page from '../styles/shared.module.css'; }
+.toolbar { composes: toolbar from '../styles/shared.module.css'; }
+.filters { composes: filters from '../styles/shared.module.css'; }
+.actions { composes: actions from '../styles/shared.module.css'; }
+.emptyState { composes: emptyState from '../styles/shared.module.css'; }
+.form { composes: form from '../styles/shared.module.css'; }
+.detailGrid { composes: detailGrid from '../styles/shared.module.css'; }
+.sectionDivider { composes: sectionDivider from '../styles/shared.module.css'; }
+.sectionTitle { composes: sectionTitle from '../styles/shared.module.css'; }
+.sectionHeader { composes: sectionHeader from '../styles/shared.module.css'; }
+.addButtonRow { composes: addButtonRow from '../styles/shared.module.css'; }
 
-.toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 20px;
-}
-
-.toolbar h2 {
-  margin: 0 0 4px;
-  font-size: 1.15rem;
-}
-
-.toolbar p,
-.feedback,
-.error,
-.emptyState {
-  margin: 0;
-  color: var(--text-secondary);
-}
-
-.filters {
-  display: grid;
-  gap: 12px;
-  padding: 0 20px 20px;
-}
-
-.feedback {
-  color: var(--success);
-  font-weight: 600;
-}
-
-.error {
-  color: var(--danger);
-  font-weight: 600;
-}
-
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
+/* Van dentro de `.filters`, que ya trae el padding del borde de la Card. */
+.feedback { composes: feedback from '../styles/shared.module.css'; }
+.error { composes: error from '../styles/shared.module.css'; }
 
 .actions button {
   padding-inline: 0.85rem;
 }
 
-.form {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-}
+/* --- Rescisión ------------------------------------------------------------ */
 
-.sectionDivider {
-  grid-column: 1 / -1;
-  border-top: 1px solid var(--border);
-  padding-top: 1rem;
-  margin-top: 0.25rem;
-}
-
-.sectionTitle {
-  grid-column: 1 / -1;
-  margin: 0;
-}
-
-.sectionHeader {
-  grid-column: 1 / -1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.addButtonRow {
-  grid-column: 1 / -1;
-  justify-self: start;
-}
-
-
-/* Modal de rescisión: dirección fija, selector de mes y resumen del cálculo. */
 .rescisionForm {
   display: grid;
   gap: 14px;
@@ -90,7 +27,7 @@
 
 .rescisionPropiedad {
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   padding: 14px 16px;
   background: var(--surface-muted);
 }
@@ -98,14 +35,27 @@
 .rescisionPropiedad span {
   display: block;
   margin-bottom: 6px;
-  color: var(--text-secondary);
-  font-size: 0.85rem;
+  color: var(--text-tertiary);
+  font-size: var(--fs-label);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
 }
 
 .rescisionNota {
   margin: 0;
+  color: var(--text-tertiary);
+  font-size: var(--fs-meta);
+}
+
+/* El filete al margen: esto reclama atención. Mismo gesto que el ítem activo del
+ * sidebar, mismo significado. */
+.rescisionAviso {
+  composes: attentionRule from '../styles/shared.module.css';
+  margin: 0;
+  padding: 2px 0 2px 12px;
   color: var(--text-secondary);
-  font-size: 0.85rem;
+  font-size: var(--fs-meta);
 }
 
 .rescisionResumen {
@@ -115,63 +65,22 @@
   gap: 14px;
   flex-wrap: wrap;
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   padding: 14px 16px;
   background: var(--surface-muted);
   color: var(--text-secondary);
-  font-size: 0.9rem;
+  font-size: var(--fs-meta);
 }
 
-.rescisionAviso {
-  margin: 0;
-  border-left: 3px solid var(--warning);
-  padding: 2px 0 2px 12px;
-  color: var(--text-secondary);
-  font-size: 0.85rem;
-}
-
+/* La penalidad es el foco del modal: gana por tamaño, peso y color a la vez. */
 .penalidad {
-  font-size: 1.35rem;
+  composes: figure from '../styles/shared.module.css';
+  font-size: var(--fs-h2);
   color: var(--danger);
 }
 
 .sinPenalidad {
-  font-size: 1.1rem;
+  font-size: var(--fs-h4);
+  font-weight: 600;
   color: var(--success);
-}
-
-.detailGrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.detailGrid div {
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 14px 16px;
-  background: var(--surface-muted);
-}
-
-.detailGrid span {
-  display: block;
-  margin-bottom: 6px;
-  color: var(--text-secondary);
-  font-size: 0.85rem;
-}
-
-.detailGrid strong {
-  font-size: 0.98rem;
-}
-
-@media (max-width: 720px) {
-  .toolbar {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .form,
-  .detailGrid {
-    grid-template-columns: 1fr;
-  }
 }

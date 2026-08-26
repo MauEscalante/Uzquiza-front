@@ -4,26 +4,43 @@
 }
 
 .label {
-  font-size: 0.92rem;
+  color: var(--text-secondary);
+  font-size: var(--fs-label);
   font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
 }
 
 .select {
   width: 100%;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-control);
   padding: 0.85rem 0.95rem;
-  background: var(--white);
+  background: var(--surface-sunken);
   color: var(--text-primary);
+  transition:
+    border-color var(--dur) var(--ease-out),
+    box-shadow var(--dur) var(--ease-out),
+    background-color var(--dur) var(--ease-out);
+}
+
+.select:hover:not(:disabled):not(:focus) {
+  border-color: var(--border-strong);
 }
 
 .select:focus {
-  border-color: rgba(21, 101, 192, 0.45);
-  box-shadow: 0 0 0 4px rgba(21, 101, 192, 0.08);
+  border-color: var(--blue);
+  background: var(--surface);
+  box-shadow: 0 0 0 4px var(--focus-ring);
   outline: 0;
+}
+
+.select:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .error {
   color: var(--danger);
-  font-size: 0.84rem;
+  font-size: var(--fs-meta);
 }

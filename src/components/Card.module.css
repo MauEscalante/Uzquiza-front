@@ -1,8 +1,9 @@
 .card {
-  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--surface);
-  box-shadow: var(--shadow);
+  /* Una sola estrategia de profundidad: el hairline del shadow hace de borde, así
+   * no conviven un borde sólido y una sombra dramática peleando por el mismo canto. */
+  box-shadow: var(--shadow-sm);
 }
 
 .header {
@@ -13,11 +14,12 @@
 
 .header h3 {
   margin: 0;
-  font-size: 1rem;
+  font-size: var(--fs-h3);
+  font-weight: 600;
 }
 
 .header p {
   margin: 0;
   color: var(--text-secondary);
-  font-size: 0.92rem;
+  font-size: var(--fs-meta);
 }

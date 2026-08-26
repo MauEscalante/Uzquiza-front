@@ -1,34 +1,44 @@
+/*
+ * Cada estado sale de UN hue con su tinte y su tinta, en vez de los cinco pastel
+ * sueltos que había antes (#dcfce7, #dbeafe, #ffedd5, #e5e7eb…), que no pertenecían
+ * a ninguna familia.
+ */
+
 .badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 999px;
-  padding: 0.4rem 0.7rem;
-  font-size: 0.8rem;
-  font-weight: 700;
+  border-radius: var(--radius-pill);
+  padding: 0.35rem 0.65rem;
+  font-size: var(--fs-label);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
 }
 
 .success {
-  background: #dcfce7;
+  background: var(--success-tint);
   color: var(--success);
 }
 
+/* El naranja de marca: acá es donde "reclama atención" se vuelve visible. El texto
+ * usa --accent-ink porque el naranja puro sobre claro no llega a 4.5:1. */
 .warning {
-  background: #ffedd5;
-  color: var(--warning);
+  background: var(--warning-tint);
+  color: var(--warning-ink);
 }
 
 .danger {
-  background: #fee2e2;
+  background: var(--danger-tint);
   color: var(--danger);
 }
 
 .info {
-  background: #dbeafe;
-  color: var(--primary-blue);
+  background: var(--info-tint);
+  color: var(--info);
 }
 
 .neutral {
-  background: #e5e7eb;
-  color: #374151;
+  background: var(--neutral-tint);
+  color: var(--text-secondary);
 }

@@ -1,45 +1,11 @@
-.page {
-  display: grid;
-  gap: 18px;
-}
+.page { composes: page from '../styles/shared.module.css'; }
+.toolbar { composes: toolbar from '../styles/shared.module.css'; }
+.actions { composes: actions from '../styles/shared.module.css'; }
+.emptyState { composes: emptyState from '../styles/shared.module.css'; }
 
-.toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 20px;
-}
-
-.toolbar h2 {
-  margin: 0 0 4px;
-  font-size: 1.15rem;
-}
-
-.toolbar p,
-.feedback,
-.error,
-.emptyState {
-  margin: 0;
-  color: var(--text-secondary);
-}
-
-.feedback {
-  color: var(--success);
-  font-weight: 600;
-}
-
-.error {
-  padding: 0 20px 20px;
-  color: var(--danger);
-  font-weight: 600;
-}
-
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
+/* Cuelgan directo de la Card, así que traen su propio padding. */
+.feedback { composes: feedback from '../styles/shared.module.css'; }
+.error { composes: errorBlock from '../styles/shared.module.css'; }
 
 .actions button {
   padding-inline: 0.85rem;
@@ -52,7 +18,7 @@
 
 .historyList article {
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   padding: 14px 16px;
   background: var(--surface-muted);
 }
@@ -62,14 +28,13 @@
   display: block;
 }
 
+.historyList strong {
+  font-size: var(--fs-h4);
+  font-weight: 600;
+}
+
 .historyList p {
   margin: 6px 0 0;
   color: var(--text-secondary);
-}
-
-@media (max-width: 720px) {
-  .toolbar {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+  font-size: var(--fs-meta);
 }

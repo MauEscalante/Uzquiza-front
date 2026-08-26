@@ -1,0 +1,193 @@
+/*
+ * Primitivos que las páginas comparten.
+ *
+ * Antes cada página tenía su copia de estas clases y habían derivado entre sí: el
+ * gap de `.page` era 18px salvo en Dashboard, `.error` llevaba padding en tres
+ * páginas y en otras tres no. Acá viven una sola vez.
+ *
+ * Las páginas los toman con `composes`, así el TSX sigue usando `styles.toolbar`
+ * sin enterarse. Como `composes` produce clases de igual especificidad, las
+ * divergencias reales van como VARIANTES acá abajo, nunca como override local:
+ * un override dependería del orden del bundle.
+ */
+
+.page {
+  display: grid;
+  gap: 20px;
+}
+
+/* --- Encabezado de sección ------------------------------------------------ */
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 20px;
+}
+
+/* LibroDiario alinea abajo a propósito: la toolbar lleva filtros de distinta altura. */
+.toolbarBaseline {
+  composes: toolbar;
+  align-items: flex-end;
+}
+
+/* El título lidera por tamaño Y peso; el subtítulo baja a metadato. Antes iban
+ * 1.15rem contra 1rem, que a ojo es el mismo nivel. */
+.toolbar h2 {
+  margin: 0 0 4px;
+  font-size: var(--fs-h2);
+  font-weight: 600;
+}
+
+.toolbar p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--fs-meta);
+}
+
+.filters {
+  display: grid;
+  gap: 12px;
+  padding: 0 20px 20px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* --- Mensajes -------------------------------------------------------------
+ * Dos contextos reales, y de ahí venía la deriva: dentro de `.filters` el padding
+ * ya está puesto, pero colgando directo de una Card hace falta el propio. */
+
+.message {
+  margin: 0;
+  font-size: var(--fs-meta);
+  font-weight: 500;
+}
+
+.messageBlock {
+  composes: message;
+  padding: 0 20px 20px;
+}
+
+.feedback {
+  composes: message;
+  color: var(--success);
+}
+
+.feedbackBlock {
+  composes: messageBlock;
+  color: var(--success);
+}
+
+.error {
+  composes: message;
+  color: var(--danger);
+}
+
+.errorBlock {
+  composes: messageBlock;
+  color: var(--danger);
+}
+
+.emptyState {
+  margin: 0;
+  padding: 20px;
+  color: var(--text-tertiary);
+}
+
+/* --- Formularios y detalle ------------------------------------------------ */
+
+.form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.detailGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+/* Celda de dato: el rótulo se hunde a versalita y el valor lidera. Antes iban
+ * 0.85 contra 0.98rem, que a ojo es el mismo nivel. */
+.detailGrid div {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  background: var(--surface-muted);
+}
+
+.detailGrid span {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--text-tertiary);
+  font-size: var(--fs-label);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.detailGrid strong {
+  font-size: var(--fs-h4);
+  font-weight: 600;
+}
+
+/* --- Secciones dentro de un formulario ------------------------------------ */
+
+.sectionDivider {
+  grid-column: 1 / -1;
+  border-top: 1px solid var(--border-soft);
+  padding-top: 1rem;
+  margin-top: 0.25rem;
+}
+
+.sectionTitle {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: var(--fs-h4);
+  font-weight: 600;
+}
+
+.sectionHeader {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.addButtonRow {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
+
+/* --- Cifras ---------------------------------------------------------------
+ * La otra mitad de la firma: la plata se lee como una columna de mayor. */
+.figure {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* Marca lo que reclama atención, como el filete al margen de un libro contable. */
+.attentionRule {
+  border-left: 3px solid var(--accent);
+}
+
+@media (max-width: 720px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .form,
+  .detailGrid {
+    grid-template-columns: 1fr;
+  }
+}

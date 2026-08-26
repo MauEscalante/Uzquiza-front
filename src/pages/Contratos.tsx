@@ -138,7 +138,7 @@ function Contratos() {
                   ) : null}
                 </div>
               </td>
-            </tr>
+            </ClickableRow>
           ))}
         </Table>
       ) : null}

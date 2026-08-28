@@ -62,7 +62,7 @@ export function useClientesController() {
     }
 
     // Varios campos son opcionales y llegan en null, por eso el String(value ?? '').
-    return clientes.filter((cliente) => [cliente.nombre, cliente.apellido, cliente.dni, cliente.telefono, cliente.email, cliente.direccion, cliente.cuil, cliente.nacionalidad, cliente.tipo]
+    return clientes.filter((cliente) => [cliente.nombre, cliente.apellido, cliente.dni, cliente.telefono, cliente.email, cliente.direccion, cliente.direccion_propiedades, cliente.cuil, cliente.nacionalidad, cliente.tipo]
       .some((value) => String(value ?? '').toLowerCase().includes(normalizedSearch)))
   }, [clientes, search])
 

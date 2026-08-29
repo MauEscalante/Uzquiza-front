@@ -121,12 +121,6 @@ function Contratos() {
               </td>
               <td>
                 <div className={styles.actions}>
-                  <Button variant="ghost" onClick={() => openDetail(contrato)}>Ver detalles</Button>
-                  {/*
-                    Las acciones siguen las tres fases: sin aviso se rescinde, con aviso
-                    pendiente se cierra por entrega de llaves (o se cancela el aviso), y un
-                    contrato ya cerrado no ofrece ninguna.
-                  */}
                   {contrato.estado === 'Activo' && !tieneRescisionPendiente(contrato) ? (
                     <Button variant="danger" onClick={() => openRescision(contrato)}>Rescindir</Button>
                   ) : null}
@@ -138,7 +132,7 @@ function Contratos() {
                   ) : null}
                 </div>
               </td>
-            </tr>
+            </ClickableRow>
           ))}
         </Table>
       ) : null}

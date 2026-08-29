@@ -13,6 +13,8 @@ export interface Propiedad {
   comision: number | null
   estado: PropiedadEstado
   estado_alquiler: EstadoAlquiler
+  /** Condiciones especiales pactadas para el inmueble, en texto libre. */
+  excepciones: string | null
 }
 
 export interface PropiedadPropietarioDetalle {
@@ -91,4 +93,9 @@ export interface PropiedadUpdateValues {
   ambientes: number | null
   estado: PropiedadEstado
   estado_alquiler: EstadoAlquiler
+  /**
+   * Opcional porque el PUT del formulario no la manda: las excepciones se
+   * editan aparte, desde el detalle, con patchPropiedad.
+   */
+  excepciones?: string | null
 }

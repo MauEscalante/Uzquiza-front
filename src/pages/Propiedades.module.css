@@ -35,3 +35,28 @@
   color: var(--text-secondary);
   font-size: var(--fs-meta);
 }
+
+/* Las excepciones son texto largo: ocupan las dos columnas del detalle. Heredan
+   el recuadro de `.detailGrid div`, solo hay que estirarlas. */
+.detailNotes {
+  grid-column: 1 / -1;
+}
+
+/* pre-wrap para respetar los saltos de línea que escribió el usuario. */
+.notesText {
+  margin: 0 0 12px;
+  white-space: pre-wrap;
+  color: var(--text-primary);
+}
+
+.notesInput {
+  min-height: 96px;
+  resize: vertical;
+}
+
+.notesActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}

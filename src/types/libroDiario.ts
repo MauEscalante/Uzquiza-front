@@ -53,11 +53,19 @@ export function hoy() {
   return `${ahora.getFullYear()}-${mes}-${dia}`
 }
 
+/**
+ * Valor del selector de propiedad cuando el ingreso en efectivo no corresponde a un
+ * alquiler. No es un id: al enviar se manda `propiedad_id: null` y vale el concepto
+ * que se escribió a mano.
+ */
+export const PROPIEDAD_OTRO = 'OTRO'
+
 export function crearMovimientoVacio(tipo: TipoMovimiento): MovimientoFormValues {
   return {
     fecha: hoy(),
     tipo,
-    propiedadId: '',
+    // El efectivo abre en "Otro": la propiedad se elige solo si el cobro es de un alquiler.
+    propiedadId: tipo === 'INGRESO' ? PROPIEDAD_OTRO : '',
     concepto: '',
     monto: '',
     cuenta: '',

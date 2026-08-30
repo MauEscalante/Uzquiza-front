@@ -45,6 +45,7 @@ function LibroDiario() {
     handleSubmit,
     handleDelete,
     requierePropiedad,
+    usaConceptoLibre,
     formatCurrency,
     formatDate,
   } = useLibroDiarioController()
@@ -178,9 +179,12 @@ function LibroDiario() {
           {requierePropiedad(form.tipo) ? (
             // El piso y el depto ya vienen en la dirección de la propiedad.
             <Select label="Propiedad" options={propiedadOptions} value={form.propiedadId} onChange={(event) => setForm((current) => ({ ...current, propiedadId: event.target.value }))} />
-          ) : (
-            <Input label="A qué corresponde" placeholder="Ej: Monotributo" value={form.concepto} onChange={(event) => setForm((current) => ({ ...current, concepto: event.target.value }))} />
-          )}
+          ) : null}
+
+          {/* En el efectivo con "Otro" se ven los dos: el selector arriba y el texto acá. */}
+          {usaConceptoLibre(form) ? (
+            <Input label="A qué corresponde" placeholder="Ej: Seña depto 2B" value={form.concepto} onChange={(event) => setForm((current) => ({ ...current, concepto: event.target.value }))} />
+          ) : null}
 
           <Input label="Monto" type="number" min={0} step="0.01" value={form.monto} onChange={(event) => setForm((current) => ({ ...current, monto: event.target.value }))} />
 
@@ -200,7 +204,7 @@ function LibroDiario() {
             />
           ) : null}
 
-          {requierePropiedad(form.tipo) ? (
+          {requierePropiedad(form.tipo) && !usaConceptoLibre(form) ? (
             <p className={styles.hint}>Al guardar, la propiedad queda marcada como abonada.</p>
           ) : null}
           {formError ? <div className={styles.error}>{formError}</div> : null}

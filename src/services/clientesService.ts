@@ -1,5 +1,5 @@
 import { apiRequest, fetchAllPages } from './api'
-import type { Cliente, ClienteUpdateValues } from '../types/cliente'
+import type { Cliente, ClienteUpdateValues, ClienteValorHistorico } from '../types/cliente'
 
 // No hay createCliente: los clientes se dan de alta solos al crear un contrato
 // (inquilino) o una propiedad (propietario). El backend tampoco expone el alta.
@@ -27,5 +27,14 @@ export async function patchCliente(clienteNum: number, cambios: Partial<ClienteU
     `/clientes/${clienteNum}`,
     { method: 'PATCH', body: JSON.stringify(cambios) },
     'Error al actualizar el cliente',
+  )
+}
+
+/** Un renglón por período de vigencia: cada ajuste del alquiler deja el suyo. */
+export async function getClienteHistorial(clienteNum: number): Promise<ClienteValorHistorico[]> {
+  return apiRequest<ClienteValorHistorico[]>(
+    `/clientes/${clienteNum}/historial`,
+    undefined,
+    'Error al cargar el historial del cliente',
   )
 }

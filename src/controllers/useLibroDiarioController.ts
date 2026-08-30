@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { formatCurrency, formatDate, mensajeDe } from '../services/api'
 import { crearMovimiento, eliminarMovimiento, listMovimientos, listRetiros, obtenerResumenCaja } from '../services/libroDiarioService'
 import { listPropiedades } from '../services/propiedadesService'
-import { crearMovimientoVacio, hoy } from '../types/libroDiario'
+import { PROPIEDAD_OTRO, crearMovimientoVacio, hoy } from '../types/libroDiario'
 import type { MovimientoDiario, MovimientoFormValues, ResumenCaja, TipoMovimiento } from '../types/libroDiario'
 import type { Propiedad } from '../types/propiedad'
 
@@ -40,6 +40,17 @@ export const cuentaOptions = [
 /** Los ingresos y depósitos se registran contra una propiedad; el resto no. */
 function requierePropiedad(tipo: TipoMovimiento) {
 	return tipo === 'INGRESO' || tipo === 'DEPOSITO'
+}
+
+/**
+ * Si el concepto lo escribe el usuario en vez de armarse con la dirección.
+ *
+ * Son los egresos y retiros, que nunca tienen propiedad, más el ingreso en efectivo
+ * que se registró como "Otro": una seña, una comisión suelta, algo que entró a la
+ * caja sin ser el alquiler de una propiedad.
+ */
+function usaConceptoLibre(form: MovimientoFormValues) {
+	return !requierePropiedad(form.tipo) || form.propiedadId === PROPIEDAD_OTRO
 }
 
 const resumenVacio: ResumenCaja = {
@@ -132,13 +143,14 @@ export function useLibroDiarioController() {
 		}
 	}, [])
 
-	const propiedadOptions = useMemo(
-		() => [
-			{ label: 'Seleccioná una propiedad', value: '' },
-			...propiedades.map((propiedad) => ({ label: propiedad.direccion, value: String(propiedad.propiedad_id) })),
-		],
-		[propiedades],
-	)
+	// Las dos listas difieren en su primera opción: el efectivo no necesita placeholder
+	// vacío porque abre en "Otro", que ya es una selección válida.
+	const propiedadOptions = useMemo(() => {
+		const deLaLista = propiedades.map((propiedad) => ({ label: propiedad.direccion, value: String(propiedad.propiedad_id) }))
+		return form.tipo === 'INGRESO'
+			? [{ label: 'Otro (no es de una propiedad)', value: PROPIEDAD_OTRO }, ...deLaLista]
+			: [{ label: 'Seleccioná una propiedad', value: '' }, ...deLaLista]
+	}, [propiedades, form.tipo])
 
 	const periodoLabel = useMemo(() => `${monthNames[Number(mes) - 1]} ${anio}`, [mes, anio])
 
@@ -195,13 +207,18 @@ export function useLibroDiarioController() {
 	 *
 	 * La cuenta se limpia salvo en depósito porque el selector no se muestra en los
 	 * otros tipos: si no, una cuenta elegida antes se guardaría sin que se vea.
+	 *
+	 * La propiedad se reinicia siempre, no solo al salir de un tipo que la usa: "Otro"
+	 * existe únicamente en el efectivo y el placeholder vacío únicamente en el depósito,
+	 * así que un valor arrastrado dejaría al select mostrando algo fuera de su lista.
 	 */
 	function handleTipoChange(tipo: TipoMovimiento) {
 		setForm((current) => ({
 			...current,
 			tipo,
 			...(tipo === 'DEPOSITO' ? {} : { cuenta: '' }),
-			...(requierePropiedad(tipo) ? { concepto: '' } : { propiedadId: '' }),
+			propiedadId: tipo === 'INGRESO' ? PROPIEDAD_OTRO : '',
+			concepto: '',
 		}))
 	}
 
@@ -219,7 +236,7 @@ export function useLibroDiarioController() {
 			return
 		}
 
-		if (!requierePropiedad(form.tipo) && !form.concepto.trim()) {
+		if (usaConceptoLibre(form) && !form.concepto.trim()) {
 			setFormError('Ingresá a qué corresponde el movimiento.')
 			return
 		}
@@ -234,13 +251,19 @@ export function useLibroDiarioController() {
 		try {
 			// La fecha se resuelve recién acá: si el modal quedó abierto pasada la
 			// medianoche, la que se calculó al abrirlo ya no sería la de hoy.
-			await crearMovimiento({ ...form, fecha: hoy() })
+			await crearMovimiento({
+				...form,
+				fecha: hoy(),
+				// "Otro" es una opción del selector, no una propiedad: sin esto viajaría
+				// como Number('OTRO'), o sea NaN.
+				propiedadId: form.propiedadId === PROPIEDAD_OTRO ? '' : form.propiedadId,
+			})
 			await cargarMes()
 			cerrarModales()
 			setFeedback(
 				form.tipo === 'RETIRO'
 					? 'Retiro de caja registrado.'
-					: requierePropiedad(form.tipo)
+					: !usaConceptoLibre(form)
 						? 'Movimiento registrado y propiedad marcada como abonada.'
 						: 'Movimiento registrado.',
 			)
@@ -291,6 +314,7 @@ export function useLibroDiarioController() {
 		handleSubmit,
 		handleDelete,
 		requierePropiedad,
+		usaConceptoLibre,
 		formatCurrency,
 		formatDate,
 	}

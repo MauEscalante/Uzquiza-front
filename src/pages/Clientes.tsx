@@ -66,8 +66,9 @@ function Clientes() {
               onSelect={() => openDetailModal(cliente)}
               label={`Ver detalle de ${cliente.nombre} ${cliente.apellido}`}
             >
-              {/* El propietario muestra las direcciones de sus propiedades; el inquilino, su domicilio. */}
-              <td>{cliente.direccion_propiedades ?? cliente.direccion ?? '—'}</td>
+              {/* El inquilino tiene domicilio personal; el propietario no, así que
+                  para él se muestra la propiedad que posee. */}
+              <td>{cliente.direccion ?? cliente.direccion_propiedades ?? '—'}</td>
               <td>{cliente.nombre}</td>
               <td>{cliente.apellido}</td>
               <td>{cliente.telefono}</td>

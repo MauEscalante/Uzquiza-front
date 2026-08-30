@@ -73,7 +73,7 @@ function Contratos() {
         </div>
 
         <div className={styles.filters}>
-          <Input placeholder="Buscar por contrato, propiedad o estado" value={search} onChange={(event) => setSearch(event.target.value)} />
+          <Input placeholder="Buscar por contrato, dirección, estado o fecha de fin" value={search} onChange={(event) => setSearch(event.target.value)} />
           {feedback ? <div className={styles.feedback}>{feedback}</div> : null}
           {error ? <div className={styles.error}>{error}</div> : null}
         </div>
@@ -104,12 +104,12 @@ function Contratos() {
               label={`Ver detalle del contrato ${contrato.contrato_id}`}
             >
               <td>{getPropiedadDireccion(contrato.propiedad)}</td>
-              <td className={cell.dato}>{contrato.fecha_inicio}</td>
-              <td className={cell.dato}>{contrato.fecha_fin}</td>
+              <td className={cell.dato}>{formatDate(contrato.fecha_inicio)}</td>
+              <td className={cell.dato}>{formatDate(contrato.fecha_fin)}</td>
               <td className={cell.money}>{formatCurrency(contrato.importe_inicial)}</td>
               <td className={cell.money}>{contrato.deposito != null ? formatCurrency(contrato.deposito) : '—'}</td>
-              <td>{contrato.tipo_ajuste}</td>
-              <td>{contrato.periodicidad}</td>
+              <td>{contrato.tipo_ajuste ?? '—'}</td>
+              <td>{contrato.periodicidad ?? '—'}</td>
               <td>
                 {tieneRescisionPendiente(contrato) ? (
                   <StatusBadge variant="warning">
@@ -121,12 +121,6 @@ function Contratos() {
               </td>
               <td>
                 <div className={styles.actions}>
-                  <Button variant="ghost" onClick={() => openDetail(contrato)}>Ver detalles</Button>
-                  {/*
-                    Las acciones siguen las tres fases: sin aviso se rescinde, con aviso
-                    pendiente se cierra por entrega de llaves (o se cancela el aviso), y un
-                    contrato ya cerrado no ofrece ninguna.
-                  */}
                   {contrato.estado === 'Activo' && !tieneRescisionPendiente(contrato) ? (
                     <Button variant="danger" onClick={() => openRescision(contrato)}>Rescindir</Button>
                   ) : null}

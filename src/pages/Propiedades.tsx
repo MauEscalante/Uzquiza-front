@@ -7,6 +7,7 @@ import Select from '../components/Select'
 import StatusBadge from '../components/StatusBadge'
 import Table, { ClickableRow } from '../components/Table'
 import { cell } from '../components/tableCells'
+import Textarea from '../components/Textarea'
 import { estadoAlquilerOptions, estadoOptions, usePropiedadesController } from '../controllers/usePropiedadesController'
 import { formatPercent } from '../services/api'
 import type { EstadoAlquiler, PropiedadEstado } from '../types/propiedad'
@@ -29,6 +30,14 @@ function Propiedades() {
     selectedPropiedad,
     detailLoading,
     detailError,
+    editandoExcepciones,
+    excepcionesDraft,
+    setExcepcionesDraft,
+    excepcionesSaving,
+    excepcionesError,
+    startEditExcepciones,
+    cancelEditExcepciones,
+    saveExcepciones,
     editingPropiedad,
     form,
     setForm,
@@ -189,6 +198,40 @@ function Propiedades() {
                 ))}
               </>
             ) : null}
+            {/* Se muestra siempre, aunque esté vacía: si no, no habría desde dónde cargarla. */}
+            <div className={styles.detailNotes}>
+              <span>Excepciones</span>
+              {editandoExcepciones ? (
+                <>
+                  <Textarea
+                    rows={4}
+                    className={styles.notesInput}
+                    maxLength={2000}
+                    placeholder="Ej: el inquilino no paga expensas."
+                    value={excepcionesDraft}
+                    onChange={(event) => setExcepcionesDraft(event.target.value)}
+                  />
+                  {excepcionesError ? <div className={styles.error}>{excepcionesError}</div> : null}
+                  <div className={styles.notesActions}>
+                    <Button variant="ghost" onClick={cancelEditExcepciones} disabled={excepcionesSaving}>Cancelar</Button>
+                    <Button onClick={() => void saveExcepciones()} disabled={excepcionesSaving}>
+                      {excepcionesSaving ? 'Guardando...' : 'Guardar'}
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className={styles.notesText}>
+                    {selectedPropiedad.excepciones?.trim() || 'Sin excepciones registradas.'}
+                  </p>
+                  <div className={styles.notesActions}>
+                    <Button variant="secondary" onClick={startEditExcepciones}>
+                      {selectedPropiedad.excepciones?.trim() ? 'Editar' : 'Agregar'}
+                    </Button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         ) : null}
       </Modal>

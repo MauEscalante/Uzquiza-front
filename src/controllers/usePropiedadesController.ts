@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { mensajeDe } from '../services/api'
+import { mensajeDe, normalizarTexto } from '../services/api'
 import {
   createPropiedad,
   deletePropiedad,
@@ -7,6 +7,7 @@ import {
   getPropiedad,
   listPropiedades,
   listPropietarios,
+  patchPropiedad,
   updatePropiedad,
 } from '../services/propiedadesService'
 import type {
@@ -40,6 +41,16 @@ export const estadoAlquilerOptions = [
   { label: 'Adeuda', value: 'Adeuda' },
 ]
 
+/**
+ * Lo que uno escribe cuando busca por cobranza. El valor guardado es literalmente
+ * "Abono"/"Adeuda", así que sin esto "abonado" o "debe" no encuentran nada. No se
+ * muestra en ningún lado: es solo texto extra contra el que matchear.
+ */
+const SINONIMOS_ALQUILER: Record<EstadoAlquiler, string> = {
+  Abono: 'abono abonado abonó abona pagó pagado al día',
+  Adeuda: 'adeuda adeudado adeudó debe deuda atrasado impago',
+}
+
 const emptyForm: FormState = {
   direccion: '',
   ambientes: '',
@@ -59,6 +70,12 @@ export function usePropiedadesController() {
   const [selectedPropiedad, setSelectedPropiedad] = useState<PropiedadDetalle | null>(null)
   const [detailLoading, setDetailLoading] = useState(false)
   const [detailError, setDetailError] = useState('')
+  // Las excepciones se editan dentro del propio modal de detalle, no en el
+  // formulario de la propiedad: son lo que uno corrige justo cuando las lee.
+  const [editandoExcepciones, setEditandoExcepciones] = useState(false)
+  const [excepcionesDraft, setExcepcionesDraft] = useState('')
+  const [excepcionesSaving, setExcepcionesSaving] = useState(false)
+  const [excepcionesError, setExcepcionesError] = useState('')
   const [editingPropiedad, setEditingPropiedad] = useState<Propiedad | null>(null)
   const [form, setForm] = useState<FormState>(emptyForm)
   const [formError, setFormError] = useState('')
@@ -107,7 +124,7 @@ export function usePropiedadesController() {
   }, [])
 
   const filteredPropiedades = useMemo(() => {
-    const normalizedSearch = search.trim().toLowerCase()
+    const normalizedSearch = normalizarTexto(search)
 
     if (!normalizedSearch) {
       return propiedades
@@ -116,11 +133,14 @@ export function usePropiedadesController() {
     return propiedades.filter((propiedad) => [
       formatPropiedadId(propiedad.propiedad_id),
       propiedad.direccion,
-      propiedad.propietario ?? '',
-      propiedad.inquilino ?? '',
+      propiedad.propietario,
+      propiedad.inquilino,
       propiedad.estado,
       propiedad.estado_alquiler,
-    ].some((value) => value.toLowerCase().includes(normalizedSearch)))
+      SINONIMOS_ALQUILER[propiedad.estado_alquiler],
+      propiedad.excepciones,
+      // normalizarTexto absorbe los null de propietario, inquilino y excepciones.
+    ].some((value) => normalizarTexto(value).includes(normalizedSearch)))
   }, [propiedades, search])
 
   // Con un solo propietario el porcentaje es implícito (100%); recién se pide
@@ -196,6 +216,9 @@ export function usePropiedadesController() {
     setDetailError('')
     setDetailOpen(true)
     setDetailLoading(true)
+    setEditandoExcepciones(false)
+    setExcepcionesDraft('')
+    setExcepcionesError('')
 
     try {
       const detalle = await getPropiedad(propiedad.propiedad_id)
@@ -204,6 +227,46 @@ export function usePropiedadesController() {
       setDetailError(mensajeDe(e, 'No se pudo cargar el detalle de la propiedad.'))
     } finally {
       setDetailLoading(false)
+    }
+  }
+
+  function startEditExcepciones() {
+    setExcepcionesDraft(selectedPropiedad?.excepciones ?? '')
+    setExcepcionesError('')
+    setEditandoExcepciones(true)
+  }
+
+  function cancelEditExcepciones() {
+    setEditandoExcepciones(false)
+    setExcepcionesError('')
+  }
+
+  async function saveExcepciones() {
+    if (!selectedPropiedad) {
+      return
+    }
+
+    const texto = excepcionesDraft.trim()
+    setExcepcionesSaving(true)
+    setExcepcionesError('')
+
+    try {
+      // Vacío se guarda como NULL: "sin excepciones" y "excepciones en blanco"
+      // son lo mismo, y así el detalle muestra siempre el mismo texto por defecto.
+      const saved = await patchPropiedad(selectedPropiedad.propiedad_id, {
+        excepciones: texto || null,
+      })
+      setSelectedPropiedad(saved)
+      // La grilla tiene su propia copia de la fila: sin esto queda desactualizada
+      // hasta el próximo refresh y la búsqueda no encuentra el texto nuevo.
+      setPropiedades((current) => current.map((propiedad) => (
+        propiedad.propiedad_id === saved.propiedad_id ? saved : propiedad
+      )))
+      setEditandoExcepciones(false)
+    } catch (e) {
+      setExcepcionesError(mensajeDe(e, 'No se pudieron guardar las excepciones.'))
+    } finally {
+      setExcepcionesSaving(false)
     }
   }
 
@@ -346,6 +409,14 @@ export function usePropiedadesController() {
     selectedPropiedad,
     detailLoading,
     detailError,
+    editandoExcepciones,
+    excepcionesDraft,
+    setExcepcionesDraft,
+    excepcionesSaving,
+    excepcionesError,
+    startEditExcepciones,
+    cancelEditExcepciones,
+    saveExcepciones,
     editingPropiedad,
     form,
     setForm,

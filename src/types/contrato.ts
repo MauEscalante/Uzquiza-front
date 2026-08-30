@@ -11,8 +11,10 @@ export interface Contrato {
   fechaFin: string
   importe_inicial: number
   deposito: number | null
-  tipo_ajuste: TipoAjuste
-  periodicidad: PeriodicidadLabel
+  // Nullables en la base y en el schema del backend: 25 de los 98 contratos
+  // cargados no los tienen.
+  tipo_ajuste: TipoAjuste | null
+  periodicidad: PeriodicidadLabel | null
   estado: ContratoEstado
   fecha_rescision: string | null
   fecha_entrega_llaves: string | null
@@ -58,8 +60,10 @@ export interface ContratoDetalle {
   fecha_fin: string
   importe_inicial: number
   deposito: number | null
-  tipo_ajuste: TipoAjuste
-  periodicidad: PeriodicidadLabel
+  // Nullables en la base y en el schema del backend: 25 de los 98 contratos
+  // cargados no los tienen.
+  tipo_ajuste: TipoAjuste | null
+  periodicidad: PeriodicidadLabel | null
   estado: ContratoEstado
   fecha_rescision: string | null
   fecha_entrega_llaves: string | null

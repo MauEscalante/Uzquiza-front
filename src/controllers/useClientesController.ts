@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { mensajeDe } from '../services/api'
+import { mensajeDe, normalizarTexto } from '../services/api'
 import { listClientes, updateCliente } from '../services/clientesService'
 import type { Cliente, ClienteUpdateValues } from '../types/cliente'
 
@@ -55,15 +55,31 @@ export function useClientesController() {
   }, [])
 
   const filteredClientes = useMemo(() => {
-    const normalizedSearch = search.trim().toLowerCase()
+    const normalizedSearch = normalizarTexto(search)
 
     if (!normalizedSearch) {
       return clientes
     }
 
-    // Varios campos son opcionales y llegan en null, por eso el String(value ?? '').
-    return clientes.filter((cliente) => [cliente.nombre, cliente.apellido, cliente.dni, cliente.telefono, cliente.email, cliente.direccion, cliente.cuil, cliente.nacionalidad, cliente.tipo]
-      .some((value) => String(value ?? '').toLowerCase().includes(normalizedSearch)))
+    return clientes.filter((cliente) => [
+      cliente.nombre,
+      cliente.apellido,
+      // El nombre completo en los dos órdenes: la tabla muestra Nombre y Apellido en
+      // columnas contiguas, así que se busca "Diego Palmer" tal como se lee.
+      `${cliente.nombre} ${cliente.apellido}`,
+      `${cliente.apellido} ${cliente.nombre}`,
+      cliente.dni,
+      cliente.telefono,
+      cliente.email,
+      cliente.direccion,
+      // Los propietarios no tienen domicilio personal cargado: a ellos se los busca
+      // por la dirección de la propiedad que poseen.
+      cliente.direccion_propiedades,
+      cliente.cuil,
+      cliente.nacionalidad,
+      cliente.tipo,
+      // normalizarTexto absorbe los null de los campos opcionales.
+    ].some((value) => normalizarTexto(value).includes(normalizedSearch)))
   }, [clientes, search])
 
   function openEditModal(cliente: Cliente) {

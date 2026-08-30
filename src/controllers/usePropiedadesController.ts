@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { mensajeDe } from '../services/api'
+import { mensajeDe, normalizarTexto } from '../services/api'
 import {
   createPropiedad,
   deletePropiedad,
@@ -40,6 +40,16 @@ export const estadoAlquilerOptions = [
   { label: 'Abono', value: 'Abono' },
   { label: 'Adeuda', value: 'Adeuda' },
 ]
+
+/**
+ * Lo que uno escribe cuando busca por cobranza. El valor guardado es literalmente
+ * "Abono"/"Adeuda", así que sin esto "abonado" o "debe" no encuentran nada. No se
+ * muestra en ningún lado: es solo texto extra contra el que matchear.
+ */
+const SINONIMOS_ALQUILER: Record<EstadoAlquiler, string> = {
+  Abono: 'abono abonado abonó abona pagó pagado al día',
+  Adeuda: 'adeuda adeudado adeudó debe deuda atrasado impago',
+}
 
 const emptyForm: FormState = {
   direccion: '',
@@ -114,7 +124,7 @@ export function usePropiedadesController() {
   }, [])
 
   const filteredPropiedades = useMemo(() => {
-    const normalizedSearch = search.trim().toLowerCase()
+    const normalizedSearch = normalizarTexto(search)
 
     if (!normalizedSearch) {
       return propiedades
@@ -123,12 +133,14 @@ export function usePropiedadesController() {
     return propiedades.filter((propiedad) => [
       formatPropiedadId(propiedad.propiedad_id),
       propiedad.direccion,
-      propiedad.propietario ?? '',
-      propiedad.inquilino ?? '',
+      propiedad.propietario,
+      propiedad.inquilino,
       propiedad.estado,
       propiedad.estado_alquiler,
-      propiedad.excepciones ?? '',
-    ].some((value) => value.toLowerCase().includes(normalizedSearch)))
+      SINONIMOS_ALQUILER[propiedad.estado_alquiler],
+      propiedad.excepciones,
+      // normalizarTexto absorbe los null de propietario, inquilino y excepciones.
+    ].some((value) => normalizarTexto(value).includes(normalizedSearch)))
   }, [propiedades, search])
 
   // Con un solo propietario el porcentaje es implícito (100%); recién se pide

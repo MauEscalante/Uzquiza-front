@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { formatCurrency, formatDate, mensajeDe } from '../services/api'
+import { formatCurrency, formatDate, mensajeDe, normalizarTexto } from '../services/api'
 import {
   calcularRescision,
   createContrato,
@@ -267,15 +267,35 @@ export function useContratosController() {
   }, [previewContratoId, previewMes])
 
   const filteredContratos = useMemo(() => {
-    const normalizedSearch = search.trim().toLowerCase()
+    const normalizedSearch = normalizarTexto(search)
 
     if (!normalizedSearch) {
       return contratos
     }
 
-    return contratos.filter((contrato) => [contrato.contrato_id, contrato.propiedad, contrato.estado, contrato.tipo_ajuste, contrato.periodicidad]
-      .some((value) => value.toString().toLowerCase().includes(normalizedSearch)))
-  }, [contratos, search])
+    // Un Map en vez de getPropiedadDireccion: ese find() recorre el array entero por
+    // cada contrato y por cada tecla que se escribe.
+    const direcciones = new Map(propiedades.map((propiedad) => [
+      String(propiedad.propiedad_id), propiedad.direccion,
+    ]))
+
+    return contratos.filter((contrato) => [
+      contrato.contrato_id,
+      String(contrato.propiedad),
+      direcciones.get(String(contrato.propiedad)) ?? '',
+      // Las dos formas de la fecha: el ISO matchea "2026" y "2026-09"; el formateado
+      // matchea "09/2026" y "28/09", que es lo que se ve en la grilla.
+      contrato.fecha_fin,
+      formatDate(contrato.fecha_fin),
+      contrato.estado,
+      contrato.tipo_ajuste,
+      contrato.periodicidad,
+      // normalizarTexto absorbe los null de tipo_ajuste y periodicidad: sin eso la
+      // búsqueda revienta el render, como pasaba antes.
+    ].some((value) => normalizarTexto(value).includes(normalizedSearch)))
+    // `propiedades` se carga en paralelo con los contratos: sin la dependencia el
+    // filtro por dirección quedaría congelado en vacío hasta la próxima tecla.
+  }, [contratos, propiedades, search])
 
   function getPropiedadDireccion(propiedadId: string | number): string {
     const propiedad = propiedades.find((entry) => String(entry.propiedad_id) === String(propiedadId))

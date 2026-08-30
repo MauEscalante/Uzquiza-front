@@ -140,6 +140,19 @@ export function formatPercent(value: number)  {
   }).format(value/100)
 }
 
+/**
+ * Texto listo para comparar en los buscadores: sin espacios sobrantes, en minúsculas y
+ * sin acentos, para que "peron" encuentre "PERÓN" y "nuñez" encuentre "NUNEZ".
+ * Absorbe null/undefined porque varios de los campos buscables son opcionales.
+ */
+export function normalizarTexto(value: string | number | null | undefined) {
+  return String(value ?? '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '') // los diacríticos que el NFD separó de su letra
+}
+
 /** "2026-08-10" -> "10/08/2026". El backend siempre manda fechas ISO. */
 export function formatDate(value: string) {
   const [anio, mes, dia] = value.slice(0, 10).split('-')

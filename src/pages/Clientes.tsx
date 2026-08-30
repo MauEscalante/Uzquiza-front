@@ -120,6 +120,7 @@ function Clientes() {
             <div><span>Teléfono</span><strong>{selectedCliente.telefono}</strong></div>
             <div><span>Email</span><strong>{selectedCliente.email ?? '—'}</strong></div>
             <div><span>Dirección</span><strong>{selectedCliente.direccion ?? '—'}</strong></div>
+            <div><span>Propiedades</span><strong>{selectedCliente.direccion_propiedades ?? '—'}</strong></div>
             <div><span>CUIL</span><strong>{selectedCliente.cuil ?? '—'}</strong></div>
             <div><span>Nacionalidad</span><strong>{selectedCliente.nacionalidad ?? '—'}</strong></div>
             <div><span>Inquilino/Propietario</span><strong>{selectedCliente.tipo ?? '—'}</strong></div>

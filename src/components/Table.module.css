@@ -1,5 +1,9 @@
 .wrapper {
   overflow: auto;
+  /* El tope de alto es lo que le da sentido al thead sticky: sin él la tabla crece
+   * con la página, el scroll lo hace la ventana y el encabezado nunca se pega. */
+  max-height: 68vh;
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--surface);
   box-shadow: var(--shadow-sm);
@@ -18,7 +22,7 @@
 .table td {
   padding: 10px 14px;
   text-align: left;
-  border-bottom: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--border);
   vertical-align: middle;
 }
 
@@ -29,8 +33,12 @@
 /* El encabezado acompaña el scroll: en Libro Diario y Recibos las
    listas pasan largo de una pantalla. */
 .table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   background: var(--surface-muted);
-  color: var(--text-tertiary);
+  border-bottom: 1px solid var(--border-strong);
+  color: var(--text-secondary);
   font-size: var(--fs-label);
   font-weight: 600;
   letter-spacing: var(--tracking-label);
@@ -61,9 +69,13 @@
   outline-offset: -2px;
 }
 
+/* Los totales quedan a la vista mientras se recorre la lista, igual que el
+   encabezado y por el mismo motivo. */
 .table tfoot td {
+  position: sticky;
+  bottom: 0;
   background: var(--surface-muted);
-  font-weight: 600;
+  border-top: 1px solid var(--border-strong);
   border-bottom: 0;
   font-weight: 600;
 }
@@ -82,7 +94,7 @@
    seguidas y las líneas verticales las convertían en una reja. La
    alineación a la derecha y el mono ya las separan. */
 .table td.money {
-  font-family: var(--fuente-mono);
+  font-family: var(--font-mono);
   font-size: 0.86rem;
   font-weight: 500;
 }
@@ -90,9 +102,9 @@
 /* Fechas e identificadores: mono, pero sin el filete de la columna
    de importes. */
 .dato {
-  font-family: var(--fuente-mono);
+  font-family: var(--font-mono);
   font-size: 0.83rem;
-  color: var(--texto-suave);
+  color: var(--text-tertiary);
   white-space: nowrap;
 }
 
@@ -101,15 +113,15 @@
    de una celda: cuesta menos ancho y se escanea en vertical.
    Naranja = requiere acción. Azul = en regla. Sin filo = neutro. */
 .filoAccion td:first-child {
-  box-shadow: inset 3px 0 0 var(--naranja);
+  box-shadow: inset 3px 0 0 var(--accent);
 }
 
 .filoRegla td:first-child {
-  box-shadow: inset 3px 0 0 var(--azul);
+  box-shadow: inset 3px 0 0 var(--blue);
 }
 
 .filoAlerta td:first-child {
-  box-shadow: inset 3px 0 0 var(--peligro);
+  box-shadow: inset 3px 0 0 var(--danger);
 }
 
 .filoAccion td:first-child,

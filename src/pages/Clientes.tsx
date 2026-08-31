@@ -7,6 +7,7 @@ import Table, { ClickableRow } from '../components/Table'
 import { useClientesController } from '../controllers/useClientesController'
 import type { ClienteTipo } from '../types/cliente'
 import styles from './Clientes.module.css'
+import { formatCurrency, formatDate } from '../services/api'
 
 function badgeVariant(tipo: ClienteTipo) {
   if (tipo === 'Propietario') return 'success' as const
@@ -29,6 +30,9 @@ function Clientes() {
     setForm,
     formError,
     feedback,
+    historial,
+    historialLoading,
+    historialError,
     filteredClientes,
     openEditModal,
     openDetailModal,
@@ -125,6 +129,31 @@ function Clientes() {
             <div><span>Nacionalidad</span><strong>{selectedCliente.nacionalidad ?? '—'}</strong></div>
             <div><span>Inquilino/Propietario</span><strong>{selectedCliente.tipo ?? '—'}</strong></div>
           </div>
+        ) : null}
+
+        {selectedCliente ? (
+          <>
+            <h3 className={styles.sectionTitle}>Importes históricos</h3>
+            {/* Un renglón por período de vigencia: cada ajuste del alquiler deja el suyo. */}
+            {historialLoading ? <div className={styles.emptyState}>Cargando importes...</div> : null}
+            {historialError ? <div className={styles.error}>{historialError}</div> : null}
+            {!historialLoading && !historialError && historial.length === 0 ? (
+              <div className={styles.emptyState}>Este cliente no tiene importes registrados.</div>
+            ) : null}
+            {!historialLoading && !historialError && historial.length > 0 ? (
+              <Table headers={["Desde", "Hasta", "Propiedad", "Importe"]} className={styles.historial}>
+                {historial.map((valor) => (
+                  // La PK de valor_historico es (contrato, fecha_inicio).
+                  <tr key={`${valor.contrato}-${valor.fecha_inicio}`}>
+                    <td>{formatDate(valor.fecha_inicio)}</td>
+                    <td>{formatDate(valor.fecha_fin)}</td>
+                    <td>{valor.direccion}</td>
+                    <td className={styles.monto}>{formatCurrency(valor.importe_inicial)}</td>
+                  </tr>
+                ))}
+              </Table>
+            ) : null}
+          </>
         ) : null}
       </Modal>
     </div>

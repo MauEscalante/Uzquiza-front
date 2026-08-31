@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { mensajeDe, normalizarTexto } from '../services/api'
-import { listClientes, updateCliente } from '../services/clientesService'
-import type { Cliente, ClienteUpdateValues } from '../types/cliente'
+import { getClienteHistorial, listClientes, updateCliente } from '../services/clientesService'
+import type { Cliente, ClienteUpdateValues, ClienteValorHistorico } from '../types/cliente'
 
 const emptyForm: ClienteUpdateValues = {
   nombre: '',
@@ -26,6 +26,9 @@ export function useClientesController() {
   const [form, setForm] = useState<ClienteUpdateValues>(emptyForm)
   const [formError, setFormError] = useState('')
   const [feedback, setFeedback] = useState('')
+  const [historial, setHistorial] = useState<ClienteValorHistorico[]>([])
+  const [historialLoading, setHistorialLoading] = useState(false)
+  const [historialError, setHistorialError] = useState('')
 
   useEffect(() => {
     let mounted = true
@@ -98,9 +101,21 @@ export function useClientesController() {
     setModalOpen(true)
   }
 
-  function openDetailModal(cliente: Cliente) {
+  async function openDetailModal(cliente: Cliente) {
+    // La ficha ya la tenemos de la fila; lo único que falta buscar es el historial.
     setSelectedCliente(cliente)
+    setHistorial([])
+    setHistorialError('')
     setDetailOpen(true)
+    setHistorialLoading(true)
+
+    try {
+      setHistorial(await getClienteHistorial(cliente.cliente_num))
+    } catch {
+      setHistorialError('No se pudo cargar el historial de importes.')
+    } finally {
+      setHistorialLoading(false)
+    }
   }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -145,6 +160,9 @@ export function useClientesController() {
     setForm,
     formError,
     feedback,
+    historial,
+    historialLoading,
+    historialError,
     filteredClientes,
     openEditModal,
     openDetailModal,

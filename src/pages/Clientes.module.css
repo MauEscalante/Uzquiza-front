@@ -13,3 +13,19 @@
 .actions button {
   padding-inline: 0.85rem;
 }
+
+/* --- Historial de importes, dentro del modal de detalle -------------------- */
+
+.sectionTitle { composes: sectionTitle from '../styles/shared.module.css'; }
+
+/* El min-width del sistema de tablas está pensado para el ancho de una página, no
+   para caber en un modal de 760px: sin esto la tabla saca scroll horizontal. */
+.historial table {
+  min-width: 0;
+}
+
+.monto {
+  composes: figure from '../styles/shared.module.css';
+  text-align: right;
+  white-space: nowrap;
+}

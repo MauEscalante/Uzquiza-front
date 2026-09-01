@@ -48,7 +48,8 @@ interface ClickableRowProps extends PropsWithChildren {
 /** Fila cuyo click abre el detalle del registro.
  *
  * Las acciones que viven dentro de la fila tienen que cortar la propagación del
- * click, si no abren además el detalle.
+ * click, si no abren además el detalle. El teclado ya está cubierto acá: el
+ * Enter/Espacio que sale de un control hijo no dispara `onSelect`.
  */
 export function ClickableRow({ onSelect, label, className = '', children }: ClickableRowProps) {
   return (
@@ -58,6 +59,8 @@ export function ClickableRow({ onSelect, label, className = '', children }: Clic
       title={label}
       onClick={onSelect}
       onKeyDown={(event) => {
+        // Enter/Espacio sobre un botón de la fila lo activa a él, no al detalle.
+        if (event.target !== event.currentTarget) return
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault()
           onSelect()

@@ -94,6 +94,7 @@ function Contratos() {
             'Tipo de ajuste',
             'Periodicidad',
             'Estado',
+            'Acciones',
           ]}
         >
           
@@ -120,7 +121,8 @@ function Contratos() {
                 )}
               </td>
               <td>
-                <div className={styles.actions}>
+                {/* La fila entera abre el detalle: las acciones no deben propagar el click. */}
+                <div className={styles.actions} onClick={(event) => event.stopPropagation()}>
                   {contrato.estado === 'Activo' && !tieneRescisionPendiente(contrato) ? (
                     <Button variant="danger" onClick={() => openRescision(contrato)}>Rescindir</Button>
                   ) : null}

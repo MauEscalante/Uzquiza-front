@@ -4,6 +4,7 @@ import Input from '../components/Input'
 import Modal from '../components/Modal'
 import StatusBadge from '../components/StatusBadge'
 import Table, { ClickableRow } from '../components/Table'
+import { cell } from '../components/tableCells'
 import { useClientesController } from '../controllers/useClientesController'
 import type { ClienteTipo } from '../types/cliente'
 import styles from './Clientes.module.css'
@@ -106,7 +107,7 @@ function Clientes() {
           <Input label="Apellido" value={form.apellido} onChange={(event) => setForm((current) => ({ ...current, apellido: event.target.value }))} />
           <Input label="DNI" value={form.dni} onChange={(event) => setForm((current) => ({ ...current, dni: event.target.value }))} />
           <Input label="Teléfono" value={form.telefono} onChange={(event) => setForm((current) => ({ ...current, telefono: event.target.value }))} />
-          <Input label="Email (opcional)" type="email" value={form.email ?? ''} onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))} />
+          <Input label="Email" type="email" value={form.email ?? ''} onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))} />
           <Input label="Dirección (opcional)" value={form.direccion ?? ''} onChange={(event) => setForm((current) => ({ ...current, direccion: event.target.value }))} />
           <Input label="CUIL (opcional)" value={form.cuil ?? ''} onChange={(event) => setForm((current) => ({ ...current, cuil: event.target.value }))} />
           <Input label="Nacionalidad (opcional)" value={form.nacionalidad ?? ''} onChange={(event) => setForm((current) => ({ ...current, nacionalidad: event.target.value }))} />
@@ -141,14 +142,14 @@ function Clientes() {
               <div className={styles.emptyState}>Este cliente no tiene importes registrados.</div>
             ) : null}
             {!historialLoading && !historialError && historial.length > 0 ? (
-              <Table headers={["Desde", "Hasta", "Propiedad", "Importe"]} className={styles.historial}>
+              <Table headers={["Desde", "Hasta", "Propiedad", { label: 'Importe', money: true }]} className={styles.historial}>
                 {historial.map((valor) => (
                   // La PK de valor_historico es (contrato, fecha_inicio).
                   <tr key={`${valor.contrato}-${valor.fecha_inicio}`}>
                     <td>{formatDate(valor.fecha_inicio)}</td>
                     <td>{formatDate(valor.fecha_fin)}</td>
                     <td>{valor.direccion}</td>
-                    <td className={styles.monto}>{formatCurrency(valor.importe_inicial)}</td>
+                    <td className={cell.money}>{formatCurrency(valor.importe_inicial)}</td>
                   </tr>
                 ))}
               </Table>

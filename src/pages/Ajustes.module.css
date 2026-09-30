@@ -2,8 +2,19 @@
 .toolbar { composes: toolbar from '../styles/shared.module.css'; }
 .actions { composes: actions from '../styles/shared.module.css'; }
 .emptyState { composes: emptyState from '../styles/shared.module.css'; }
+.filters { composes: filters from '../styles/shared.module.css'; }
 
-/* Cuelgan directo de la Card, así que traen su propio padding. */
+/* Mes y año en una fila; el feedback y el error caen debajo, a lo ancho. */
+.filters {
+  grid-template-columns: repeat(2, minmax(140px, 200px));
+}
+
+.filters .feedback,
+.filters .error {
+  grid-column: 1 / -1;
+}
+
+/* Van dentro de `.filters`, que ya trae el padding del borde de la Card. */
 .feedback { composes: feedback from '../styles/shared.module.css'; }
 .error { composes: errorBlock from '../styles/shared.module.css'; }
 

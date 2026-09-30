@@ -18,10 +18,12 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Encabezado y datos centrados en la columna; la excepción es `.money`, que
+   va a la derecha para que las cifras compartan eje. */
 .table th,
 .table td {
   padding: 10px 14px;
-  text-align: left;
+  text-align: center;
   border-bottom: 1px solid var(--border);
   vertical-align: middle;
 }
@@ -82,9 +84,13 @@
 
 /* --- Columna de dinero ---
    Cifras tabulares en mono y alineadas a la derecha, para que la coma
-   decimal caiga en el mismo eje en todas las filas. */
-.money,
-.table th.money {
+   decimal caiga en el mismo eje en todas las filas.
+   Van calificadas con `.table td` / `.table th`: la regla general de celdas
+   de arriba tiene esa misma especificidad y, con `.money` a secas, le
+   ganaba y dejaba los importes a la izquierda mientras el encabezado
+   quedaba a la derecha. */
+.table th.money,
+.table td.money {
   font-variant-numeric: tabular-nums;
   text-align: right;
   white-space: nowrap;
@@ -100,8 +106,8 @@
 }
 
 /* Fechas e identificadores: mono, pero sin el filete de la columna
-   de importes. */
-.dato {
+   de importes. Mismo motivo que `.money` para calificar con `.table td`. */
+.table td.dato {
   font-family: var(--font-mono);
   font-size: 0.83rem;
   color: var(--text-tertiary);

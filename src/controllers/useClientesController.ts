@@ -125,8 +125,8 @@ export function useClientesController() {
       return
     }
 
-    if (!form.nombre || !form.apellido || !form.dni || !form.telefono) {
-      setFormError('Nombre, apellido, DNI y teléfono son obligatorios.')
+    if (!form.nombre || !form.apellido || !form.dni || !form.telefono || !form.email?.trim()) {
+      setFormError('Nombre, apellido, DNI, teléfono y email son obligatorios.')
       return
     }
 

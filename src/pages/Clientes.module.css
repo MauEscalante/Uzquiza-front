@@ -23,9 +23,3 @@
 .historial table {
   min-width: 0;
 }
-
-.monto {
-  composes: figure from '../styles/shared.module.css';
-  text-align: right;
-  white-space: nowrap;
-}

@@ -299,11 +299,16 @@ export function usePropiedadesController() {
 
       const incompleto = form.propietarios.some((propietario) => (
         propietario.clienteNum === ''
-          && (!propietario.nombre.trim() || !propietario.apellido.trim() || !propietario.dni.trim())
+          && (
+            !propietario.nombre.trim()
+            || !propietario.apellido.trim()
+            || !propietario.dni.trim()
+            || !propietario.domicilioElectronico.trim()
+          )
       ))
 
       if (incompleto) {
-        setFormError('Cada propietario nuevo necesita nombre, apellido y DNI.')
+        setFormError('Cada propietario nuevo necesita nombre, apellido, DNI y email.')
         return
       }
 

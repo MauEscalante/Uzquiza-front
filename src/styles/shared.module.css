@@ -58,6 +58,11 @@
   gap: 8px;
 }
 
+/* Dentro de una celda los botones siguen al resto de la tabla: centrados. */
+td .actions {
+  justify-content: center;
+}
+
 /* --- Mensajes -------------------------------------------------------------
  * Dos contextos reales, y de ahí venía la deriva: dentro de `.filters` el padding
  * ya está puesto, pero colgando directo de una Card hace falta el propio. */

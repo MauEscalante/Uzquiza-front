@@ -1,48 +1,40 @@
-import type { Ajuste } from '../types/ajuste'
+import { apiRequest, construirQuery } from './api'
+import type { AjusteAplicado, AjustePendiente, TramoHistorial } from '../types/ajuste'
 
-const mockAjustes: Ajuste[] = [
-  {
-    id: '1',
-    propiedad: 'Av. San Martín 1234',
-    inquilino: 'Ana Pérez',
-    importeAnterior: 320000,
-    tipoAjuste: 'IPC',
-    periodicidad: 'Trimestral',
-    fechaProximoAjuste: '2026-09-01',
-    nuevoImporte: 336000,
-    estado: 'Ajuste próximo',
-    actualizacion: 'Ajuste',
-    historial: [
-      { fecha: '2025-01-01', detalle: 'Ajuste inicial' },
-      { fecha: '2025-04-01', detalle: 'Subió 5%' },
-    ],
-  },
-  {
-    id: '2',
-    propiedad: 'Italia 789',
-    inquilino: 'Julián Gómez',
-    importeAnterior: 285000,
-    tipoAjuste: 'ICL',
-    periodicidad: 'Semestral',
-    fechaProximoAjuste: '2026-07-01',
-    nuevoImporte: 301500,
-    estado: 'Ajuste pendiente',
-    actualizacion: 'Re Ajuste',
-    historial: [
-      { fecha: '2024-07-01', detalle: 'Ajuste por inflación' },
-      { fecha: '2025-01-01', detalle: 'Reajuste anual' },
-    ],
-  },
-]
-
-// Los ajustes todavía no tienen backend: esta pantalla se sirve de datos de ejemplo.
-export async function listAjustes(): Promise<Ajuste[]> {
-  return mockAjustes
+/**
+ * Contratos a los que les toca ajuste en el período.
+ *
+ * Solo los de IPC: los de ICL no los ajusta nadie todavía, así que nunca aparecen.
+ */
+export async function listPendientes(mes: number, anio: number): Promise<AjustePendiente[]> {
+  const query = construirQuery({ mes: String(mes), anio: String(anio) })
+  return apiRequest<AjustePendiente[]>(
+    `/ajustes/pendientes?${query}`,
+    { method: 'GET' },
+    'Error al cargar los ajustes pendientes',
+  )
 }
 
-// Se eliminó chequearHistorial: apuntaba a /ajuste/historial/{id}/, un endpoint
-// que no existe en el backend, y no la llamaba nadie.
+/**
+ * Aplica el aumento del período a los alquileres que corresponden.
+ *
+ * Ajusta solo la plata: no reescribe la planilla de recibos ni marca las
+ * propiedades como impagas, que es lo que hace de más "Hacer recibos". Repetirlo
+ * no vuelve a aumentar.
+ */
+export async function ajustarAlquileres(mes: number, anio: number): Promise<AjusteAplicado> {
+  return apiRequest<AjusteAplicado>(
+    '/ajustes',
+    { method: 'POST', body: JSON.stringify({ mes, anio }) },
+    'Error al ajustar los alquileres',
+  )
+}
 
-
-
-
+/** Historial de alquileres del contrato: un tramo por ajuste. */
+export async function listHistorial(contratoId: string): Promise<TramoHistorial[]> {
+  return apiRequest<TramoHistorial[]>(
+    `/ajustes/${contratoId}/historial`,
+    { method: 'GET' },
+    'Error al cargar el historial del contrato',
+  )
+}

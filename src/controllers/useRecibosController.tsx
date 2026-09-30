@@ -22,7 +22,13 @@ const monthNames = [
 const currentDate = new Date()
 const currentYear = currentDate.getFullYear()
 
-export const monthOptions = monthNames.map((month) => ({ label: month, value: month }))
+// El value va numérico ("1".."12") y el nombre queda de label. Antes el value era
+// el nombre, y como el service manda Number(form.mes) el body salía con
+// {"mes":null}: el backend lo rechazaba con 422 y no se ajustaba nada.
+export const monthOptions = monthNames.map((month, index) => ({
+	label: month,
+	value: String(index + 1),
+}))
 export const yearOptions = Array.from({ length: 4 }, (_, index) => String(currentYear - 1 + index)).map((year) => ({
 	label: year,
 	value: year,
@@ -34,7 +40,7 @@ interface FormState {
 }
 
 const emptyForm: FormState = {
-	mes: monthNames[currentDate.getMonth()],
+	mes: String(currentDate.getMonth() + 1),
 	anio: String(currentYear),
 }
 

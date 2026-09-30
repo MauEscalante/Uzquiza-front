@@ -102,7 +102,7 @@ function buildGarantesPayload(form: FormState): { garantes: GaranteInput[]; dire
           apellido: form[`apellidoGarante${index}` as keyof FormState] as string,
           telefono: form[`telefonoGarante${index}` as keyof FormState] as string,
           sueldo: Number(form[`sueldoGarante${index}` as keyof FormState]) || undefined,
-          email: form[`emailGarante${index}` as keyof FormState] as string,
+          email: (form[`emailGarante${index}` as keyof FormState] as string).trim(),
         }))
         .filter((garante) => garante.nombre.trim() !== ''),
     }
@@ -454,6 +454,27 @@ export function useContratosController() {
       return
     }
 
+    // El email es obligatorio para todas las personas: el backend lo rechaza, pero
+    // mejor avisar acá con un mensaje propio que con el 422 del campo.
+    if (form.inquilinos.some((inquilino) => !inquilino.domicilioElectronico.trim())) {
+      setFormError('Cada inquilino necesita domicilio electrónico.')
+      return
+    }
+
+    // Solo la garantía 'Garantes' pide email: el garante de una garantía propietaria
+    // respalda con su inmueble y el formulario ni se lo pide.
+    if (form.garantia === 'Garantes') {
+      const garanteSinEmail = [1, 2, 3].some((index) => (
+        (form[`nombreGarante${index}` as keyof FormState] as string).trim() !== ''
+          && !(form[`emailGarante${index}` as keyof FormState] as string).trim()
+      ))
+
+      if (garanteSinEmail) {
+        setFormError('Cada garante necesita email.')
+        return
+      }
+    }
+
     const payload: ContratoFormValues = {
       propiedad: Number(form.propiedad),
       fecha_inicio: form.fechaInicio,
@@ -471,7 +492,7 @@ export function useContratosController() {
         cuil: inquilino.cuil,
         nacionalidad: inquilino.nacionalidad,
         direccion: inquilino.domicilioLegal,
-        email: inquilino.domicilioElectronico,
+        email: inquilino.domicilioElectronico.trim(),
       })),
       garantia: form.garantia as TipoGarantia,
       ...buildGarantesPayload(form),
